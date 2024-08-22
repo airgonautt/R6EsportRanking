@@ -1,0 +1,51 @@
+﻿@page "/regions/details"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Region</h4>
+    <hr />
+    @if (region is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">RegionName</dt>
+            <dd class="col-sm-10">@region.RegionName</dd>
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@region.CreatedAt</dd>
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@region.UpdatedAt</dd>
+        </dl>
+        <div>
+            <a href="@($"/regions/edit?regionid={region.RegionID}")">Edit</a> |
+            <a href="@($"/regions")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Region? region;
+
+    [SupplyParameterFromQuery]
+    public int RegionID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        region = await context.Regions.FirstOrDefaultAsync(m => m.RegionID == RegionID);
+
+        if (region is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

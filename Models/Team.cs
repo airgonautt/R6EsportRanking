@@ -4,7 +4,7 @@ namespace R6Ranking.Models {
     public class Team {
         public int TeamID { get; set; }
         public string? TeamName { get; set; }
-        public string? RegionID { get; set; }
+        public int? RegionID { get; set; }
         public string? RegionName { get; set; }
         public string? Coach { get; set; }
 
@@ -17,8 +17,10 @@ namespace R6Ranking.Models {
 
 
         public ICollection<Player>? Players { get; set; }
-        public ICollection<TeamEloHistory>? TeamEloHistories { get; set; }
-        public ICollection<Match>? TeamMatches { get; set; }
-        
+        public ICollection<TeamEloChange>? TeamEloChanges { get; set; }
+        public ICollection<Match> MatchesAsTeam1 { get; set; } = new List<Match>();
+        public ICollection<Match> MatchesAsTeam2 { get; set; } = new List<Match>();
+        public ICollection<Tournament>? WonTournaments { get; set; }
+
     }
 }

@@ -5,25 +5,23 @@ namespace R6Ranking.Models {
     public class Match {
 
         public int MatchID { get; set; }
-        public string MatchName { get; set; }
+        public string? MatchName { get; set; }
 
         public required int Team1ID { get; set; }
         public required Team Team1 { get; set; }
         public int Team1Score { get; set; }
-        public TeamEloHistory? Team1EloHistory { get; set; }
 
         public required int Team2ID { get; set; }
         public required Team Team2 { get; set; }
         public int Team2Score { get; set; }
-        public TeamEloHistory? Team2EloHistory { get; set; }
 
-        public required string TournamentID { get; set; }
+        public required int TournamentID { get; set; }
         public required Tournament Tournament { get; set; }
 
         public DateTime MatchDate { get; set; }
 
         public ICollection<PlayerEloHistory>? PlayerEloHistories { get; set; }
-        public ICollection<TeamEloHistory>? TeamEloHistories { get; set; }
+        public ICollection<TeamEloChange>? TeamEloChanges { get; set; }
 
         public void GenerateMatchName() {
             if (Team1 != null && Team2 != null) {
@@ -67,7 +65,7 @@ namespace R6Ranking.Models {
             // Create new TeamElohistory entries
             using (var context = new R6EsportsDbContext()) {
 
-                TeamEloHistory historyA = new TeamEloHistory {
+                TeamEloChange historyA = new TeamEloChange {
                     TeamID = Team1ID,
                     RivalTeamName = Team2.TeamName,
                     RivalTeamID = Team2.TeamID,
@@ -78,7 +76,7 @@ namespace R6Ranking.Models {
                     Date = DateTime.Now
                 };
 
-                TeamEloHistory historyB = new TeamEloHistory {
+                TeamEloChange historyB = new TeamEloChange {
                     TeamID = Team2ID,
                     RivalTeamName = Team1.TeamName,
                     RivalTeamID = Team1.TeamID,
@@ -88,6 +86,7 @@ namespace R6Ranking.Models {
                     Date = DateTime.Now
                 };
 
+                GenerateMatchName();
                 await context.SaveChangesAsync();
             }
         }

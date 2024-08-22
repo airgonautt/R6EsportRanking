@@ -13,11 +13,11 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Match> Matches { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<PlayerEloHistory> PlayerEloHistories { get; set; }
-    public DbSet<TeamEloHistory> TeamEloHistories { get; set; }
+    public DbSet<TeamEloChange> TeamEloChanges { get; set; }
     public DbSet<RegionEloHistory> RegionEloHistories { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
-        
+
         : base(options) {
         Database.EnsureCreated();
     }
@@ -30,7 +30,7 @@ public class R6EsportsDbContext : DbContext {
 
         // TEAM RELATIONSHIPS
         modelBuilder.Entity<Team>()
-        .HasKey(t => t.TeamID);
+            .HasKey(t => t.TeamID);
 
         modelBuilder.Entity<Team>()
             .HasOne(t => t.Logo)
@@ -39,45 +39,66 @@ public class R6EsportsDbContext : DbContext {
 
         //REGION RELATIONSHIPS
         modelBuilder.Entity<Region>()
-        .Property(r => r.RegionID)
-        .HasMaxLength(2);  // name max length
+            .HasKey(r => r.RegionID);
+
+        modelBuilder.Entity<Region>()
+           .HasMany(r => r.Tournaments)
+           .WithOne(t => t.Region)
+           .HasForeignKey(t => t.TournamentID);///
 
         //MATCH RELATIONSHIPS
         modelBuilder.Entity<Match>()
-        .HasKey(m => m.MatchID);
+           .HasKey(m => m.MatchID);
 
         modelBuilder.Entity<Match>()
-            .HasOne(m => m.Team1)
-            .WithMany(t => t.TeamMatches)
-            .HasForeignKey(m => m.Team1ID)
-            .OnDelete(DeleteBehavior.Restrict);
+           .HasOne(m => m.Team1)
+           .WithMany(t => t.MatchesAsTeam1)
+           .HasForeignKey(m => m.Team1ID)
+           .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Match>()
-            .HasOne(m => m.Team2)
-            .WithMany(t => t.TeamMatches)
-            .HasForeignKey(m => m.Team2ID)
-            .OnDelete(DeleteBehavior.Restrict);
+           .HasOne(m => m.Team2)
+           .WithMany(t => t.MatchesAsTeam2)
+           .HasForeignKey(m => m.Team2ID)
+           .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Match>()
-            .HasOne(m => m.Tournament)
-            .WithMany(t => t.Matches)
-            .HasForeignKey(m => m.TournamentID);
+           .HasOne(t => t.Tournament)
+           .WithMany(m => m.Matches)
+           .HasForeignKey(t => t.TournamentID);
 
-        //TEAM ELO HISTORY RELATIONSHIPS
-        modelBuilder.Entity<TeamEloHistory>()
-            .HasOne(teh => teh.Team)
-            .WithMany(t => t.TeamEloHistories)
-            .HasForeignKey(teh => teh.TeamID);
+        //TEAM ELO CHANGE RELATIONSHIPS
+        modelBuilder.Entity<TeamEloChange>()
+            .HasOne(tec => tec.Team)
+            .WithMany(t => t.TeamEloChanges)
+            .HasForeignKey(tec => tec.TeamID)
+            .OnDelete(DeleteBehavior.Restrict); // Ensure no cascade delete conflicts
 
-        modelBuilder.Entity<TeamEloHistory>()
-            .HasOne(teh => teh.Match)
-            .WithMany(m => m.TeamEloHistories)
-            .HasForeignKey(teh => teh.MatchID);
-
-        modelBuilder.Entity<TeamEloHistory>()
-            .HasOne(teh => teh.RivalTeam)
+        modelBuilder.Entity<TeamEloChange>()
+            .HasOne(tec => tec.RivalTeam)
             .WithMany()
-            .HasForeignKey(teh => teh.RivalTeamID);
+            .HasForeignKey(tec => tec.RivalTeamID)
+            .OnDelete(DeleteBehavior.Restrict); // Avoids circular cascade delete
+        
+        modelBuilder.Entity<TeamEloChange>()
+            .HasOne(tec => tec.Match)
+            .WithMany(m => m.TeamEloChanges)
+            .HasForeignKey(tec => tec.MatchID)   
+            .OnDelete(DeleteBehavior.Cascade);
+
+        //TOURNAAMENT RELATIONSHIPS
+        modelBuilder.Entity<Tournament>()
+            .HasKey(t => t.TournamentID);
+
+        modelBuilder.Entity<Tournament>()
+            .HasOne(t => t.WinnerTeam)
+            .WithMany()
+            .HasForeignKey(t => t.WinnerTeamID);
+
+        modelBuilder.Entity<Tournament>()
+            .HasOne(t => t.Region)
+            .WithMany(r => r.Tournaments)
+            .HasForeignKey(t => t.RegionID);
 
     }
 

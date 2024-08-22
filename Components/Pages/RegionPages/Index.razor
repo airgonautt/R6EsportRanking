@@ -1,0 +1,39 @@
+﻿@page "/regions"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using R6Ranking.Models
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="regions/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Regions">
+    <PropertyColumn Property="region => region.RegionName" />
+    <PropertyColumn Property="region => region.CreatedAt" />
+    <PropertyColumn Property="region => region.UpdatedAt" />
+
+    <TemplateColumn Context="region">
+        <a href="@($"regions/edit?regionid={region.RegionID}")">Edit</a> |
+        <a href="@($"regions/details?regionid={region.RegionID}")">Details</a> |
+        <a href="@($"regions/delete?regionid={region.RegionID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    R6EsportsDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

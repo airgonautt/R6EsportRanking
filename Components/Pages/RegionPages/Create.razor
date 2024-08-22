@@ -1,0 +1,71 @@
+﻿@page "/regions/create"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Region</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Region" OnValidSubmit="AddRegion" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="regionname" class="form-label">RegionName:</label> 
+                <InputText id="regionname" @bind-Value="Region.RegionName" class="form-control" /> 
+                <ValidationMessage For="() => Region.RegionName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdat" class="form-label">CreatedAt:</label> 
+                <InputDate id="createdat" @bind-Value="Region.CreatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Region.CreatedAt" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedat" class="form-label">UpdatedAt:</label> 
+                <InputDate id="updatedat" @bind-Value="Region.UpdatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Region.UpdatedAt" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/regions">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    
+    public Region Region { get; set; } = new Region(){RegionID = 0, RegionName = "default"};
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+
+    public async Task AddRegion() {
+
+        Region.RegionName = "RegionInitialized";
+
+        using var context = DbFactory.CreateDbContext();
+
+        // Generate a unique RegionID by incrementing the highest existing RegionID
+        int maxRegionID = context.Regions.Any()
+                          ? await context.Regions.MaxAsync(r => r.RegionID)
+                          : 0;
+        Region.RegionID = maxRegionID + 1;
+
+        Region.CreatedAt = new DateTime(2023, 2, 22); //start of r6 Blast format
+        Region.UpdatedAt = DateTime.UtcNow;           
+
+        context.Regions.Add(Region);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/regions");
+    }
+
+    
+}

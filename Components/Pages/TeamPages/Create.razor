@@ -1,0 +1,76 @@
+﻿@page "/teams/create"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Team</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Team" OnValidSubmit="AddTeam" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="teamname" class="form-label">TeamName:</label> 
+                <InputText id="teamname" @bind-Value="Team.TeamName" class="form-control" /> 
+                <ValidationMessage For="() => Team.TeamName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="regionid" class="form-label">RegionID:</label> 
+                <InputNumber id="regionid" @bind-Value="Team.RegionID" class="form-control" /> 
+                <ValidationMessage For="() => Team.RegionID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="regionname" class="form-label">RegionName:</label> 
+                <InputText id="regionname" @bind-Value="Team.RegionName" class="form-control" /> 
+                <ValidationMessage For="() => Team.RegionName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="coach" class="form-label">Coach:</label> 
+                <InputText id="coach" @bind-Value="Team.Coach" class="form-control" /> 
+                <ValidationMessage For="() => Team.Coach" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="currentelo" class="form-label">CurrentElo:</label> 
+                <InputNumber id="currentelo" @bind-Value="Team.CurrentElo" class="form-control" /> 
+                <ValidationMessage For="() => Team.CurrentElo" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdat" class="form-label">CreatedAt:</label> 
+                <InputDate id="createdat" @bind-Value="Team.CreatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Team.CreatedAt" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedat" class="form-label">UpdatedAt:</label> 
+                <InputDate id="updatedat" @bind-Value="Team.UpdatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Team.UpdatedAt" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/teams">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Team Team { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddTeam()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Teams.Add(Team);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/teams");
+    }
+}
