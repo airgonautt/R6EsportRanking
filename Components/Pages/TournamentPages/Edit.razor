@@ -1,0 +1,120 @@
+﻿@page "/Tournaments/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Tournament</h4>
+<hr />
+@if (Tournament is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Tournament" OnValidSubmit="UpdateTournament" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Tournament.TournamentID" value="@Tournament.TournamentID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Tournament.Name" class="form-control" />
+                    <ValidationMessage For="() => Tournament.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location:</label>
+                    <InputText id="location" @bind-Value="Tournament.Location" class="form-control" />
+                    <ValidationMessage For="() => Tournament.Location" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="logo" class="form-label">Logo:</label>
+                    <InputText id="logo" @bind-Value="Tournament.Logo" class="form-control" />
+                    <ValidationMessage For="() => Tournament.Logo" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="startdate" class="form-label">StartDate:</label>
+                    <InputDate id="startdate" @bind-Value="Tournament.StartDate" class="form-control" />
+                    <ValidationMessage For="() => Tournament.StartDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="enddate" class="form-label">EndDate:</label>
+                    <InputDate id="enddate" @bind-Value="Tournament.EndDate" class="form-control" />
+                    <ValidationMessage For="() => Tournament.EndDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="winnerteamid" class="form-label">WinnerTeamID:</label>
+                    <InputNumber id="winnerteamid" @bind-Value="Tournament.WinnerTeamID" class="form-control" />
+                    <ValidationMessage For="() => Tournament.WinnerTeamID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="regionid" class="form-label">RegionID:</label>
+                    <InputText id="regionid" @bind-Value="Tournament.RegionID" class="form-control" />
+                    <ValidationMessage For="() => Tournament.RegionID" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/tournaments">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int TournamentID { get; set; }
+
+    [SupplyParameterFromForm]
+    public Tournament? Tournament { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Tournament ??= await context.Tournaments.FirstOrDefaultAsync(m => m.TournamentID == TournamentID);
+
+        if (Tournament is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateTournament()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Tournament!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TournamentExists(Tournament!.TournamentID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/tournaments");
+    }
+
+    bool TournamentExists(int tournamentid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Tournaments.Any(e => e.TournamentID == tournamentid);
+    }
+}

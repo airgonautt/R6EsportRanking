@@ -29,6 +29,11 @@ else
                     <ValidationMessage For="() => Region.RegionName" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                    <label for="logourl" class="form-label">LogoUrl:</label>
+                    <InputText id="logourl" @bind-Value="Region.LogoUrl" class="form-control" />
+                    <ValidationMessage For="() => Region.LogoUrl" class="text-danger" />
+                </div>
+                <div class="mb-3">
                     <label for="createdat" class="form-label">CreatedAt:</label>
                     <InputDate id="createdat" @bind-Value="Region.CreatedAt" class="form-control" />
                     <ValidationMessage For="() => Region.CreatedAt" class="text-danger" />
@@ -50,7 +55,7 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int RegionID { get; set; }
+    public string RegionID { get; set; }
 
     [SupplyParameterFromForm]
     public Region? Region { get; set; }
@@ -92,7 +97,7 @@ else
         NavigationManager.NavigateTo("/regions");
     }
 
-    bool RegionExists(int regionid)
+    bool RegionExists(string regionid)
     {
         using var context = DbFactory.CreateDbContext();
         return context.Regions.Any(e => e.RegionID == regionid);

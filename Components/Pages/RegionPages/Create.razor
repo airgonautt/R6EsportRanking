@@ -17,9 +17,19 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="regionname" class="form-label">RegionName:</label> 
-                <InputText id="regionname" @bind-Value="Region.RegionName" class="form-control" /> 
-                <ValidationMessage For="() => Region.RegionName" class="text-danger" /> 
+                <label for="regionname" class="form-label">RegionName:</label>
+                <InputText id="regionname" @bind-Value="Region.RegionName" class="form-control" />
+                <ValidationMessage For="() => Region.RegionName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="regionid" class="form-label">RegionId:</label>
+                <InputText id="regionid" @bind-Value="Region.RegionID" class="form-control" />
+                <ValidationMessage For="() => Region.RegionID" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="logourl" class="form-label">LogoUrl:</label> 
+                <InputText id="logourl" @bind-Value="Region.LogoUrl" class="form-control" /> 
+                <ValidationMessage For="() => Region.LogoUrl" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="createdat" class="form-label">CreatedAt:</label> 
@@ -41,31 +51,16 @@
 </div>
 
 @code {
+
     [SupplyParameterFromForm]
-    
-    public Region Region { get; set; } = new Region(){RegionID = 0, RegionName = "default"};
+    public Region Region { get; set; } = new Region() {RegionID = "Region ID", RegionName = "Region Name" };
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-
-    public async Task AddRegion() {
-
-        Region.RegionName = "RegionInitialized";
-
+    public async Task AddRegion()
+    {
         using var context = DbFactory.CreateDbContext();
-
-        // Generate a unique RegionID by incrementing the highest existing RegionID
-        int maxRegionID = context.Regions.Any()
-                          ? await context.Regions.MaxAsync(r => r.RegionID)
-                          : 0;
-        Region.RegionID = maxRegionID + 1;
-
-        Region.CreatedAt = new DateTime(2023, 2, 22); //start of r6 Blast format
-        Region.UpdatedAt = DateTime.UtcNow;           
-
         context.Regions.Add(Region);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/regions");
     }
-
-    
 }

@@ -1,0 +1,57 @@
+﻿@page "/players/details"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Player</h4>
+    <hr />
+    @if (player is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">PlayerName</dt>
+            <dd class="col-sm-10">@player.PlayerName</dd>
+            <dt class="col-sm-2">Role</dt>
+            <dd class="col-sm-10">@player.Role</dd>
+            <dt class="col-sm-2">PhotoURL</dt>
+            <dd class="col-sm-10">@player.PhotoURL</dd>
+            <dt class="col-sm-2">TeamID</dt>
+            <dd class="col-sm-10">@player.TeamID</dd>
+            <dt class="col-sm-2">DateJoined</dt>
+            <dd class="col-sm-10">@player.DateJoined</dd>
+            <dt class="col-sm-2">DateLeft</dt>
+            <dd class="col-sm-10">@player.DateLeft</dd>
+        </dl>
+        <div>
+            <a href="@($"/players/edit?playerid={player.PlayerID}")">Edit</a> |
+            <a href="@($"/players")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Player? player;
+
+    [SupplyParameterFromQuery]
+    public int PlayerID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        player = await context.Players.FirstOrDefaultAsync(m => m.PlayerID == PlayerID);
+
+        if (player is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,43 @@
+﻿@page "/tournaments"
+
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using R6Ranking.Models
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="tournaments/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Tournaments">
+    <PropertyColumn Property="tournament => tournament.Name" />
+    <PropertyColumn Property="tournament => tournament.Location" />
+    <PropertyColumn Property="tournament => tournament.Logo" />
+    <PropertyColumn Property="tournament => tournament.StartDate" />
+    <PropertyColumn Property="tournament => tournament.EndDate" />
+    <PropertyColumn Property="tournament => tournament.WinnerTeamID" />
+    <PropertyColumn Property="tournament => tournament.RegionID" />
+
+    <TemplateColumn Context="tournament">
+        <a href="@($"tournaments/edit?tournamentid={tournament.TournamentID}")">Edit</a> |
+        <a href="@($"tournaments/details?tournamentid={tournament.TournamentID}")">Details</a> |
+        <a href="@($"tournaments/delete?tournamentid={tournament.TournamentID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    R6EsportsDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

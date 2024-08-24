@@ -16,51 +16,55 @@
         <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
-       
+
+            <div class="mb-3">
+                <label for="matchname" class="form-label">MatchName:</label> 
+                <InputText id="matchname" @bind-Value="Match.MatchName" cla.....ss="form-control" /> 
+                <ValidationMessage For="() => Match.MatchName" class="text-danger" /> 
+            </div>        
+            
             <div class="mb-3">
                 <label for="team1id" class="form-label">Team1ID:</label> 
-                <InputSelect id="team1id" @bind-Value="Match.Team1ID" class="form-control">
-                    @foreach (var team in Teams) {
-                        <option value="@team.TeamID">@team.TeamName</option>
-                    }
-                </InputSelect>
+                <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team1ID" class="text-danger" /> 
-            </div> 
+            </div>        
             
             <div class="mb-3">
                 <label for="team1score" class="form-label">Team1Score:</label> 
                 <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team1Score" class="text-danger" /> 
-            </div> 
+            </div>        
             
             <div class="mb-3">
-                <label for="team2id" class="form-label">Team 2:</label>
-                <InputSelect id="team2id" @bind-Value="Match.Team2ID" class="form-control">
-                    @foreach (var team in Teams) {
-                        <option value="@team.TeamID">@team.TeamName</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Match.Team2ID" class="text-danger" />
-            </div>
-
+                <label for="team2id" class="form-label">Team2ID:</label> 
+                <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" /> 
+                <ValidationMessage For="() => Match.Team2ID" class="text-danger" /> 
+            </div>        
+            
             <div class="mb-3">
                 <label for="team2score" class="form-label">Team2Score:</label> 
                 <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team2Score" class="text-danger" /> 
-            </div>  
+            </div>        
+            
+            <div class="mb-3">
+                <label for="mapid" class="form-label">MapID:</label> 
+                <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" /> 
+                <ValidationMessage For="() => Match.MapID" class="text-danger" /> 
+            </div>        
             
             <div class="mb-3">
                 <label for="tournamentid" class="form-label">TournamentID:</label> 
                 <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" /> 
                 <ValidationMessage For="() => Match.TournamentID" class="text-danger" /> 
-            </div>   
+            </div>        
             
             <div class="mb-3">
                 <label for="matchdate" class="form-label">MatchDate:</label> 
                 <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" /> 
                 <ValidationMessage For="() => Match.MatchDate" class="text-danger" /> 
-            </div> 
-            
+            </div>        
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -71,40 +75,15 @@
 </div>
 
 @code {
-    // Initialize Match object with default values
-    public Match Match { get; set; } = new Match {
-            Team1 = new Team(),
-            Team1ID = 0,
-            Team2 = new Team(),
-            Team2ID = 0,  
-            TournamentID = 0,
-            Tournament = new Tournament { Name = "d", Logo = "d" },
-            MatchDate = DateTime.UtcNow  // Set to current date by default
-        };
 
-    // Lists to hold teams and tournaments
-    private List<Team> Teams { get; set; } = new();
-    private List<Tournament> Tournaments { get; set; } = new();
+    [SupplyParameterFromForm]
+    public Match Match { get; set; } = new Match(){TournamentID = 000, Tournament = new Tournament(), Team2ID = 405, Team1ID = 404, Team1 = new Team(), Team2 = new Team(), Map = new Map() };
 
-    // Fetch teams and tournaments from the database on component initialization
-    protected override async Task OnInitializedAsync() {
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddMatch()
+
+    {
         using var context = DbFactory.CreateDbContext();
-        Teams = await context.Teams.ToListAsync();
-        Tournaments = await context.Tournaments.ToListAsync();
-    }
-
-    // Method to add a match to the database
-    public async Task AddMatch() {
-        using var context = DbFactory.CreateDbContext();
-
-        // Assign foreign key relationships
-        Match.Team1 = await context.Teams.FindAsync(Match.Team1ID);
-        Match.Team2 = await context.Teams.FindAsync(Match.Team2ID);
-        Match.Tournament = await context.Tournaments.FindAsync(Match.TournamentID);
-
-        // Additional logic to automatically generate the match name
-        Match.MatchName = $"{Match.Team1.TeamName} vs {Match.Team2.TeamName}";
-
         context.Matches.Add(Match);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/matches");

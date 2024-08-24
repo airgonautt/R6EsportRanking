@@ -49,6 +49,11 @@ else
                     <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                    <label for="mapid" class="form-label">MapID:</label>
+                    <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" />
+                    <ValidationMessage For="() => Match.MapID" class="text-danger" />
+                </div>
+                <div class="mb-3">
                     <label for="tournamentid" class="form-label">TournamentID:</label>
                     <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" />
                     <ValidationMessage For="() => Match.TournamentID" class="text-danger" />

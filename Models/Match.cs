@@ -1,4 +1,5 @@
 ﻿using R6Ranking.Data;
+using System.ComponentModel.DataAnnotations.Schema;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace R6Ranking.Models {
@@ -15,12 +16,16 @@ namespace R6Ranking.Models {
         public required Team Team2 { get; set; }
         public int Team2Score { get; set; }
 
+        public int MapID { get; set; }
+        [ForeignKey("MapID")]
+        public required Map Map { get; set; }
+        public List<OperatorBan> OperatorBans { get; set; } = new List<OperatorBan>();
+
         public required int TournamentID { get; set; }
         public required Tournament Tournament { get; set; }
 
         public DateTime MatchDate { get; set; }
 
-        public ICollection<PlayerEloHistory>? PlayerEloHistories { get; set; }
         public ICollection<TeamEloChange>? TeamEloChanges { get; set; }
 
         public void GenerateMatchName() {

@@ -16,41 +16,37 @@
         <EditForm method="post" Model="Team" OnValidSubmit="AddTeam" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
+
             <div class="mb-3">
                 <label for="teamname" class="form-label">TeamName:</label> 
                 <InputText id="teamname" @bind-Value="Team.TeamName" class="form-control" /> 
                 <ValidationMessage For="() => Team.TeamName" class="text-danger" /> 
-            </div>        
+            </div> 
+            
             <div class="mb-3">
-                <label for="regionid" class="form-label">RegionID:</label> 
-                <InputNumber id="regionid" @bind-Value="Team.RegionID" class="form-control" /> 
+                <label for="logourl" class="form-label">LogoUrl:</label> 
+                <InputText id="logourl" @bind-Value="Team.LogoUrl" class="form-control" /> 
+                <ValidationMessage For="() => Team.LogoUrl" class="text-danger" /> 
+            </div> 
+            
+            <div class="mb-3">
+                <label for="regionid" class="form-label">Region:</label> 
+                <InputSelect id="regionid" @bind-Value="@Team.RegionID" class="form-control"> 
+                    <option value ="">Select a region</option>
+                    @foreach (var region in Regions) 
+                        {
+                         <option value="@region.RegionID">@region.RegionName</option>
+                        }  
+                    </InputSelect>
                 <ValidationMessage For="() => Team.RegionID" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="regionname" class="form-label">RegionName:</label> 
-                <InputText id="regionname" @bind-Value="Team.RegionName" class="form-control" /> 
-                <ValidationMessage For="() => Team.RegionName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="coach" class="form-label">Coach:</label> 
-                <InputText id="coach" @bind-Value="Team.Coach" class="form-control" /> 
-                <ValidationMessage For="() => Team.Coach" class="text-danger" /> 
-            </div>        
+            </div> 
+            
             <div class="mb-3">
                 <label for="currentelo" class="form-label">CurrentElo:</label> 
                 <InputNumber id="currentelo" @bind-Value="Team.CurrentElo" class="form-control" /> 
                 <ValidationMessage For="() => Team.CurrentElo" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="createdat" class="form-label">CreatedAt:</label> 
-                <InputDate id="createdat" @bind-Value="Team.CreatedAt" class="form-control" /> 
-                <ValidationMessage For="() => Team.CreatedAt" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="updatedat" class="form-label">UpdatedAt:</label> 
-                <InputDate id="updatedat" @bind-Value="Team.UpdatedAt" class="form-control" /> 
-                <ValidationMessage For="() => Team.UpdatedAt" class="text-danger" /> 
-            </div>        
+            </div>             
+                  
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -63,7 +59,14 @@
 @code {
 
     [SupplyParameterFromForm]
-    public Team Team { get; set; } = new();
+    public Team Team { get; set; } = new Team() { TeamName = "Default name", CreatedAt = new DateTime(2023, 2, 22), UpdatedAt = DateTime.Now};
+
+    private List<Region> Regions { get; set; } = new();
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        Regions = await context.Regions.ToListAsync();
+    }
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddTeam()

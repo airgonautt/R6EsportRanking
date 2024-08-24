@@ -1,0 +1,76 @@
+﻿@page "/tournaments/create"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Tournament</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Tournament" OnValidSubmit="AddTournament" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Tournament.Name" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="location" class="form-label">Location:</label> 
+                <InputText id="location" @bind-Value="Tournament.Location" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.Location" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="logo" class="form-label">Logo:</label> 
+                <InputText id="logo" @bind-Value="Tournament.Logo" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.Logo" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="startdate" class="form-label">StartDate:</label> 
+                <InputDate id="startdate" @bind-Value="Tournament.StartDate" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.StartDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="enddate" class="form-label">EndDate:</label> 
+                <InputDate id="enddate" @bind-Value="Tournament.EndDate" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.EndDate" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="winnerteamid" class="form-label">WinnerTeamID:</label> 
+                <InputNumber id="winnerteamid" @bind-Value="Tournament.WinnerTeamID" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.WinnerTeamID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="regionid" class="form-label">RegionID:</label> 
+                <InputText id="regionid" @bind-Value="Tournament.RegionID" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.RegionID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/tournaments">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Tournament Tournament { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddTournament()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Tournaments.Add(Tournament);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/tournaments");
+    }
+}

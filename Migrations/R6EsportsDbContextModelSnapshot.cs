@@ -22,6 +22,89 @@ namespace R6Ranking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("R6Ranking.Models.Map", b =>
+                {
+                    b.Property<int>("MapID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapID"));
+
+                    b.Property<string>("MapName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("MapPhoto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MapID");
+
+                    b.ToTable("Map");
+
+                    b.HasData(
+                        new
+                        {
+                            MapID = 1,
+                            MapName = "Bank"
+                        },
+                        new
+                        {
+                            MapID = 2,
+                            MapName = "Border"
+                        },
+                        new
+                        {
+                            MapID = 3,
+                            MapName = "Chalet"
+                        },
+                        new
+                        {
+                            MapID = 4,
+                            MapName = "Clubhouse"
+                        },
+                        new
+                        {
+                            MapID = 5,
+                            MapName = "Consulate"
+                        },
+                        new
+                        {
+                            MapID = 6,
+                            MapName = "Kafe Dostoyevksy"
+                        },
+                        new
+                        {
+                            MapID = 7,
+                            MapName = "Lair"
+                        },
+                        new
+                        {
+                            MapID = 8,
+                            MapName = "Nighthaven Labs"
+                        },
+                        new
+                        {
+                            MapID = 9,
+                            MapName = "Oregon"
+                        },
+                        new
+                        {
+                            MapID = 10,
+                            MapName = "Skyscraper"
+                        },
+                        new
+                        {
+                            MapID = 11,
+                            MapName = "Theme Park"
+                        },
+                        new
+                        {
+                            MapID = 12,
+                            MapName = "Villa"
+                        });
+                });
+
             modelBuilder.Entity("R6Ranking.Models.Match", b =>
                 {
                     b.Property<int>("MatchID")
@@ -29,6 +112,9 @@ namespace R6Ranking.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MatchID"));
+
+                    b.Property<int>("MapID")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("MatchDate")
                         .HasColumnType("datetime2");
@@ -53,6 +139,8 @@ namespace R6Ranking.Migrations
 
                     b.HasKey("MatchID");
 
+                    b.HasIndex("MapID");
+
                     b.HasIndex("Team1ID");
 
                     b.HasIndex("Team2ID");
@@ -60,6 +148,28 @@ namespace R6Ranking.Migrations
                     b.HasIndex("TournamentID");
 
                     b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("R6Ranking.Models.OperatorBan", b =>
+                {
+                    b.Property<int>("OperatorBanID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OperatorBanID"));
+
+                    b.Property<int>("MatchID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OperatorName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OperatorBanID");
+
+                    b.HasIndex("MatchID");
+
+                    b.ToTable("OperatorBans");
                 });
 
             modelBuilder.Entity("R6Ranking.Models.Player", b =>
@@ -70,12 +180,14 @@ namespace R6Ranking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayerID"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("DateJoined")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("CurrentElo")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
+                    b.Property<DateTime?>("DateLeft")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhotoURL")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlayerName")
                         .IsRequired()
@@ -84,11 +196,8 @@ namespace R6Ranking.Migrations
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TeamID")
+                    b.Property<int?>("TeamID")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("PlayerID");
 
@@ -97,54 +206,17 @@ namespace R6Ranking.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.PlayerEloHistory", b =>
-                {
-                    b.Property<int>("EloHistoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EloHistoryID"));
-
-                    b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("EloChange")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<int>("MatchID")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("NewElo")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<decimal>("OldElo")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<int>("PlayerID")
-                        .HasColumnType("int");
-
-                    b.HasKey("EloHistoryID");
-
-                    b.HasIndex("MatchID");
-
-                    b.HasIndex("PlayerID");
-
-                    b.ToTable("PlayerEloHistories");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Region", b =>
                 {
-                    b.Property<int>("RegionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegionID"));
+                    b.Property<string>("RegionID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("LogoUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegionName")
                         .IsRequired()
@@ -158,39 +230,6 @@ namespace R6Ranking.Migrations
                     b.ToTable("Regions");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.RegionEloHistory", b =>
-                {
-                    b.Property<int>("RegionEloHistoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegionEloHistoryID"));
-
-                    b.Property<DateTime>("ChangeDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("EloChange")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<decimal>("NewElo")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<decimal>("OldElo")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<int>("RegionID")
-                        .HasColumnType("int");
-
-                    b.HasKey("RegionEloHistoryID");
-
-                    b.HasIndex("RegionID");
-
-                    b.ToTable("RegionEloHistories");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Team", b =>
                 {
                     b.Property<int>("TeamID")
@@ -199,23 +238,22 @@ namespace R6Ranking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TeamID"));
 
-                    b.Property<string>("Coach")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("CurrentElo")
                         .HasPrecision(7, 2)
                         .HasColumnType("decimal(7,2)");
 
-                    b.Property<int?>("RegionID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RegionName")
+                    b.Property<string>("LogoUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("RegionID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("TeamName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -273,28 +311,6 @@ namespace R6Ranking.Migrations
                     b.ToTable("TeamEloChanges");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.TeamLogo", b =>
-                {
-                    b.Property<int>("TeamLogoID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TeamLogoID"));
-
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TeamID")
-                        .HasColumnType("int");
-
-                    b.HasKey("TeamLogoID");
-
-                    b.HasIndex("TeamID")
-                        .IsUnique();
-
-                    b.ToTable("TeamsLogo");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Tournament", b =>
                 {
                     b.Property<int>("TournamentID")
@@ -317,8 +333,8 @@ namespace R6Ranking.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RegionID")
-                        .HasColumnType("int");
+                    b.Property<string>("RegionID")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -342,6 +358,12 @@ namespace R6Ranking.Migrations
 
             modelBuilder.Entity("R6Ranking.Models.Match", b =>
                 {
+                    b.HasOne("R6Ranking.Models.Map", "Map")
+                        .WithMany("Matches")
+                        .HasForeignKey("MapID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("R6Ranking.Models.Team", "Team1")
                         .WithMany("MatchesAsTeam1")
                         .HasForeignKey("Team1ID")
@@ -360,6 +382,8 @@ namespace R6Ranking.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Map");
+
                     b.Navigation("Team1");
 
                     b.Navigation("Team2");
@@ -367,52 +391,33 @@ namespace R6Ranking.Migrations
                     b.Navigation("Tournament");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.Player", b =>
-                {
-                    b.HasOne("R6Ranking.Models.Team", "Team")
-                        .WithMany("Players")
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
-            modelBuilder.Entity("R6Ranking.Models.PlayerEloHistory", b =>
+            modelBuilder.Entity("R6Ranking.Models.OperatorBan", b =>
                 {
                     b.HasOne("R6Ranking.Models.Match", "Match")
-                        .WithMany("PlayerEloHistories")
+                        .WithMany("OperatorBans")
                         .HasForeignKey("MatchID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("R6Ranking.Models.Player", "Player")
-                        .WithMany("PlayerEloHistories")
-                        .HasForeignKey("PlayerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Match");
-
-                    b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.RegionEloHistory", b =>
+            modelBuilder.Entity("R6Ranking.Models.Player", b =>
                 {
-                    b.HasOne("R6Ranking.Models.Region", "Region")
-                        .WithMany("RegionEloHistories")
-                        .HasForeignKey("RegionID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("R6Ranking.Models.Team", "Team")
+                        .WithMany("Players")
+                        .HasForeignKey("TeamID");
 
-                    b.Navigation("Region");
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("R6Ranking.Models.Team", b =>
                 {
                     b.HasOne("R6Ranking.Models.Region", "Region")
                         .WithMany("Teams")
-                        .HasForeignKey("RegionID");
+                        .HasForeignKey("RegionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Region");
                 });
@@ -442,17 +447,6 @@ namespace R6Ranking.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.TeamLogo", b =>
-                {
-                    b.HasOne("R6Ranking.Models.Team", "Team")
-                        .WithOne("Logo")
-                        .HasForeignKey("R6Ranking.Models.TeamLogo", "TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Team");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Tournament", b =>
                 {
                     b.HasOne("R6Ranking.Models.Region", "Region")
@@ -472,22 +466,20 @@ namespace R6Ranking.Migrations
                     b.Navigation("WinnerTeam");
                 });
 
+            modelBuilder.Entity("R6Ranking.Models.Map", b =>
+                {
+                    b.Navigation("Matches");
+                });
+
             modelBuilder.Entity("R6Ranking.Models.Match", b =>
                 {
-                    b.Navigation("PlayerEloHistories");
+                    b.Navigation("OperatorBans");
 
                     b.Navigation("TeamEloChanges");
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.Player", b =>
-                {
-                    b.Navigation("PlayerEloHistories");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Region", b =>
                 {
-                    b.Navigation("RegionEloHistories");
-
                     b.Navigation("Teams");
 
                     b.Navigation("Tournaments");
@@ -495,8 +487,6 @@ namespace R6Ranking.Migrations
 
             modelBuilder.Entity("R6Ranking.Models.Team", b =>
                 {
-                    b.Navigation("Logo");
-
                     b.Navigation("MatchesAsTeam1");
 
                     b.Navigation("MatchesAsTeam2");

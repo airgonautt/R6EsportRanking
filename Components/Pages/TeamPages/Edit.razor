@@ -29,19 +29,14 @@ else
                     <ValidationMessage For="() => Team.TeamName" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                    <label for="logourl" class="form-label">LogoUrl:</label>
+                    <InputText id="logourl" @bind-Value="Team.LogoUrl" class="form-control" />
+                    <ValidationMessage For="() => Team.LogoUrl" class="text-danger" />
+                </div>
+                <div class="mb-3">
                     <label for="regionid" class="form-label">RegionID:</label>
-                    <InputNumber id="regionid" @bind-Value="Team.RegionID" class="form-control" />
+                    <InputText id="regionid" @bind-Value="Team.RegionID" class="form-control" />
                     <ValidationMessage For="() => Team.RegionID" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="regionname" class="form-label">RegionName:</label>
-                    <InputText id="regionname" @bind-Value="Team.RegionName" class="form-control" />
-                    <ValidationMessage For="() => Team.RegionName" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="coach" class="form-label">Coach:</label>
-                    <InputText id="coach" @bind-Value="Team.Coach" class="form-control" />
-                    <ValidationMessage For="() => Team.Coach" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="currentelo" class="form-label">CurrentElo:</label>

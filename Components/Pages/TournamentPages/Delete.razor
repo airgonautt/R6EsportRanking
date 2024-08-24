@@ -1,0 +1,81 @@
+﻿@page "/tournaments/delete"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Tournament</h4>
+    <hr />
+    @if (tournament is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@tournament.Name</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@tournament.Location</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Logo</dt>
+            <dd class="col-sm-10">@tournament.Logo</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">StartDate</dt>
+            <dd class="col-sm-10">@tournament.StartDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">EndDate</dt>
+            <dd class="col-sm-10">@tournament.EndDate</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">WinnerTeamID</dt>
+            <dd class="col-sm-10">@tournament.WinnerTeamID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">RegionID</dt>
+            <dd class="col-sm-10">@tournament.RegionID</dd>
+        </dl>
+        <EditForm method="post" Model="tournament" OnValidSubmit="DeleteTournament" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(tournament is null)">Delete</button> |
+            <a href="/tournaments">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    Tournament? tournament;
+
+    [SupplyParameterFromQuery]
+    public int TournamentID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        tournament = await context.Tournaments.FirstOrDefaultAsync(m => m.TournamentID == TournamentID);
+
+        if (tournament is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteTournament()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Tournaments.Remove(tournament!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/tournaments");
+    }
+}

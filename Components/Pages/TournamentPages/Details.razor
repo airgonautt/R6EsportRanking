@@ -1,0 +1,59 @@
+﻿@page "/tournaments/details"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Tournament</h4>
+    <hr />
+    @if (tournament is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@tournament.Name</dd>
+            <dt class="col-sm-2">Location</dt>
+            <dd class="col-sm-10">@tournament.Location</dd>
+            <dt class="col-sm-2">Logo</dt>
+            <dd class="col-sm-10">@tournament.Logo</dd>
+            <dt class="col-sm-2">StartDate</dt>
+            <dd class="col-sm-10">@tournament.StartDate</dd>
+            <dt class="col-sm-2">EndDate</dt>
+            <dd class="col-sm-10">@tournament.EndDate</dd>
+            <dt class="col-sm-2">WinnerTeamID</dt>
+            <dd class="col-sm-10">@tournament.WinnerTeamID</dd>
+            <dt class="col-sm-2">RegionID</dt>
+            <dd class="col-sm-10">@tournament.RegionID</dd>
+        </dl>
+        <div>
+            <a href="@($"/tournaments/edit?tournamentid={tournament.TournamentID}")">Edit</a> |
+            <a href="@($"/tournaments")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Tournament? tournament;
+
+    [SupplyParameterFromQuery]
+    public int TournamentID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        tournament = await context.Tournaments.FirstOrDefaultAsync(m => m.TournamentID == TournamentID);
+
+        if (tournament is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

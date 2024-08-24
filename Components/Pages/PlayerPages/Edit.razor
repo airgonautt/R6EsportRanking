@@ -1,0 +1,115 @@
+﻿@page "/Players/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Player</h4>
+<hr />
+@if (Player is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Player" OnValidSubmit="UpdatePlayer" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Player.PlayerID" value="@Player.PlayerID" />
+                <div class="mb-3">
+                    <label for="playername" class="form-label">PlayerName:</label>
+                    <InputText id="playername" @bind-Value="Player.PlayerName" class="form-control" />
+                    <ValidationMessage For="() => Player.PlayerName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role:</label>
+                    <InputText id="role" @bind-Value="Player.Role" class="form-control" />
+                    <ValidationMessage For="() => Player.Role" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="photourl" class="form-label">PhotoURL:</label>
+                    <InputText id="photourl" @bind-Value="Player.PhotoURL" class="form-control" />
+                    <ValidationMessage For="() => Player.PhotoURL" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="teamid" class="form-label">TeamID:</label>
+                    <InputNumber id="teamid" @bind-Value="Player.TeamID" class="form-control" />
+                    <ValidationMessage For="() => Player.TeamID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datejoined" class="form-label">DateJoined:</label>
+                    <InputDate id="datejoined" @bind-Value="Player.DateJoined" class="form-control" />
+                    <ValidationMessage For="() => Player.DateJoined" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateleft" class="form-label">DateLeft:</label>
+                    <InputDate id="dateleft" @bind-Value="Player.DateLeft" class="form-control" />
+                    <ValidationMessage For="() => Player.DateLeft" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/players">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int PlayerID { get; set; }
+
+    [SupplyParameterFromForm]
+    public Player? Player { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Player ??= await context.Players.FirstOrDefaultAsync(m => m.PlayerID == PlayerID);
+
+        if (Player is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdatePlayer()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Player!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PlayerExists(Player!.PlayerID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/players");
+    }
+
+    bool PlayerExists(int playerid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Players.Any(e => e.PlayerID == playerid);
+    }
+}

@@ -8,13 +8,11 @@ public class R6EsportsDbContext : DbContext {
 
     public DbSet<Region> Regions { get; set; }
     public DbSet<Team> Teams { get; set; }
-    public DbSet<TeamLogo> TeamsLogo { get; set; }
     public DbSet<Player> Players { get; set; }
     public DbSet<Match> Matches { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
-    public DbSet<PlayerEloHistory> PlayerEloHistories { get; set; }
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
-    public DbSet<RegionEloHistory> RegionEloHistories { get; set; }
+    public DbSet<OperatorBan> OperatorBans { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
 
@@ -28,27 +26,32 @@ public class R6EsportsDbContext : DbContext {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
-        // TEAM RELATIONSHIPS
-        modelBuilder.Entity<Team>()
-            .HasKey(t => t.TeamID);
-
-        modelBuilder.Entity<Team>()
-            .HasOne(t => t.Logo)
-            .WithOne(l => l.Team)
-            .HasForeignKey<TeamLogo>(l => l.TeamID);
-
-        //REGION RELATIONSHIPS
-        modelBuilder.Entity<Region>()
-            .HasKey(r => r.RegionID);
-
-        modelBuilder.Entity<Region>()
-           .HasMany(r => r.Tournaments)
-           .WithOne(t => t.Region)
-           .HasForeignKey(t => t.TournamentID);///
-
+        //MAPS
+        modelBuilder.Entity<Map>().HasData(
+            new Map { MapID = 1, MapName = "Bank" },
+            new Map { MapID = 2, MapName = "Border" },
+            new Map { MapID = 3, MapName = "Chalet" },
+            new Map { MapID = 4, MapName = "Clubhouse" },
+            new Map { MapID = 5, MapName = "Consulate" },
+            new Map { MapID = 6, MapName = "Kafe Dostoyevksy" },
+            new Map { MapID = 7, MapName = "Lair" },
+            new Map { MapID = 8, MapName = "Nighthaven Labs" },
+            new Map { MapID = 9, MapName = "Oregon" },
+            new Map { MapID = 10, MapName = "Skyscraper" },
+            new Map { MapID = 11, MapName = "Theme Park" },
+            new Map { MapID = 12, MapName = "Villa" }
+            // needs to add map photos url in EDIT
+        );
+             
         //MATCH RELATIONSHIPS
         modelBuilder.Entity<Match>()
            .HasKey(m => m.MatchID);
+
+        modelBuilder.Entity<Match>()
+            .HasOne(m => m.Map)
+            .WithMany(map => map.Matches)
+            .HasForeignKey(m => m.MapID)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Match>()
            .HasOne(m => m.Team1)
@@ -66,6 +69,29 @@ public class R6EsportsDbContext : DbContext {
            .HasOne(t => t.Tournament)
            .WithMany(m => m.Matches)
            .HasForeignKey(t => t.TournamentID);
+
+        //OPERATOR BANS
+        modelBuilder.Entity<OperatorBan>()
+            .HasKey(t => t.OperatorBanID);
+
+        modelBuilder.Entity<OperatorBan>()
+            .HasOne(ob => ob.Match)
+            .WithMany(m => m.OperatorBans)
+            .HasForeignKey(ob => ob.MatchID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        //REGION RELATIONSHIPS
+        modelBuilder.Entity<Region>()
+            .HasKey(r => r.RegionID);
+
+        modelBuilder.Entity<Region>()
+           .HasMany(r => r.Tournaments)
+           .WithOne(t => t.Region)
+           .HasForeignKey(t => t.TournamentID);
+
+        // TEAM RELATIONSHIPS
+        modelBuilder.Entity<Team>()
+            .HasKey(t => t.TeamID);
 
         //TEAM ELO CHANGE RELATIONSHIPS
         modelBuilder.Entity<TeamEloChange>()
@@ -99,7 +125,8 @@ public class R6EsportsDbContext : DbContext {
             .HasOne(t => t.Region)
             .WithMany(r => r.Tournaments)
             .HasForeignKey(t => t.RegionID);
-
+               
     }
 
 }
+
