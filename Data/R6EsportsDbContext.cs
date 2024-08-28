@@ -75,12 +75,6 @@ public class R6EsportsDbContext : DbContext {
         modelBuilder.Entity<OperatorBan>()
             .HasKey(t => t.OperatorBanID);
 
-        modelBuilder.Entity<OperatorBan>()
-            .HasOne(ob => ob.Match)
-            .WithMany(m => m.OperatorBans)
-            .HasForeignKey(ob => ob.MatchID)
-            .OnDelete(DeleteBehavior.Cascade);
-
         //REGION RELATIONSHIPS
         modelBuilder.Entity<Region>()
             .HasKey(r => r.RegionID);

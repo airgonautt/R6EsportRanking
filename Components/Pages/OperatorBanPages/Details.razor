@@ -1,0 +1,49 @@
+﻿@page "/operatorbans/details"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>OperatorBan</h4>
+    <hr />
+    @if (operatorban is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">OperatorName</dt>
+            <dd class="col-sm-10">@operatorban.OperatorName</dd>
+            <dt class="col-sm-2">OperatorLogo</dt>
+            <dd class="col-sm-10">@operatorban.OperatorLogo</dd>
+        </dl>
+        <div>
+            <a href="@($"/operatorbans/edit?operatorbanid={operatorban.OperatorBanID}")">Edit</a> |
+            <a href="@($"/operatorbans")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    OperatorBan? operatorban;
+
+    [SupplyParameterFromQuery]
+    public int OperatorBanID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        operatorban = await context.OperatorBans.FirstOrDefaultAsync(m => m.OperatorBanID == OperatorBanID);
+
+        if (operatorban is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,51 @@
+﻿@page "/operatorbans/create"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>OperatorBan</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="OperatorBan" OnValidSubmit="AddOperatorBan" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="operatorname" class="form-label">OperatorName:</label> 
+                <InputText id="operatorname" @bind-Value="OperatorBan.OperatorName" class="form-control" /> 
+                <ValidationMessage For="() => OperatorBan.OperatorName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="operatorlogo" class="form-label">OperatorLogo:</label> 
+                <InputText id="operatorlogo" @bind-Value="OperatorBan.OperatorLogo" class="form-control" /> 
+                <ValidationMessage For="() => OperatorBan.OperatorLogo" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/operatorbans">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public OperatorBan OperatorBan { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddOperatorBan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.OperatorBans.Add(OperatorBan);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/operatorbans");
+    }
+}

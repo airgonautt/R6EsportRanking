@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "R6Ranking", "R6Ranking.csproj", "{75371879-C1C9-416E-84C0-40B7B4DFD07C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "R6Ranking", "R6Ranking.csproj", "{75371879-C1C9-416E-84C0-40B7B4DFD07C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

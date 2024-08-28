@@ -20,6 +20,7 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddRazorPages();  // Add Razor Pages
 builder.Services.AddServerSideBlazor();  // Add Blazor Server
 
+builder.Services.AddScoped<R6Ranking.Services.MatchService>();
 
 var app = builder.Build();
 

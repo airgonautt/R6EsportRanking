@@ -4,8 +4,5 @@
         public int OperatorBanID { get; set; } 
         public string? OperatorName { get; set; }
         public string? OperatorLogo { get; set; }
-
-        public int MatchID { get; set; }
-        public Match? Match { get; set; }
     }
 }

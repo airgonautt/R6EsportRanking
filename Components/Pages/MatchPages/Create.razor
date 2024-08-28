@@ -4,6 +4,7 @@
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject R6Ranking.Services.MatchService MatchService
 
 <PageTitle>Create</PageTitle>
 
@@ -13,49 +14,49 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
+        <EditForm Model="Match" OnValidSubmit="AddMatch" FormName="createForm">
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="matchname" class="form-label">MatchName:</label> 
-                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" /> 
-                <ValidationMessage For="() => Match.MatchName" class="text-danger" /> 
-            </div>        
+                <label for="matchname" class="form-label">MatchName:</label>
+                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" />
+                <ValidationMessage For="() => Match.MatchName" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="team1id" class="form-label">Team1ID:</label> 
-                <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team1ID" class="text-danger" /> 
-            </div>        
+                <label for="team1id" class="form-label">Team1ID:</label>
+                <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" />
+                <ValidationMessage For="() => Match.Team1ID" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="team1score" class="form-label">Team1Score:</label> 
-                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team1Score" class="text-danger" /> 
-            </div>        
+                <label for="team1score" class="form-label">Team1Score:</label>
+                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
+                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="team2id" class="form-label">Team2ID:</label> 
-                <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team2ID" class="text-danger" /> 
-            </div>        
+                <label for="team2id" class="form-label">Team2ID:</label>
+                <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" />
+                <ValidationMessage For="() => Match.Team2ID" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="team2score" class="form-label">Team2Score:</label> 
-                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team2Score" class="text-danger" /> 
-            </div>        
+                <label for="team2score" class="form-label">Team2Score:</label>
+                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
+                <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="mapid" class="form-label">MapID:</label> 
-                <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" /> 
-                <ValidationMessage For="() => Match.MapID" class="text-danger" /> 
-            </div>        
+                <label for="mapid" class="form-label">MapID:</label>
+                <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" />
+                <ValidationMessage For="() => Match.MapID" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="tournamentid" class="form-label">TournamentID:</label> 
-                <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" /> 
-                <ValidationMessage For="() => Match.TournamentID" class="text-danger" /> 
-            </div>        
+                <label for="tournamentid" class="form-label">TournamentID:</label>
+                <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" />
+                <ValidationMessage For="() => Match.TournamentID" class="text-danger" />
+            </div>
             <div class="mb-3">
-                <label for="matchdate" class="form-label">MatchDate:</label> 
-                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" /> 
-                <ValidationMessage For="() => Match.MatchDate" class="text-danger" /> 
-            </div>        
+                <label for="matchdate" class="form-label">MatchDate:</label>
+                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
+                <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
+            </div>
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -66,19 +67,33 @@
 </div>
 
 @code {
-
-
-
-    [SupplyParameterFromForm]
     public Match Match { get; set; } = new();
 
-    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-    public async Task AddMatch()
-    {
-        
+
+
+    public async Task AddMatch() {
+
         using var context = DbFactory.CreateDbContext();
+
+
+
+        // Add the match to the database
+
         context.Matches.Add(Match);
+
         await context.SaveChangesAsync();
+
+
+
+        // Call the Elo calculation method
+
+        await MatchService.CalculateEloAsync(Match);
+
+
+
+        // Navigate to the matches list
+
         NavigationManager.NavigateTo("/matches");
+
     }
 }
