@@ -7,19 +7,23 @@
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Regions</PageTitle>
 
-<h1>Index</h1>
+<h1>Regions</h1>
 
-<p>
-    <a href="regions/create">Create New</a>
-</p>
+<div class="flex-container">
+    <p style="margin-left: auto;">
+        <a href="regions/create" class="btn btn-primary">Create New</a>
+    </p>
+</div>
 
-<QuickGrid Class="table" Items="context.Regions">
-    <PropertyColumn Property="region => region.RegionName" />
-    <PropertyColumn Property="region => region.LogoUrl" />
-    <PropertyColumn Property="region => region.CreatedAt" />
-    <PropertyColumn Property="region => region.UpdatedAt" />
+<QuickGrid Class="table" Items="@context.Regions">
+    <TemplateColumn Context="region">
+        <div class="region-info">
+            <img src="@region.LogoUrl" alt="@region.RegionName Logo" class="region-logo" />
+            <span>@region.RegionName (@region.RegionID)</span>
+        </div>
+    </TemplateColumn>
 
     <TemplateColumn Context="region">
         <a href="@($"regions/edit?regionid={region.RegionID}")">Edit</a> |
@@ -31,10 +35,28 @@
 @code {
     R6EsportsDbContext context = default!;
 
-    protected override void OnInitialized()
-    {
+
+
+    protected override void OnInitialized() {
+
         context = DbFactory.CreateDbContext();
+
     }
+
+
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
+
+<style>
+    .region-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .region-logo {
+        width: 40px;
+        height: auto;
+        margin-right: 10px;
+    }
+</style>

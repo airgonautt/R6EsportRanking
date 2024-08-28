@@ -16,55 +16,46 @@
         <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
-
             <div class="mb-3">
                 <label for="matchname" class="form-label">MatchName:</label> 
-                <InputText id="matchname" @bind-Value="Match.MatchName" cla.....ss="form-control" /> 
+                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" /> 
                 <ValidationMessage For="() => Match.MatchName" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="team1id" class="form-label">Team1ID:</label> 
                 <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team1ID" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="team1score" class="form-label">Team1Score:</label> 
                 <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team1Score" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="team2id" class="form-label">Team2ID:</label> 
                 <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team2ID" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="team2score" class="form-label">Team2Score:</label> 
                 <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" /> 
                 <ValidationMessage For="() => Match.Team2Score" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="mapid" class="form-label">MapID:</label> 
                 <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" /> 
                 <ValidationMessage For="() => Match.MapID" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="tournamentid" class="form-label">TournamentID:</label> 
                 <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" /> 
                 <ValidationMessage For="() => Match.TournamentID" class="text-danger" /> 
             </div>        
-            
             <div class="mb-3">
                 <label for="matchdate" class="form-label">MatchDate:</label> 
                 <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" /> 
                 <ValidationMessage For="() => Match.MatchDate" class="text-danger" /> 
             </div>        
-
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -76,13 +67,15 @@
 
 @code {
 
+
+
     [SupplyParameterFromForm]
-    public Match Match { get; set; } = new Match(){TournamentID = 000, Tournament = new Tournament(), Team2ID = 405, Team1ID = 404, Team1 = new Team(), Team2 = new Team(), Map = new Map() };
+    public Match Match { get; set; } = new();
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMatch()
-
     {
+        
         using var context = DbFactory.CreateDbContext();
         context.Matches.Add(Match);
         await context.SaveChangesAsync();

@@ -46,11 +46,19 @@
                 <InputNumber id="winnerteamid" @bind-Value="Tournament.WinnerTeamID" class="form-control" /> 
                 <ValidationMessage For="() => Tournament.WinnerTeamID" class="text-danger" /> 
             </div>        
+                        
             <div class="mb-3">
-                <label for="regionid" class="form-label">RegionID:</label> 
-                <InputText id="regionid" @bind-Value="Tournament.RegionID" class="form-control" /> 
-                <ValidationMessage For="() => Tournament.RegionID" class="text-danger" /> 
-            </div>        
+                <label for="regionid" class="form-label">RegionID:</label>
+                <InputSelect id="regionid" @bind-Value="@Tournament.RegionID" class="form-control">
+                    <option value="">Select a region</option>
+                    @foreach (var region in Regions) 
+                    {
+                        <option value="@region.RegionID">@region.RegionName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Tournament.RegionID" class="text-danger" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -65,6 +73,12 @@
     [SupplyParameterFromForm]
     public Tournament Tournament { get; set; } = new();
 
+    private List<Region> Regions { get; set; } = new();
+
+    protected override async Task OnInitializedAsync() {
+        using var context = DbFactory.CreateDbContext();
+        Regions = await context.Regions.ToListAsync();
+    }
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddTournament()
     {

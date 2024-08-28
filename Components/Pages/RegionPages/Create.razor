@@ -17,15 +17,10 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="regionname" class="form-label">RegionName:</label>
-                <InputText id="regionname" @bind-Value="Region.RegionName" class="form-control" />
-                <ValidationMessage For="() => Region.RegionName" class="text-danger" />
-            </div>
-            <div class="mb-3">
-                <label for="regionid" class="form-label">RegionId:</label>
-                <InputText id="regionid" @bind-Value="Region.RegionID" class="form-control" />
-                <ValidationMessage For="() => Region.RegionID" class="text-danger" />
-            </div>
+                <label for="regionname" class="form-label">RegionName:</label> 
+                <InputText id="regionname" @bind-Value="Region.RegionName" class="form-control" /> 
+                <ValidationMessage For="() => Region.RegionName" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
                 <label for="logourl" class="form-label">LogoUrl:</label> 
                 <InputText id="logourl" @bind-Value="Region.LogoUrl" class="form-control" /> 
@@ -53,7 +48,7 @@
 @code {
 
     [SupplyParameterFromForm]
-    public Region Region { get; set; } = new Region() {RegionID = "Region ID", RegionName = "Region Name" };
+    public Region Region { get; set; } = new Region(){RegionName = "defaultname",RegionID = "ERROR"};
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddRegion()

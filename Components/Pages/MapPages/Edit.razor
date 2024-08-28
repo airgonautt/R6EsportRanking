@@ -1,0 +1,95 @@
+﻿@page "/Maps/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Map</h4>
+<hr />
+@if (Map is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Map" OnValidSubmit="UpdateMap" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Map.MapID" value="@Map.MapID" />
+                <div class="mb-3">
+                    <label for="mapname" class="form-label">MapName:</label>
+                    <InputText id="mapname" @bind-Value="Map.MapName" class="form-control" />
+                    <ValidationMessage For="() => Map.MapName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="mapphoto" class="form-label">MapPhoto:</label>
+                    <InputText id="mapphoto" @bind-Value="Map.MapPhoto" class="form-control" />
+                    <ValidationMessage For="() => Map.MapPhoto" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/maps">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int MapID { get; set; }
+
+    [SupplyParameterFromForm]
+    public Map? Map { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Map ??= await context.Map.FirstOrDefaultAsync(m => m.MapID == MapID);
+
+        if (Map is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMap()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Map!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MapExists(Map!.MapID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/maps");
+    }
+
+    bool MapExists(int mapid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Map.Any(e => e.MapID == mapid);
+    }
+}

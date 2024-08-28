@@ -7,6 +7,7 @@ namespace R6Ranking.Models {
         public string PlayerName { get; set; }
         public string? Role { get; set; }
         public string? PhotoURL {  get; set; }
+        public string? CardURL { get; set; }
 
         public int? TeamID { get; set; }
         public Team? Team { get; set; }

@@ -13,6 +13,7 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
     public DbSet<OperatorBan> OperatorBans { get; set; }
+    public DbSet<Map> Maps { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
 
@@ -127,6 +128,8 @@ public class R6EsportsDbContext : DbContext {
             .HasForeignKey(t => t.RegionID);
                
     }
+
+public DbSet<R6Ranking.Models.Map> Map { get; set; } = default!;
 
 }
 

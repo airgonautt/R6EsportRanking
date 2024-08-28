@@ -1,0 +1,49 @@
+﻿@page "/maps/details"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Map</h4>
+    <hr />
+    @if (map is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">MapName</dt>
+            <dd class="col-sm-10">@map.MapName</dd>
+            <dt class="col-sm-2">MapPhoto</dt>
+            <dd class="col-sm-10">@map.MapPhoto</dd>
+        </dl>
+        <div>
+            <a href="@($"/maps/edit?mapid={map.MapID}")">Edit</a> |
+            <a href="@($"/maps")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Map? map;
+
+    [SupplyParameterFromQuery]
+    public int MapID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        map = await context.Map.FirstOrDefaultAsync(m => m.MapID == MapID);
+
+        if (map is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

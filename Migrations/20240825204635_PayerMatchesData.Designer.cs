@@ -12,8 +12,8 @@ using R6Ranking.Data;
 namespace R6Ranking.Migrations
 {
     [DbContext(typeof(R6EsportsDbContext))]
-    [Migration("20240822233325_InitialComit")]
-    partial class InitialComit
+    [Migration("20240825204635_PayerMatchesData")]
+    partial class PayerMatchesData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,6 @@ namespace R6Ranking.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapID"));
 
                     b.Property<string>("MapName")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -183,6 +182,9 @@ namespace R6Ranking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlayerID"));
 
+                    b.Property<string>("CardURL")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("DateJoined")
                         .HasColumnType("datetime2");
 
@@ -218,7 +220,6 @@ namespace R6Ranking.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LogoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegionName")
@@ -252,11 +253,9 @@ namespace R6Ranking.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegionID")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("TeamName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -329,11 +328,9 @@ namespace R6Ranking.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RegionID")
@@ -418,9 +415,7 @@ namespace R6Ranking.Migrations
                 {
                     b.HasOne("R6Ranking.Models.Region", "Region")
                         .WithMany("Teams")
-                        .HasForeignKey("RegionID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RegionID");
 
                     b.Navigation("Region");
                 });

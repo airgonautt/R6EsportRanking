@@ -1,42 +1,76 @@
 ﻿@page "/teams"
 
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using R6Ranking.Models
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Teams</PageTitle>
 
-<h1>Index</h1>
+<h1>Teams</h1>
 
-<p>
-    <a href="teams/create">Create New</a>
-</p>
+<div class="flex-container">
+    <p style="margin-left: auto;">
+        <a href="teams/create" class="btn btn-primary">Create New</a>
+    </p>
+</div>
 
-<QuickGrid Class="table" Items="context.Teams">
-    <PropertyColumn Property="team => team.TeamName" />
-    <PropertyColumn Property="team => team.LogoUrl" />
-    <PropertyColumn Property="team => team.RegionID" />
-    <PropertyColumn Property="team => team.CurrentElo" />
-    <PropertyColumn Property="team => team.CreatedAt" />
-    <PropertyColumn Property="team => team.UpdatedAt" />
-
-    <TemplateColumn Context="team">
-        <a href="@($"teams/edit?teamid={team.TeamID}")">Edit</a> |
-        <a href="@($"teams/details?teamid={team.TeamID}")">Details</a> |
-        <a href="@($"teams/delete?teamid={team.TeamID}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+<div class="flex-container">
+    @foreach (var team in context.Teams) {
+        <div class="team-card">
+            <img src="@team.LogoUrl" alt="@team.TeamName Logo" class="team-logo" />
+            <h5>@team.TeamName</h5>
+            <p>Region ID: @team.RegionID</p>
+            <p>Current Elo: @team.CurrentElo</p>
+            <p>Created At: @team.CreatedAt</p>
+            <p>Updated At: @team.UpdatedAt</p>
+            <p class="team-actions">
+                <a href="@($"teams/edit?teamid={team.TeamID}")">Edit</a> |
+                <a href="@($"teams/details?teamid={team.TeamID}")">Details</a> |
+                <a href="@($"teams/delete?teamid={team.TeamID}")">Delete</a>
+            </p>
+        </div>
+    }
+</div>
 
 @code {
     R6EsportsDbContext context = default!;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         context = DbFactory.CreateDbContext();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
+
+<style>
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: flex-start;
+    }
+
+    .team-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid #ccc;
+        padding: 15px;
+        width: 300px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .team-logo {
+        width: 100px;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .team-actions {
+        font-size: small;
+        color: #007bff;
+    }
+</style>
