@@ -3,10 +3,9 @@
     public class Tournament {
 
         public int TournamentID { get; set; }
-        public string? Name { get; set; }
-
-        public string? Location { get; set; }
-        public string? Logo { get; set; } // URL to the logo
+        public string? TournamentName { get; set; }
+        public string? TournamentLocation { get; set; }
+        public string? TournamentLogo { get; set; } // URL to the logo
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -15,10 +14,12 @@
         public Team? WinnerTeam { get; set; }
 
         public string? RegionID { get; set; }
-        public Region? Region { get; set; } // Relationship with the region where the tournament takes place
+        public Region? Region { get; set; }
 
 
         // Navigation property for related Matches
         public ICollection<Match>? Matches { get; set; }
+        public ICollection<TeamTournament>? TournamentTeams { get; set; } ///skips many2many navigations
+        public Trophy Trophy { get; set; }
     }
 }

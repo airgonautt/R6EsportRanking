@@ -17,19 +17,19 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="name" class="form-label">Name:</label> 
-                <InputText id="name" @bind-Value="Tournament.Name" class="form-control" /> 
-                <ValidationMessage For="() => Tournament.Name" class="text-danger" /> 
+                <label for="tournamentname" class="form-label">TournamentName:</label> 
+                <InputText id="tournamentname" @bind-Value="Tournament.TournamentName" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.TournamentName" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="location" class="form-label">Location:</label> 
-                <InputText id="location" @bind-Value="Tournament.Location" class="form-control" /> 
-                <ValidationMessage For="() => Tournament.Location" class="text-danger" /> 
+                <label for="tournamentlocation" class="form-label">TournamentLocation:</label> 
+                <InputText id="tournamentlocation" @bind-Value="Tournament.TournamentLocation" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.TournamentLocation" class="text-danger" /> 
             </div>        
             <div class="mb-3">
-                <label for="logo" class="form-label">Logo:</label> 
-                <InputText id="logo" @bind-Value="Tournament.Logo" class="form-control" /> 
-                <ValidationMessage For="() => Tournament.Logo" class="text-danger" /> 
+                <label for="tournamentlogo" class="form-label">TournamentLogo:</label> 
+                <InputText id="tournamentlogo" @bind-Value="Tournament.TournamentLogo" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.TournamentLogo" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="startdate" class="form-label">StartDate:</label> 
@@ -46,19 +46,11 @@
                 <InputNumber id="winnerteamid" @bind-Value="Tournament.WinnerTeamID" class="form-control" /> 
                 <ValidationMessage For="() => Tournament.WinnerTeamID" class="text-danger" /> 
             </div>        
-                        
             <div class="mb-3">
-                <label for="regionid" class="form-label">RegionID:</label>
-                <InputSelect id="regionid" @bind-Value="@Tournament.RegionID" class="form-control">
-                    <option value="">Select a region</option>
-                    @foreach (var region in Regions) 
-                    {
-                        <option value="@region.RegionID">@region.RegionName</option>
-                    }
-                </InputSelect>
-                <ValidationMessage For="() => Tournament.RegionID" class="text-danger" />
-            </div>
-
+                <label for="regionid" class="form-label">RegionID:</label> 
+                <InputText id="regionid" @bind-Value="Tournament.RegionID" class="form-control" /> 
+                <ValidationMessage For="() => Tournament.RegionID" class="text-danger" /> 
+            </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -73,12 +65,6 @@
     [SupplyParameterFromForm]
     public Tournament Tournament { get; set; } = new();
 
-    private List<Region> Regions { get; set; } = new();
-
-    protected override async Task OnInitializedAsync() {
-        using var context = DbFactory.CreateDbContext();
-        Regions = await context.Regions.ToListAsync();
-    }
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddTournament()
     {

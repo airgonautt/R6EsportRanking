@@ -12,8 +12,11 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Match> Matches { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
+    public DbSet<TeamTournament> TeamTournaments { get; set; }
     public DbSet<OperatorBan> OperatorBans { get; set; }
+    public DbSet<MatchOperatorBan> MatchOperatorBans { get; set; }
     public DbSet<Map> Maps { get; set; }
+    public DbSet<Trophy> Trophies { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
 
@@ -75,6 +78,20 @@ public class R6EsportsDbContext : DbContext {
         modelBuilder.Entity<OperatorBan>()
             .HasKey(t => t.OperatorBanID);
 
+        //MATCHOPERATORBANS ----JOINED ENTITY
+        modelBuilder.Entity<MatchOperatorBan>()
+            .HasKey(mob => new { mob.MatchID, mob.OperatorBanID });
+
+        modelBuilder.Entity<MatchOperatorBan>()
+            .HasOne(mob => mob.Match)
+            .WithMany(m => m.MatchOperatorBans)
+            .HasForeignKey(mob => mob.MatchID);
+
+        modelBuilder.Entity<MatchOperatorBan>()
+            .HasOne(mob => mob.OperatorBan)
+            .WithMany(ob => ob.MatchOperatorBans)
+            .HasForeignKey(mob => mob.OperatorBanID);
+
         //REGION RELATIONSHIPS
         modelBuilder.Entity<Region>()
             .HasKey(r => r.RegionID);
@@ -87,6 +104,20 @@ public class R6EsportsDbContext : DbContext {
         // TEAM RELATIONSHIPS
         modelBuilder.Entity<Team>()
             .HasKey(t => t.TeamID);
+
+        // TEAMTOURNAMENT ---------------JOINED ENTITY 
+        modelBuilder.Entity<TeamTournament>()
+            .HasKey(tt => new { tt.TeamID, tt.TournamentID });
+
+        modelBuilder.Entity<TeamTournament>()
+            .HasOne(tt => tt.Team)
+            .WithMany(t => t.TournamentsIn)
+            .HasForeignKey(tt => tt.TeamID);
+
+        modelBuilder.Entity<TeamTournament>()
+            .HasOne(tt => tt.Tournament)
+            .WithMany(t => t.TournamentTeams)
+            .HasForeignKey(tt => tt.TournamentID);
 
         //TEAM ELO CHANGE RELATIONSHIPS
         modelBuilder.Entity<TeamEloChange>()
@@ -110,6 +141,11 @@ public class R6EsportsDbContext : DbContext {
         //TOURNAAMENT RELATIONSHIPS
         modelBuilder.Entity<Tournament>()
             .HasKey(t => t.TournamentID);
+
+        modelBuilder.Entity<Tournament>()
+            .HasOne(t => t.Trophy)
+            .WithOne(tr => tr.Tournament)
+            .HasForeignKey<Trophy>(tr => tr.TournamentID);
 
         modelBuilder.Entity<Tournament>()
             .HasOne(t => t.WinnerTeam)

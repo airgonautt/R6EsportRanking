@@ -24,19 +24,19 @@ else
                 <ValidationSummary />
                 <input type="hidden" name="Tournament.TournamentID" value="@Tournament.TournamentID" />
                 <div class="mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <InputText id="name" @bind-Value="Tournament.Name" class="form-control" />
-                    <ValidationMessage For="() => Tournament.Name" class="text-danger" />
+                    <label for="tournamentname" class="form-label">TournamentName:</label>
+                    <InputText id="tournamentname" @bind-Value="Tournament.TournamentName" class="form-control" />
+                    <ValidationMessage For="() => Tournament.TournamentName" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="location" class="form-label">Location:</label>
-                    <InputText id="location" @bind-Value="Tournament.Location" class="form-control" />
-                    <ValidationMessage For="() => Tournament.Location" class="text-danger" />
+                    <label for="tournamentlocation" class="form-label">TournamentLocation:</label>
+                    <InputText id="tournamentlocation" @bind-Value="Tournament.TournamentLocation" class="form-control" />
+                    <ValidationMessage For="() => Tournament.TournamentLocation" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="logo" class="form-label">Logo:</label>
-                    <InputText id="logo" @bind-Value="Tournament.Logo" class="form-control" />
-                    <ValidationMessage For="() => Tournament.Logo" class="text-danger" />
+                    <label for="tournamentlogo" class="form-label">TournamentLogo:</label>
+                    <InputText id="tournamentlogo" @bind-Value="Tournament.TournamentLogo" class="form-control" />
+                    <ValidationMessage For="() => Tournament.TournamentLogo" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="startdate" class="form-label">StartDate:</label>

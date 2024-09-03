@@ -21,6 +21,6 @@ namespace R6Ranking.Models {
         public ICollection<Match> MatchesAsTeam2 { get; set; } = new List<Match>();
 
         public ICollection<Tournament>? WonTournaments { get; set; }
-
+        public ICollection<TeamTournament>? TournamentsIn { get; } = [];
     }
 }

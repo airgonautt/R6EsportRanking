@@ -14,7 +14,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm Model="Match" OnValidSubmit="AddMatch" FormName="createForm">
+        <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
@@ -57,6 +57,18 @@
                 <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
                 <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
             </div>
+
+            <!-- Operator Bans selection -->
+            <div class="mb-3">
+                <label for="operatorBans" class="form-label">Select up to 4 Operator Bans:</label>
+                <select multiple class="form-control" @bind="selectedOperatorBanIds">
+                    @foreach (var operatorBan in OperatorBans) {
+                        <option value="@operatorBan.OperatorBanID">@operatorBan.OperatorName</option>
+                    }
+                </select>
+                <ValidationMessage For="() => selectedOperatorBanIds" class="text-danger" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -67,33 +79,96 @@
 </div>
 
 @code {
+
+    [SupplyParameterFromForm]
     public Match Match { get; set; } = new();
+    private List<OperatorBan> OperatorBans { get; set; } = new();
+    private List<int> selectedOperatorBanIds { get; set; } = new();
 
-
-
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMatch() {
 
         using var context = DbFactory.CreateDbContext();
-
-
-
-        // Add the match to the database
+        OperatorBans = await context.OperatorBans.ToListAsync();
 
         context.Matches.Add(Match);
 
         await context.SaveChangesAsync();
+        // Create MatchOperatorBan entries for selected operator bans
+        foreach (var operatorBanId in selectedOperatorBanIds) {
+            var matchOperatorBan = new MatchOperatorBan {
+                    MatchID = Match.MatchID,
+                    OperatorBanID = operatorBanId
+                };
+            context.MatchOperatorBans.Add(matchOperatorBan);
+        }
 
+        // Increment the Elo scores for both teams
+        await IncrementTeamEloAsync(context);
 
+        // Create TeamEloChange entries
+        await CreateTeamEloChangeEntriesAsync(context);
 
-        // Call the Elo calculation method
-
-        await MatchService.CalculateEloAsync(Match);
-
-
-
-        // Navigate to the matches list
-
+        // Redirect to the match list
         NavigationManager.NavigateTo("/matches");
+    }
 
+    private async Task IncrementTeamEloAsync(R6Ranking.Data.R6EsportsDbContext context) {
+
+        // Find the teams in the database
+        var team1 = await context.Teams.FindAsync(Match.Team1ID);
+        var team2 = await context.Teams.FindAsync(Match.Team2ID);
+
+        if (team1 != null && team2 != null) {
+
+            // Increment both teams' Elo scores by 5 more than their actual scores
+            team1.CurrentElo += Match.Team1Score + 5;
+            team2.CurrentElo += team2.CurrentElo + 5;
+
+            await context.SaveChangesAsync();
+
+        }
+    }
+
+    private async Task CreateTeamEloChangeEntriesAsync(R6Ranking.Data.R6EsportsDbContext context) {
+
+        var team1 = await context.Teams.FindAsync(Match.Team1ID);
+        var team2 = await context.Teams.FindAsync(Match.Team1ID);
+
+        if(team1 !=null && team2 != null) {
+            //make entry for teams found
+            var team1EloChange = new TeamEloChange
+            {
+                    TeamID = team1.TeamID,
+                    RivalTeamID = team2.TeamID,
+                    MatchID = Match.MatchID,
+                    Date = Match.MatchDate,
+                    TournamentName = context.Tournaments
+                        .Where(t => t.TournamentID == Match.TournamentID)
+                        .Select(t => t.TournamentName)
+                        .FirstOrDefault(),
+                    CurrentElo = team1.CurrentElo,
+                    EloChange = Match.Team1Score + 5
+
+            };
+            var team2EloChange = new TeamEloChange {
+                    TeamID = team2.TeamID,
+                    RivalTeamID = team1.TeamID,
+                    MatchID = Match.MatchID,
+                    Date = Match.MatchDate,
+                    TournamentName = context.Tournaments
+                            .Where(t => t.TournamentID == Match.TournamentID)
+                            .Select(t => t.TournamentName)
+                            .FirstOrDefault(),
+                    CurrentElo = team2.CurrentElo,
+                    EloChange = Match.Team1Score + 5
+
+            };
+
+            context.TeamEloChanges.Add(team1EloChange);
+            context.TeamEloChanges.Add(team2EloChange);
+
+            await context.SaveChangesAsync();
+        }
     }
 }

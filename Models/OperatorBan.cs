@@ -4,5 +4,7 @@
         public int OperatorBanID { get; set; } 
         public string? OperatorName { get; set; }
         public string? OperatorLogo { get; set; }
+
+        public ICollection<MatchOperatorBan>? MatchOperatorBans { get; set; }
     }
 }
