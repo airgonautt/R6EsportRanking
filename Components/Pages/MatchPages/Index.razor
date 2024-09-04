@@ -17,13 +17,13 @@
 
 <QuickGrid Class="table" Items="context.Matches">
     <PropertyColumn Property="match => match.MatchName" />
+    <PropertyColumn Property="match => match.MatchDate" />
     <PropertyColumn Property="match => match.Team1ID" />
     <PropertyColumn Property="match => match.Team1Score" />
     <PropertyColumn Property="match => match.Team2ID" />
     <PropertyColumn Property="match => match.Team2Score" />
     <PropertyColumn Property="match => match.MapID" />
     <PropertyColumn Property="match => match.TournamentID" />
-    <PropertyColumn Property="match => match.MatchDate" />
 
     <TemplateColumn Context="match">
         <a href="@($"matches/edit?matchid={match.MatchID}")">Edit</a> |

@@ -20,6 +20,8 @@
         <dl class="row">
             <dt class="col-sm-2">MatchName</dt>
             <dd class="col-sm-10">@match.MatchName</dd>
+            <dt class="col-sm-2">MatchDate</dt>
+            <dd class="col-sm-10">@match.MatchDate</dd>
             <dt class="col-sm-2">Team1ID</dt>
             <dd class="col-sm-10">@match.Team1ID</dd>
             <dt class="col-sm-2">Team1Score</dt>
@@ -32,8 +34,6 @@
             <dd class="col-sm-10">@match.MapID</dd>
             <dt class="col-sm-2">TournamentID</dt>
             <dd class="col-sm-10">@match.TournamentID</dd>
-            <dt class="col-sm-2">MatchDate</dt>
-            <dd class="col-sm-10">@match.MatchDate</dd>
         </dl>
         <div>
             <a href="@($"/matches/edit?matchid={match.MatchID}")">Edit</a> |

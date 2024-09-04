@@ -29,6 +29,11 @@ else
                     <ValidationMessage For="() => Match.MatchName" class="text-danger" />
                 </div>
                 <div class="mb-3">
+                    <label for="matchdate" class="form-label">MatchDate:</label>
+                    <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
+                    <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
                     <label for="team1id" class="form-label">Team1ID:</label>
                     <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" />
                     <ValidationMessage For="() => Match.Team1ID" class="text-danger" />
@@ -57,11 +62,6 @@ else
                     <label for="tournamentid" class="form-label">TournamentID:</label>
                     <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" />
                     <ValidationMessage For="() => Match.TournamentID" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="matchdate" class="form-label">MatchDate:</label>
-                    <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
-                    <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>

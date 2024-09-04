@@ -7,23 +7,17 @@
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
 
-<PageTitle>Operator Bans</PageTitle>
+<PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
 
+<p>
+    <a href="operatorbans/create">Create New</a>
+</p>
 
-<div class="flex-container">
-    <p style="margin-left: auto;">
-        <a href="operatorbans/create" class="btn btn-primary">Create New</a>
-    </p>
-</div>
-<QuickGrid Class="table" Items="@context.OperatorBans">
-    <TemplateColumn Context="operatorban">
-        <div class="ban-info">
-            <img src="@operatorban.OperatorLogo" alt="@operatorban.OperatorName Logo" class="operator-logo" />
-            <span>@operatorban.OperatorName (@operatorban.OperatorBanID)</span>
-        </div>
-    </TemplateColumn>
+<QuickGrid Class="table" Items="context.OperatorBans">
+    <PropertyColumn Property="operatorban => operatorban.OperatorName" />
+    <PropertyColumn Property="operatorban => operatorban.OperatorLogo" />
 
     <TemplateColumn Context="operatorban">
         <a href="@($"operatorbans/edit?operatorbanid={operatorban.OperatorBanID}")">Edit</a> |
@@ -32,24 +26,11 @@
     </TemplateColumn>
 </QuickGrid>
 
-<style>
-    .ban-info {
-        display: flex;
-        align-items: center;
-    }
-
-    .operator-logo {
-        width: 60px; /* Adjust this value as needed */
-        height: 60px; /* Adjust this value as needed */
-        object-fit: contain; /* Ensure the image fits within the set dimensions */
-        margin-right: 10px;
-    }
-</style>
-
 @code {
     R6EsportsDbContext context = default!;
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         context = DbFactory.CreateDbContext();
     }
 

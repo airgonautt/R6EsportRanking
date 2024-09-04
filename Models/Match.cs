@@ -1,6 +1,6 @@
 ﻿using R6Ranking.Data;
+using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace R6Ranking.Models {
     public class Match {

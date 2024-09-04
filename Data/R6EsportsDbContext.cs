@@ -19,7 +19,6 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Trophy> Trophies { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
-
         : base(options) {
         Database.EnsureCreated();
     }
@@ -86,11 +85,6 @@ public class R6EsportsDbContext : DbContext {
             .HasOne(mob => mob.Match)
             .WithMany(m => m.MatchOperatorBans)
             .HasForeignKey(mob => mob.MatchID);
-
-        modelBuilder.Entity<MatchOperatorBan>()
-            .HasOne(mob => mob.OperatorBan)
-            .WithMany(ob => ob.MatchOperatorBans)
-            .HasForeignKey(mob => mob.OperatorBanID);
 
         //REGION RELATIONSHIPS
         modelBuilder.Entity<Region>()

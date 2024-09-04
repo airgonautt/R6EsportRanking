@@ -4,7 +4,6 @@
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
-@inject R6Ranking.Services.MatchService MatchService
 
 <PageTitle>Create</PageTitle>
 
@@ -18,57 +17,45 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="matchname" class="form-label">MatchName:</label>
-                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" />
-                <ValidationMessage For="() => Match.MatchName" class="text-danger" />
-            </div>
+                <label for="matchname" class="form-label">MatchName:</label> 
+                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" /> 
+                <ValidationMessage For="() => Match.MatchName" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="team1id" class="form-label">Team1ID:</label>
-                <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" />
-                <ValidationMessage For="() => Match.Team1ID" class="text-danger" />
-            </div>
+                <label for="matchdate" class="form-label">MatchDate:</label> 
+                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" /> 
+                <ValidationMessage For="() => Match.MatchDate" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="team1score" class="form-label">Team1Score:</label>
-                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
-                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
-            </div>
+                <label for="team1id" class="form-label">Team1ID:</label> 
+                <InputNumber id="team1id" @bind-Value="Match.Team1ID" class="form-control" /> 
+                <ValidationMessage For="() => Match.Team1ID" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="team2id" class="form-label">Team2ID:</label>
-                <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" />
-                <ValidationMessage For="() => Match.Team2ID" class="text-danger" />
-            </div>
+                <label for="team1score" class="form-label">Team1Score:</label> 
+                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" /> 
+                <ValidationMessage For="() => Match.Team1Score" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="team2score" class="form-label">Team2Score:</label>
-                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
-                <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
-            </div>
+                <label for="team2id" class="form-label">Team2ID:</label> 
+                <InputNumber id="team2id" @bind-Value="Match.Team2ID" class="form-control" /> 
+                <ValidationMessage For="() => Match.Team2ID" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="mapid" class="form-label">MapID:</label>
-                <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" />
-                <ValidationMessage For="() => Match.MapID" class="text-danger" />
-            </div>
+                <label for="team2score" class="form-label">Team2Score:</label> 
+                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" /> 
+                <ValidationMessage For="() => Match.Team2Score" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="tournamentid" class="form-label">TournamentID:</label>
-                <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" />
-                <ValidationMessage For="() => Match.TournamentID" class="text-danger" />
-            </div>
+                <label for="mapid" class="form-label">MapID:</label> 
+                <InputNumber id="mapid" @bind-Value="Match.MapID" class="form-control" /> 
+                <ValidationMessage For="() => Match.MapID" class="text-danger" /> 
+            </div>        
             <div class="mb-3">
-                <label for="matchdate" class="form-label">MatchDate:</label>
-                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
-                <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
-            </div>
-
-            <!-- Operator Bans selection -->
-            <div class="mb-3">
-                <label for="operatorBans" class="form-label">Select up to 4 Operator Bans:</label>
-                <select multiple class="form-control" @bind="selectedOperatorBanIds">
-                    @foreach (var operatorBan in OperatorBans) {
-                        <option value="@operatorBan.OperatorBanID">@operatorBan.OperatorName</option>
-                    }
-                </select>
-                <ValidationMessage For="() => selectedOperatorBanIds" class="text-danger" />
-            </div>
-
+                <label for="tournamentid" class="form-label">TournamentID:</label> 
+                <InputNumber id="tournamentid" @bind-Value="Match.TournamentID" class="form-control" /> 
+                <ValidationMessage For="() => Match.TournamentID" class="text-danger" /> 
+            </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -82,93 +69,13 @@
 
     [SupplyParameterFromForm]
     public Match Match { get; set; } = new();
-    private List<OperatorBan> OperatorBans { get; set; } = new();
-    private List<int> selectedOperatorBanIds { get; set; } = new();
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-    public async Task AddMatch() {
-
+    public async Task AddMatch()
+    {
         using var context = DbFactory.CreateDbContext();
-        OperatorBans = await context.OperatorBans.ToListAsync();
-
         context.Matches.Add(Match);
-
         await context.SaveChangesAsync();
-        // Create MatchOperatorBan entries for selected operator bans
-        foreach (var operatorBanId in selectedOperatorBanIds) {
-            var matchOperatorBan = new MatchOperatorBan {
-                    MatchID = Match.MatchID,
-                    OperatorBanID = operatorBanId
-                };
-            context.MatchOperatorBans.Add(matchOperatorBan);
-        }
-
-        // Increment the Elo scores for both teams
-        await IncrementTeamEloAsync(context);
-
-        // Create TeamEloChange entries
-        await CreateTeamEloChangeEntriesAsync(context);
-
-        // Redirect to the match list
         NavigationManager.NavigateTo("/matches");
-    }
-
-    private async Task IncrementTeamEloAsync(R6Ranking.Data.R6EsportsDbContext context) {
-
-        // Find the teams in the database
-        var team1 = await context.Teams.FindAsync(Match.Team1ID);
-        var team2 = await context.Teams.FindAsync(Match.Team2ID);
-
-        if (team1 != null && team2 != null) {
-
-            // Increment both teams' Elo scores by 5 more than their actual scores
-            team1.CurrentElo += Match.Team1Score + 5;
-            team2.CurrentElo += team2.CurrentElo + 5;
-
-            await context.SaveChangesAsync();
-
-        }
-    }
-
-    private async Task CreateTeamEloChangeEntriesAsync(R6Ranking.Data.R6EsportsDbContext context) {
-
-        var team1 = await context.Teams.FindAsync(Match.Team1ID);
-        var team2 = await context.Teams.FindAsync(Match.Team1ID);
-
-        if(team1 !=null && team2 != null) {
-            //make entry for teams found
-            var team1EloChange = new TeamEloChange
-            {
-                    TeamID = team1.TeamID,
-                    RivalTeamID = team2.TeamID,
-                    MatchID = Match.MatchID,
-                    Date = Match.MatchDate,
-                    TournamentName = context.Tournaments
-                        .Where(t => t.TournamentID == Match.TournamentID)
-                        .Select(t => t.TournamentName)
-                        .FirstOrDefault(),
-                    CurrentElo = team1.CurrentElo,
-                    EloChange = Match.Team1Score + 5
-
-            };
-            var team2EloChange = new TeamEloChange {
-                    TeamID = team2.TeamID,
-                    RivalTeamID = team1.TeamID,
-                    MatchID = Match.MatchID,
-                    Date = Match.MatchDate,
-                    TournamentName = context.Tournaments
-                            .Where(t => t.TournamentID == Match.TournamentID)
-                            .Select(t => t.TournamentName)
-                            .FirstOrDefault(),
-                    CurrentElo = team2.CurrentElo,
-                    EloChange = Match.Team1Score + 5
-
-            };
-
-            context.TeamEloChanges.Add(team1EloChange);
-            context.TeamEloChanges.Add(team2EloChange);
-
-            await context.SaveChangesAsync();
-        }
     }
 }

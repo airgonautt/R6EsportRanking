@@ -1,0 +1,85 @@
+﻿@page "/MatchOperatorBans/edit"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>MatchOperatorBan</h4>
+<hr />
+@if (MatchOperatorBan is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="MatchOperatorBan" OnValidSubmit="UpdateMatchOperatorBan" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="MatchOperatorBan.MatchID" value="@MatchOperatorBan.MatchID" />
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/matchoperatorbans">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int MatchID { get; set; }
+
+    [SupplyParameterFromForm]
+    public MatchOperatorBan? MatchOperatorBan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        MatchOperatorBan ??= await context.MatchOperatorBans.FirstOrDefaultAsync(m => m.MatchID == MatchID);
+
+        if (MatchOperatorBan is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMatchOperatorBan()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(MatchOperatorBan!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MatchOperatorBanExists(MatchOperatorBan!.MatchID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/matchoperatorbans");
+    }
+
+    bool MatchOperatorBanExists(int matchid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.MatchOperatorBans.Any(e => e.MatchID == matchid);
+    }
+}
