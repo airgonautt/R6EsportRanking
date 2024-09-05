@@ -63,8 +63,6 @@ This should create a new database on your MS SQL server that you can interact wi
 Contributions are welcome! And please contact me for any inquiries, I will respond on a timely manner
 
 
-##License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-    Player Statistics: More granular statistics for each player, including performance metrics.
-    Match Simulation: Simulate match outcomes based on team Elo and historical performance.
