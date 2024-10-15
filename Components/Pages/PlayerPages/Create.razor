@@ -16,6 +16,7 @@
         <EditForm method="post" Model="Player" OnValidSubmit="AddPlayer" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
+
             <div class="mb-3">
                 <label for="playername" class="form-label">PlayerName:</label> 
                 <InputText id="playername" @bind-Value="Player.PlayerName" class="form-control" /> 
@@ -25,13 +26,19 @@
                 <label for="role" class="form-label">Role:</label> 
                 <InputText id="role" @bind-Value="Player.Role" class="form-control" /> 
                 <ValidationMessage For="() => Player.Role" class="text-danger" /> 
-            </div>        
+            </div>  
+            
             <div class="mb-3">
                 <label for="photourl" class="form-label">PhotoURL:</label> 
                 <InputText id="photourl" @bind-Value="Player.PhotoURL" class="form-control" /> 
                 <ValidationMessage For="() => Player.PhotoURL" class="text-danger" /> 
             </div> 
-            
+            <div class="mb-3">
+                <label for="cardurl" class="form-label">CardURL:</label>
+                <InputText id="photourl" @bind-Value="Player.PhotoURL" class="form-control" />
+                <ValidationMessage For="() => Player.CardURL" class="text-danger" />
+            </div>
+
             <div class="mb-3">
                 <label for="teamid" class="form-label">Team:</label> 
                 <InputSelect id="teamid" @bind-Value="@Player.TeamID" class="form-control">

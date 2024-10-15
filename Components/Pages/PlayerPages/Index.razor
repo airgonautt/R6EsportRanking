@@ -1,42 +1,79 @@
 ﻿@page "/players"
 
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using R6Ranking.Models
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Players</PageTitle>
 
-<h1>Index</h1>
+<h1>Players</h1>
 
 <p>
     <a href="players/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Players">
-    <PropertyColumn Property="player => player.PlayerName" />
-    <PropertyColumn Property="player => player.Role" />
-    <PropertyColumn Property="player => player.PhotoURL" />
-    <PropertyColumn Property="player => player.TeamID" />
-    <PropertyColumn Property="player => player.DateJoined" />
-    <PropertyColumn Property="player => player.DateLeft" />
+<!-- Flex container for players -->
+<div class="player-container">
+    @if (players != null) {
+        @foreach (var player in players) {
+            <div class="player-card">
+                <!-- Portrait Section: Background and Foreground -->
+                <div class="player-portrait" style="background-image: url('@player.CardURL')">
+                    <img class="player-photo" src="@player.PhotoURL" alt="@player.PlayerName" />
+                </div>
 
-    <TemplateColumn Context="player">
-        <a href="@($"players/edit?playerid={player.PlayerID}")">Edit</a> |
-        <a href="@($"players/details?playerid={player.PlayerID}")">Details</a> |
-        <a href="@($"players/delete?playerid={player.PlayerID}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+                <!-- Player Information -->
+                <div class="player-info">
+                    <h3>@player.PlayerName</h3>
+                    <p>Role: @player.Role</p>
+                    <p>Joined: @player.DateJoined?.ToShortDateString()</p>
+                    <p>Team ID: @player.TeamID</p>
+                    @if (player.DateLeft.HasValue) {
+                        <p>Left: @player.DateLeft.Value.ToShortDateString()</p>
+                    }
+                </div>
 
-@code {
-    R6EsportsDbContext context = default!;
-
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
+                <!-- Player Actions -->
+                <div class="player-actions">
+                    <a href="@($"players/edit?playerid={player.PlayerID}")">Edit</a> |
+                    <a href="@($"players/details?playerid={player.PlayerID}")">Details</a> |
+                    <a href="@($"players/delete?playerid={player.PlayerID}")">Delete</a>
+                </div>
+            </div>
+        }
     }
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+    else {
+        <p>Loading players...</p>
+    }
+</div>
+
+@code {
+    private List<Player> players = new List<Player>();
+
+    private R6EsportsDbContext context = default!;
+
+
+
+    protected override async Task OnInitializedAsync() {
+
+        context = DbFactory.CreateDbContext();
+
+        players = await context.Players.ToListAsync();
+
+    }
+
+
+
+    public async ValueTask DisposeAsync() {
+
+        if (context != null) {
+
+            await context.DisposeAsync();
+
+        }
+
+    }
 }

@@ -1,0 +1,43 @@
+﻿@page "/teams/{teamName}"
+
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+<h1>@team?.TeamName</h1>
+
+@if (team != null)
+{
+    <div class="team-info">
+        <img src="@team.LogoUrl" alt="Team Logo" class="team-logo" />
+        <p><strong>Region:</strong> @team.Region</p>
+        <p><strong>Current Elo:</strong> @team.CurrentElo</p>
+        <p><strong>Players:</strong></p>
+        <ul>
+            @foreach (var player in team.Players)
+            {
+                <li>@player.PlayerName</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <p>Loading team info...</p>
+}
+
+@code {
+    private Team? team;
+
+    [Parameter]
+    public string teamName { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        team = await context.Teams
+                            .Include(t => t.Players)  // Load related players for the team
+                            .FirstOrDefaultAsync(t => t.TeamName == teamName);  // Find the team by its ID
+    }
+}

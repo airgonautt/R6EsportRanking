@@ -34,17 +34,14 @@
 </QuickGrid>
 
 @code {
+
     R6EsportsDbContext context = default!;
-
-
 
     protected override void OnInitialized() {
 
         context = DbFactory.CreateDbContext();
 
     }
-
-
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

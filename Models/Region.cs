@@ -21,5 +21,4 @@ namespace R6Ranking.Models {
         public ICollection<Tournament>? Tournaments { get; set; }
     }
     
-
 }

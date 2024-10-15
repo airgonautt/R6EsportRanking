@@ -1,0 +1,33 @@
+﻿@using R6Ranking.Models  
+
+<h3>PlayerCard</h3>
+
+@code {
+    [Parameter]
+    public Player Player { get; set; } = new Player(); // Player object passed from parent
+}
+<!-- Player card component -->
+<div class="player-card">
+    <!-- Portrait Section: Background and Foreground -->
+    <div class="player-portrait" style="background-image: url('@Player.CardURL')">
+        <img class="player-photo" src="@Player.PhotoURL" alt="@Player.PlayerName" />
+    </div>
+
+    <!-- Player Information -->
+    <div class="player-info">
+        <h3>@Player.PlayerName</h3>
+        <p>Role: @Player.Role</p>
+        <p>Joined: @Player.DateJoined?.ToShortDateString()</p>
+        <p>Team ID: @Player.TeamID</p>
+        @if (Player.DateLeft.HasValue) {
+            <p>Left: @Player.DateLeft.Value.ToShortDateString()</p>
+        }
+    </div>
+
+    <!-- Player Actions -->
+    <div class="player-actions">
+        <a href="@($"players/edit?playerid={Player.PlayerID}")">Edit</a> |
+        <a href="@($"players/details?playerid={Player.PlayerID}")">Details</a> |
+        <a href="@($"players/delete?playerid={Player.PlayerID}")">Delete</a>
+    </div>
+</div>
