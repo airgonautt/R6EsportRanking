@@ -8,6 +8,7 @@ namespace R6Ranking.Models {
         public string? Role { get; set; }
         public string? PhotoURL {  get; set; }
         public string? CardURL { get; set; }
+        public string? FlavorText { get; set; }
 
         public int? TeamID { get; set; }
         public Team? Team { get; set; }
@@ -15,5 +16,5 @@ namespace R6Ranking.Models {
         public DateTime? DateJoined { get; set; }
         public DateTime? DateLeft { get; set; }
     }
-    
+        
 }

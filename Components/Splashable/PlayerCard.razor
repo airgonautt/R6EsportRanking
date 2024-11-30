@@ -12,7 +12,6 @@
     <div class="player-portrait" style="background-image: url('@Player.CardURL')">
         <img class="player-photo" src="@Player.PhotoURL" alt="@Player.PlayerName" />
     </div>
-
     <!-- Player Information -->
     <div class="player-info">
         <h3>@Player.PlayerName</h3>
@@ -23,11 +22,10 @@
             <p>Left: @Player.DateLeft.Value.ToShortDateString()</p>
         }
     </div>
-
     <!-- Player Actions -->
     <div class="player-actions">
         <a href="@($"players/edit?playerid={Player.PlayerID}")">Edit</a> |
         <a href="@($"players/details?playerid={Player.PlayerID}")">Details</a> |
         <a href="@($"players/delete?playerid={Player.PlayerID}")">Delete</a>
-    </div>
+     </div>
 </div>

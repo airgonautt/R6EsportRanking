@@ -8,6 +8,6 @@ namespace R6Ranking.Models {
         public string? MapName { get; set; }
         public string? MapPhoto { get; set; }
 
-        public ICollection<Match> Matches { get; set; }
+        public ICollection<Match> Matches { get; set; } 
     }
 }

@@ -1,5 +1,4 @@
 ﻿@page "/operatorbans/details"
-
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -10,7 +9,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>OperatorBan</h4>
+    <h2>OperatorBan</h2>
     <hr />
     @if (operatorban is null)
     {
@@ -22,6 +21,8 @@
             <dd class="col-sm-10">@operatorban.OperatorName</dd>
             <dt class="col-sm-2">OperatorLogo</dt>
             <dd class="col-sm-10">@operatorban.OperatorLogo</dd>
+            <dt class="col-sm-2">OperatorSide</dt>
+            <dd class="col-sm-10">@operatorban.OperatorSide</dd>
         </dl>
         <div>
             <a href="@($"/operatorbans/edit?operatorbanid={operatorban.OperatorBanID}")">Edit</a> |
@@ -31,10 +32,10 @@
 </div>
 
 @code {
-    OperatorBan? operatorban;
+    private OperatorBan? operatorban;
 
     [SupplyParameterFromQuery]
-    public int OperatorBanID { get; set; }
+    private int OperatorBanID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

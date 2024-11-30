@@ -1,5 +1,4 @@
-﻿@page "/OperatorBans/edit"
-
+﻿@page "/operatorbans/edit"
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -9,7 +8,7 @@
 
 <h1>Edit</h1>
 
-<h4>OperatorBan</h4>
+<h2>OperatorBan</h2>
 <hr />
 @if (OperatorBan is null)
 {
@@ -21,7 +20,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="OperatorBan" OnValidSubmit="UpdateOperatorBan" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary />
+                <ValidationSummary role="alert"/>
                 <input type="hidden" name="OperatorBan.OperatorBanID" value="@OperatorBan.OperatorBanID" />
                 <div class="mb-3">
                     <label for="operatorname" class="form-label">OperatorName:</label>
@@ -32,6 +31,11 @@ else
                     <label for="operatorlogo" class="form-label">OperatorLogo:</label>
                     <InputText id="operatorlogo" @bind-Value="OperatorBan.OperatorLogo" class="form-control" />
                     <ValidationMessage For="() => OperatorBan.OperatorLogo" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="operatorside" class="form-label">OperatorSide:</label>
+                    <InputText id="operatorside" @bind-Value="OperatorBan.OperatorSide" class="form-control" />
+                    <ValidationMessage For="() => OperatorBan.OperatorSide" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
@@ -45,10 +49,10 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int OperatorBanID { get; set; }
+    private int OperatorBanID { get; set; }
 
     [SupplyParameterFromForm]
-    public OperatorBan? OperatorBan { get; set; }
+    private OperatorBan? OperatorBan { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,8 +66,8 @@ else
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see https://aka.ms/RazorPagesCRUD.
-    public async Task UpdateOperatorBan()
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateOperatorBan()
     {
         using var context = DbFactory.CreateDbContext();
         context.Attach(OperatorBan!).State = EntityState.Modified;
@@ -87,7 +91,7 @@ else
         NavigationManager.NavigateTo("/operatorbans");
     }
 
-    bool OperatorBanExists(int operatorbanid)
+    private bool OperatorBanExists(int operatorbanid)
     {
         using var context = DbFactory.CreateDbContext();
         return context.OperatorBans.Any(e => e.OperatorBanID == operatorbanid);

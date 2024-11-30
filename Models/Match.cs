@@ -1,8 +1,9 @@
-﻿using R6Ranking.Data;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 
-namespace R6Ranking.Models {
+namespace R6Ranking.Models
+{
     public class Match {
 
         public int MatchID { get; set; }
@@ -18,15 +19,14 @@ namespace R6Ranking.Models {
 
         public DateTime MatchDate { get; set; }
 
-        [ForeignKey("MapID")]
+        //navigation
         public int MapID { get; set; }        
         public Map Map { get; set; }
-
+        
         public int TournamentID { get; set; }
-        public Tournament Tournament { get; set; }
+        public Tournament? Tournament { get; set; }
 
-        public ICollection<TeamEloChange>? TeamEloChanges { get; set; }
-        public ICollection<MatchOperatorBan>? MatchOperatorBans { get; set; }
+        public ICollection<TeamOperatorBan> TeamOperatorBans { get; set; } = new List<TeamOperatorBan>();
 
     }
 }

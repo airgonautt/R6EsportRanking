@@ -6,7 +6,6 @@
         public string? TrophyPhotoURL {  get; set; }
 
         public int TournamentID { get; set; }
-        public Tournament Tournament{ get; set; }
-
+        public Tournament Tournament { get; set; } = null!;
     }
 }

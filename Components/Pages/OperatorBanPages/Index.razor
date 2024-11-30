@@ -1,11 +1,10 @@
 ﻿@page "/operatorbans"
-
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using R6Ranking.Models
 @using R6Ranking.Data
-@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 
 <PageTitle>Index</PageTitle>
 
@@ -18,6 +17,7 @@
 <QuickGrid Class="table" Items="context.OperatorBans">
     <PropertyColumn Property="operatorban => operatorban.OperatorName" />
     <PropertyColumn Property="operatorban => operatorban.OperatorLogo" />
+    <PropertyColumn Property="operatorban => operatorban.OperatorSide" />
 
     <TemplateColumn Context="operatorban">
         <a href="@($"operatorbans/edit?operatorbanid={operatorban.OperatorBanID}")">Edit</a> |
@@ -27,7 +27,7 @@
 </QuickGrid>
 
 @code {
-    R6EsportsDbContext context = default!;
+    private R6EsportsDbContext context = default!;
 
     protected override void OnInitialized()
     {

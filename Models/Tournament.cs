@@ -20,6 +20,6 @@
         // Navigation property for related Matches
         public ICollection<Match>? Matches { get; set; }
         public ICollection<TeamTournament>? TournamentTeams { get; set; } ///skips many2many navigations
-        public Trophy Trophy { get; set; }
+        public Trophy? Trophy { get; set; }
     }
 }

@@ -19,6 +19,7 @@ namespace R6Ranking.Models {
 
         public ICollection<Team>? Teams { get; set; }
         public ICollection<Tournament>? Tournaments { get; set; }
+        public ICollection<RegionEloChange> RegionEloHistory { get; set; } = new List<RegionEloChange>();
     }
-    
 }
+    

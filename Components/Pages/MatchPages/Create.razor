@@ -1,98 +1,90 @@
 ﻿@page "/matches/create"
-
 @using Microsoft.EntityFrameworkCore
+@using System.Text.Json
+@using R6Ranking.Data
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
-@inject R6Ranking.Services.MatchService MatchService
 
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
 
-<h4>Match</h4>
+<h2>Match</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <EditForm Model="Match" OnValidSubmit="AddMatch" FormName="createForm">
+        <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" />
+            <ValidationSummary class="text-danger" role="alert" />
 
             <div class="mb-3">
-                <label for="matchname" class="form-label">MatchName:</label> 
-                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" /> 
-                <ValidationMessage For="() => Match.MatchName" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="matchdate" class="form-label">MatchDate:</label> 
-                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" /> 
-                <ValidationMessage For="() => Match.MatchDate" class="text-danger" /> 
-            </div>  
-            
-            <div class="mb-3">
-                <label for="team1id" class="form-label">Team 1:</label>
-                <InputText id="team1name" class="form-control" @bind-Value="Team1Name" />
-                <ul class="list-group">
-                    @foreach (var team in Teams1) {
-                        <li class="list-group-item" @onclick="() => SelectTeam1(team.TeamID, team.TeamName)">
-                            @team.TeamName
-                        </li>
-                    }
-                </ul>
-                <ValidationMessage For="() => Match.Team1ID" class="text-danger" />
-            </div>
-                        
-            <div class="mb-3">
-                <label for="team1score" class="form-label">Team1Score:</label> 
-                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team1Score" class="text-danger" /> 
-            </div>  
-            
-            <div class="mb-3">
-                <label for="team2id" class="form-label">Team 2:</label>
-                <InputText id="team2name" class="form-control" @bind-Value="Team2Name"  />
-                <ul class="list-group">
-                    @foreach (var team in Teams2) {
-                        <li class="list-group-item" @onclick="() => SelectTeam2(team.TeamID, team.TeamName)">
-                            @team.TeamName
-                        </li>
-                    }
-                </ul>
-                <ValidationMessage For="() => Match.Team2ID" class="text-danger" />
+                <label for="matchname" class="form-label">MatchName:</label>
+                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" />
+                <ValidationMessage For="() => Match.MatchName" class="text-danger" />
             </div>
 
             <div class="mb-3">
-                <label for="team2score" class="form-label">Team2Score:</label> 
-                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" /> 
-                <ValidationMessage For="() => Match.Team2Score" class="text-danger" /> 
-            </div>  
-            
-            <div class="mb-3">
-                <label for="mapid" class="form-label">Map:</label>
-                <InputText id="mapname" class="form-control" @bind-Value="MapName"  />
-                <ul class="list-group">
-                    @foreach (var map in Maps) {
-                        <li class="list-group-item" @onclick="() => SelectMap(map.MapID, map.MapName)">
-                            @map.MapName
-                        </li>
+                <label>Team 1:</label>
+                <InputSelect @bind-Value="Match.Team1ID" class="form-control">
+                    <option value="">Select Team 1</option>
+                    @foreach (var team in Teams)
+                    {
+                        <option value="@team.TeamID">@team.TeamName</option>
                     }
-                </ul>
-                <ValidationMessage For="() => Match.MapID" class="text-danger" />
+                </InputSelect>
             </div>
-            
+
             <div class="mb-3">
-                <label for="tournamentid" class="form-label">Tournament:</label>
-                <InputText id="tournamentname" class="form-control" @bind-Value="TournamentName"  />
-                <ul class="list-group">
-                    @foreach (var tournament in Tournaments) {
-                        <li class="list-group-item" @onclick="() => SelectTournament(tournament.TournamentID, tournament.TournamentName)">
-                            @tournament.TournamentName
-                        </li>
-                    }
-                </ul>
-                <ValidationMessage For="() => Match.TournamentID" class="text-danger" />
+                <label for="team1score" class="form-label">Team1Score:</label>
+                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
+                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
             </div>
-            
+
+            <div class="mb-3">
+                <label>Team 2:</label>
+                <InputSelect @bind-Value="Match.Team2ID" class="form-control">
+                    <option value="">Select Team 2</option>
+                    @foreach (var team in Teams)
+                    {
+                        <option value="@team.TeamID">@team.TeamName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="team2score" class="form-label">Team2Score:</label>
+                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
+                <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="matchdate" class="form-label">MatchDate:</label>
+                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
+                <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label>Map:</label>
+                <InputSelect @bind-Value="Match.MapID" class="form-control">
+                    <option value="">Select Map</option>
+                    @foreach (var map in Maps)
+                    {
+                        <option value="@map.MapID">@map.MapName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label>Tournament:</label>
+                <InputSelect @bind-Value="Match.TournamentID" class="form-control">
+                    <option value="">Select Tournament</option>
+                    @foreach (var tournament in Tournaments)
+                    {
+                        <option value="@tournament.TournamentID">@tournament.TournamentName</option>
+                    }
+                </InputSelect>
+            </div>
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -103,70 +95,127 @@
 </div>
 
 @code {
-    private string Team1Name { get; set; } = "";
-    private string Team2Name { get; set; } = "";
-    private string MapName { get; set; } = "";
-    private string TournamentName { get; set; } = "";
 
-    private List<Team> Teams1 { get; set; } = new();
-    private List<Team> Teams2 { get; set; } = new();
+    [SupplyParameterFromForm]
+    private Match Match { get; set; } = new();
+
+    private List<Team> Teams { get; set; } = new();
     private List<Map> Maps { get; set; } = new();
     private List<Tournament> Tournaments { get; set; } = new();
 
-    [SupplyParameterFromForm]
-    public Match Match { get; set; } = new();
-
-    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-    public async Task AddMatch()
+    protected override async Task OnInitializedAsync()
     {
-        //context.Matches.Add(Match);
-        await MatchService.CalculateEloAsync(Match);
-        NavigationManager.NavigateTo("/matches");
+        using var context = DbFactory.CreateDbContext();
+        Teams = await context.Teams.ToListAsync();
+        Maps = await context.Maps.ToListAsync();
+        Tournaments = await context.Tournaments.ToListAsync();
+    }
+
+    private async Task AddMatch()
+    {
+        using var context = DbFactory.CreateDbContext();
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        
+        
+            // Add the match to the database
+            context.Matches.Add(Match);
+            await context.SaveChangesAsync();
+
+            // Update Elo and save history for both teams
+            await UpdateEloAndSaveHistoryAsync(context, Match);
+
+            // Commit the transaction
+            await transaction.CommitAsync();
+
+            // Navigate back to matches
+            NavigationManager.NavigateTo("/matches");
+        
+        //try and catch (Exception ex)
+        {
+            //await transaction.RollbackAsync();
+            //Console.WriteLine($"Transaction rolled back. Error: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateEloAndSaveHistoryAsync(R6EsportsDbContext context, Match match)
+    {
+        // Fetch teams from the database
+        var team1 = await context.Teams.FindAsync(match.Team1ID);
+        var team2 = await context.Teams.FindAsync(match.Team2ID);
+
+        if (team1 == null || team2 == null)
+        {
+            throw new InvalidOperationException("One or both teams could not be found.");
+        }
+
+        // Calculate new Elo ratings for both teams
+        (decimal team1EloChange, decimal team2EloChange) = CalculateEloChange(team1.CurrentElo, team2.CurrentElo, match.Team1Score, match.Team2Score);
+
+        // Update team Elo
+        team1.CurrentElo += team1EloChange;
+        team2.CurrentElo += team2EloChange;
+
+                /* Save Elo history for both teams
+                var team1History = new TeamEloHistory
+                {
+                TeamID = team1.TeamID,
+                MatchID = match.MatchID,
+                RivalTeamID = team2.TeamID,
+                RivalTeamName = team2.TeamName,
+                EloChange = team1EloChange,
+            CurrentElo = team1.CurrentElo,
+        Date = DateTime.UtcNow
+            };
+
+                var team2History = new TeamEloHistory
+                {
+                TeamID = team2.TeamID,
+                MatchID = match.MatchID,
+                RivalTeamID = team1.TeamID,
+                RivalTeamName = team1.TeamName,
+                EloChange = team2EloChange,
+                CurrentElo = team2.CurrentElo,
+                Date = DateTime.UtcNow
+        };
+
+        context.TeamEloHistories.AddRange(team1History, team2History);
+
+        */
+        await context.SaveChangesAsync();
+    }
+
+    private (decimal team1EloChange, decimal team2EloChange) CalculateEloChange(decimal team1Elo, decimal team2Elo, decimal team1Score, decimal team2Score)
+    {
+        const decimal kFactorBo1 = 65m; // Best of 1 match significance
+        const decimal kFactorBo3 = 32m; // Best of 3+ match significance
+
+        decimal kFactor = team1Score + team2Score >= 3 ? kFactorBo3 : kFactorBo1;
+
+        // Calculate expected results
+        decimal expectedTeam1 = 1 / (1 + (decimal)Math.Pow(10, (double)((team2Elo - team1Elo) / 500)));
+        decimal expectedTeam2 = 1 / (1 + (decimal)Math.Pow(10, (double)((team1Elo - team2Elo) / 500)));
+
+        // Determine actual results
+        decimal actualTeam1 = CalculateActualResult(team1Score, team2Score);
+        decimal actualTeam2 = 1 - actualTeam1;
+
+        // Calculate Elo changes
+        decimal team1EloChange = kFactor * (actualTeam1 - expectedTeam1);
+        decimal team2EloChange = kFactor * (actualTeam2 - expectedTeam2);
+
+        return (team1EloChange, team2EloChange);
+    }
+
+    private decimal CalculateActualResult(decimal team1Score, decimal team2Score)
+    {
+        decimal scoreDifference = Math.Abs(team1Score - team2Score);
+
+        if (scoreDifference <= 2)
+        {
+            return 0.5m; // Statistically a tie for close matches
+        }
+        return team1Score > team2Score ? 1m : 0m;
     }
     
-    /*
-    public async Task SearchTeams1(ChangeEventArgs e) {
-
-        Team1Name = e.Value?.ToString() ?? string.Empty; ;
-        Teams1 = await MatchService.SearchTeamAsync(Team1Name);
-    }
-    public async Task SearchTeams2(ChangeEventArgs e) {
-
-        Team1Name = e.Value?.ToString() ?? string.Empty; ;
-        Teams2 = await MatchService.SearchTeamAsync(Team2Name);
-    }
-    private async Task SearchMaps(ChangeEventArgs e) {
-        MapName = e.Value?.ToString() ?? string.Empty; ;
-        Maps = await MatchService.SearchMapAsync(MapName);
-    }
-
-    private async Task SearchTournaments(ChangeEventArgs e) {
-        TournamentName = e.Value?.ToString() ?? string.Empty; ;
-        Tournaments = await MatchService.SearchTournamentAsync(TournamentName);
-    }
-    */
-
-    private void SelectTeam1(int id, string name) {
-        Match.Team1ID = id;
-        Team1Name = name;
-        Teams1.Clear();  // Hide the list after selection
-    }
-
-    private void SelectTeam2(int id, string name) {
-        Match.Team2ID = id;
-        Team2Name = name;
-        Teams2.Clear();  // Hide the list after selection
-    }
-
-    private void SelectMap(int id, string name) {
-        Match.MapID = id;
-        MapName = name;
-        Maps.Clear();  // Hide the list after selection
-    }
-
-    private void SelectTournament(int id, string name) {
-        Match.TournamentID = id;
-        TournamentName = name;
-        Tournaments.Clear();  // Hide the list after selection
-    }
 }

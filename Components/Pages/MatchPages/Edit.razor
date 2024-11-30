@@ -1,5 +1,4 @@
-﻿@page "/Matches/edit"
-
+﻿@page "/matches/edit"
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -9,7 +8,7 @@
 
 <h1>Edit</h1>
 
-<h4>Match</h4>
+<h2>Match</h2>
 <hr />
 @if (Match is null)
 {
@@ -21,17 +20,12 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="Match" OnValidSubmit="UpdateMatch" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary />
+                <ValidationSummary role="alert"/>
                 <input type="hidden" name="Match.MatchID" value="@Match.MatchID" />
                 <div class="mb-3">
                     <label for="matchname" class="form-label">MatchName:</label>
                     <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" />
                     <ValidationMessage For="() => Match.MatchName" class="text-danger" />
-                </div>
-                <div class="mb-3">
-                    <label for="matchdate" class="form-label">MatchDate:</label>
-                    <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
-                    <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="team1id" class="form-label">Team1ID:</label>
@@ -52,6 +46,11 @@ else
                     <label for="team2score" class="form-label">Team2Score:</label>
                     <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
                     <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="matchdate" class="form-label">MatchDate:</label>
+                    <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
+                    <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="mapid" class="form-label">MapID:</label>
@@ -75,10 +74,10 @@ else
 
 @code {
     [SupplyParameterFromQuery]
-    public int MatchID { get; set; }
+    private int MatchID { get; set; }
 
     [SupplyParameterFromForm]
-    public Match? Match { get; set; }
+    private Match? Match { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,8 +91,8 @@ else
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see https://aka.ms/RazorPagesCRUD.
-    public async Task UpdateMatch()
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateMatch()
     {
         using var context = DbFactory.CreateDbContext();
         context.Attach(Match!).State = EntityState.Modified;
@@ -117,7 +116,7 @@ else
         NavigationManager.NavigateTo("/matches");
     }
 
-    bool MatchExists(int matchid)
+    private bool MatchExists(int matchid)
     {
         using var context = DbFactory.CreateDbContext();
         return context.Matches.Any(e => e.MatchID == matchid);

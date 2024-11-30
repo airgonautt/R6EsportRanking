@@ -17,10 +17,12 @@ namespace R6Ranking.Models {
         public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
         public ICollection<Player>? Players { get; set; }
-        public ICollection<TeamEloChange>? TeamEloChanges { get; set; }
+        public ICollection<TeamEloChange>? TeamEloHistory { get; set; } = new List<TeamEloChange>();
 
-        public ICollection<Match> MatchesAsTeam1 { get; set; } = new List<Match>();
-        public ICollection<Match> MatchesAsTeam2 { get; set; } = new List<Match>();
+        public ICollection<Match>? MatchesAsTeam1 { get; set; } = new List<Match>();
+        public ICollection<Match>? MatchesAsTeam2 { get; set; } = new List<Match>();
+
+        public ICollection<TeamOperatorBan>? TeamOperatorBans { get; set; } = new List<TeamOperatorBan>();
 
         public ICollection<TeamTournament>? TournamentsIn { get; } = [];
     }

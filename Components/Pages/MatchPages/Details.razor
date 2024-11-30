@@ -1,5 +1,4 @@
 ﻿@page "/matches/details"
-
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -10,7 +9,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Match</h4>
+    <h2>Match</h2>
     <hr />
     @if (match is null)
     {
@@ -20,8 +19,6 @@
         <dl class="row">
             <dt class="col-sm-2">MatchName</dt>
             <dd class="col-sm-10">@match.MatchName</dd>
-            <dt class="col-sm-2">MatchDate</dt>
-            <dd class="col-sm-10">@match.MatchDate</dd>
             <dt class="col-sm-2">Team1ID</dt>
             <dd class="col-sm-10">@match.Team1ID</dd>
             <dt class="col-sm-2">Team1Score</dt>
@@ -30,6 +27,8 @@
             <dd class="col-sm-10">@match.Team2ID</dd>
             <dt class="col-sm-2">Team2Score</dt>
             <dd class="col-sm-10">@match.Team2Score</dd>
+            <dt class="col-sm-2">MatchDate</dt>
+            <dd class="col-sm-10">@match.MatchDate</dd>
             <dt class="col-sm-2">MapID</dt>
             <dd class="col-sm-10">@match.MapID</dd>
             <dt class="col-sm-2">TournamentID</dt>
@@ -43,10 +42,10 @@
 </div>
 
 @code {
-    Match? match;
+    private Match? match;
 
     [SupplyParameterFromQuery]
-    public int MatchID { get; set; }
+    private int MatchID { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

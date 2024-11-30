@@ -16,11 +16,7 @@ namespace R6Ranking.Models {
         [Precision(7, 2)]
         public decimal EloChange { get; set; }
 
-        public int MatchID { get; set; }
-        public Match Match { get; set; }
-
         public DateTime Date { get; set; }
-        public string? TournamentName {  get; set; }
-
+        public string? Note { get; set; }
     }
 }

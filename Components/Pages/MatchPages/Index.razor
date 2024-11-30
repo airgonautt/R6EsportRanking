@@ -1,11 +1,10 @@
 ﻿@page "/matches"
-
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using R6Ranking.Models
 @using R6Ranking.Data
-@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 
 <PageTitle>Index</PageTitle>
 
@@ -17,11 +16,11 @@
 
 <QuickGrid Class="table" Items="context.Matches">
     <PropertyColumn Property="match => match.MatchName" />
-    <PropertyColumn Property="match => match.MatchDate" />
     <PropertyColumn Property="match => match.Team1ID" />
     <PropertyColumn Property="match => match.Team1Score" />
     <PropertyColumn Property="match => match.Team2ID" />
     <PropertyColumn Property="match => match.Team2Score" />
+    <PropertyColumn Property="match => match.MatchDate" />
     <PropertyColumn Property="match => match.MapID" />
     <PropertyColumn Property="match => match.TournamentID" />
 
@@ -33,7 +32,7 @@
 </QuickGrid>
 
 @code {
-    R6EsportsDbContext context = default!;
+    private R6EsportsDbContext context = default!;
 
     protected override void OnInitialized()
     {
