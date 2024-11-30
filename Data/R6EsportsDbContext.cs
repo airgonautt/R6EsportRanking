@@ -15,7 +15,6 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<RegionEloChange> RegionEloChanges { get; set; }
     public DbSet<Team> Teams { get; set; }
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
-    public DbSet<TeamTournament> TeamTournaments { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<Trophy> Trophies { get; set; }
 
@@ -66,10 +65,6 @@ public class R6EsportsDbContext : DbContext {
                 .HasForeignKey(m => m.Team2ID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(t => t.Tournament)
-               .WithMany(m => m.Matches)
-               .HasForeignKey(t => t.TournamentID);
-
         });
  
         //OPERATOR BANS
@@ -86,11 +81,6 @@ public class R6EsportsDbContext : DbContext {
                 .WithMany(t => t.TeamOperatorBans)
                 .HasForeignKey(e => e.TeamID)
                 .OnDelete(DeleteBehavior.Cascade); // Deleting a team removes related bans
-
-            entity.HasOne(e => e.Match)
-                .WithMany(m => m.TeamOperatorBans)
-                .HasForeignKey(e => e.MatchId)
-                .OnDelete(DeleteBehavior.Cascade); // Deleting a match removes related bans
         });
       
 
@@ -117,19 +107,22 @@ public class R6EsportsDbContext : DbContext {
         modelBuilder.Entity<Team>()
             .HasKey(t => t.TeamID);
 
-        // TEAMTOURNAMENT ---------------JOINED ENTITY 
-        modelBuilder.Entity<TeamTournament>()
-            .HasKey(tt => new { tt.TeamID, tt.TournamentID });
-
-        modelBuilder.Entity<TeamTournament>()
-            .HasOne(tt => tt.Team)
-            .WithMany(t => t.TournamentsIn)
-            .HasForeignKey(tt => tt.TeamID);
-
-        modelBuilder.Entity<TeamTournament>()
-            .HasOne(tt => tt.Tournament)
-            .WithMany(t => t.TournamentTeams)
-            .HasForeignKey(tt => tt.TournamentID);
+        modelBuilder.Entity<Team>()
+        .HasMany(t => t.Tournaments)
+        .WithMany(t => t.Teams)
+        .UsingEntity<Dictionary<string, object>>(
+            "TeamTournament",
+            join => join
+                .HasOne<Tournament>()
+                .WithMany()
+                .HasForeignKey("TournamentID")
+                .OnDelete(DeleteBehavior.Cascade),
+            join => join
+                .HasOne<Team>()
+                .WithMany()
+                .HasForeignKey("TeamID")
+                .OnDelete(DeleteBehavior.Cascade)
+        );
 
         //TEAM ELO CHANGE RELATIONSHIPS
         modelBuilder.Entity<TeamEloChange>()

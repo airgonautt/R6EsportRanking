@@ -23,7 +23,6 @@ namespace R6Ranking.Models {
         public ICollection<Match>? MatchesAsTeam2 { get; set; } = new List<Match>();
 
         public ICollection<TeamOperatorBan>? TeamOperatorBans { get; set; } = new List<TeamOperatorBan>();
-
-        public ICollection<TeamTournament>? TournamentsIn { get; } = [];
+        public ICollection<Tournament>? Tournaments { get; set; } = new List<Tournament>();
     }
 }

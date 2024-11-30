@@ -1,13 +1,12 @@
-﻿@page "/Teams/edit"
-
+﻿@page "/Teams/Edit"
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Edit</PageTitle>
+<PageTitle>Edit Team</PageTitle>
 
-<h1>Edit</h1>
+<h1>Edit Team</h1>
 
 <h4>Team</h4>
 <hr />
@@ -18,43 +17,73 @@
 else
 {
     <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Team" OnValidSubmit="UpdateTeam" FormName="edit" Enhance>
+        <div class="col-md-6">
+            <EditForm Model="Team" OnValidSubmit="UpdateTeam">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <input type="hidden" name="Team.TeamID" value="@Team.TeamID" />
+
                 <div class="mb-3">
-                    <label for="teamname" class="form-label">TeamName:</label>
+                    <label for="teamname" class="form-label">Team Name:</label>
                     <InputText id="teamname" @bind-Value="Team.TeamName" class="form-control" />
                     <ValidationMessage For="() => Team.TeamName" class="text-danger" />
                 </div>
+
                 <div class="mb-3">
-                    <label for="logourl" class="form-label">LogoUrl:</label>
+                    <label for="logourl" class="form-label">Logo URL:</label>
                     <InputText id="logourl" @bind-Value="Team.LogoUrl" class="form-control" />
                     <ValidationMessage For="() => Team.LogoUrl" class="text-danger" />
                 </div>
+
                 <div class="mb-3">
-                    <label for="regionid" class="form-label">RegionID:</label>
+                    <label for="regionid" class="form-label">Region ID:</label>
                     <InputText id="regionid" @bind-Value="Team.RegionID" class="form-control" />
                     <ValidationMessage For="() => Team.RegionID" class="text-danger" />
                 </div>
+
                 <div class="mb-3">
-                    <label for="currentelo" class="form-label">CurrentElo:</label>
+                    <label for="currentelo" class="form-label">Current Elo:</label>
                     <InputNumber id="currentelo" @bind-Value="Team.CurrentElo" class="form-control" />
                     <ValidationMessage For="() => Team.CurrentElo" class="text-danger" />
                 </div>
+
                 <div class="mb-3">
-                    <label for="createdat" class="form-label">CreatedAt:</label>
+                    <label for="createdat" class="form-label">Created At:</label>
                     <InputDate id="createdat" @bind-Value="Team.CreatedAt" class="form-control" />
                     <ValidationMessage For="() => Team.CreatedAt" class="text-danger" />
                 </div>
+
                 <div class="mb-3">
-                    <label for="updatedat" class="form-label">UpdatedAt:</label>
+                    <label for="updatedat" class="form-label">Updated At:</label>
                     <InputDate id="updatedat" @bind-Value="Team.UpdatedAt" class="form-control" />
                     <ValidationMessage For="() => Team.UpdatedAt" class="text-danger" />
                 </div>
+
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
+        </div>
+
+        <div class="col-md-6">
+            <h4>Tournaments</h4>
+            <p>Assign or remove this team from tournaments:</p>
+            @if (Tournaments is null)
+            {
+                <p><em>Loading tournaments...</em></p>
+            }
+            else
+            {
+                @foreach (var tournament in Tournaments)
+                {
+                    <div>
+                        <input type="checkbox"
+                               id="tournament_@tournament.TournamentID"
+                               value="@tournament.TournamentID"
+                               @onchange="eventArgs => ToggleTournament(eventArgs, tournament.TournamentID)"
+                               checked="@SelectedTournamentIds.Contains(tournament.TournamentID)" />
+                        <label for="tournament_@tournament.TournamentID">@tournament.TournamentName</label>
+                    </div>
+                }
+            }
         </div>
     </div>
 }
@@ -67,23 +96,31 @@ else
     [SupplyParameterFromQuery]
     public int TeamID { get; set; }
 
-    [SupplyParameterFromForm]
     public Team? Team { get; set; }
+    private List<int> SelectedTournamentIds { get; set; } = new();
+    private List<Tournament> Tournaments { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Team ??= await context.Teams.FirstOrDefaultAsync(m => m.TeamID == TeamID);
 
-        if (Team is null)
+        // Load the team and its associated tournaments
+        Team = await context.Teams
+            .Include(t => t.Tournaments)
+            .FirstOrDefaultAsync(m => m.TeamID == TeamID);
+
+        if (Team == null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
         }
+
+        // Load all tournaments and mark the ones this team is part of
+        Tournaments = await context.Tournaments.ToListAsync();
+        SelectedTournamentIds = Team.Tournaments.Select(tt => tt.TournamentID).ToList();
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see https://aka.ms/RazorPagesCRUD.
-    public async Task UpdateTeam()
+    private async Task UpdateTeam()
     {
         using var context = DbFactory.CreateDbContext();
         context.Attach(Team!).State = EntityState.Modified;
@@ -107,7 +144,34 @@ else
         NavigationManager.NavigateTo("/teams");
     }
 
-    bool TeamExists(int teamid)
+    private async Task ToggleTournament(ChangeEventArgs e, int tournamentId)
+    {
+        var isChecked = (bool)e.Value!;
+        using var context = DbFactory.CreateDbContext();
+
+       /* if (isChecked)
+        {
+            if (!SelectedTournamentIds.Contains(tournamentId))
+            {
+                SelectedTournamentIds.Add(tournamentId);
+                context.Add(new Tournament { TeamID = Team!.TeamID, TournamentID = tournamentId });
+            }
+        }
+        else
+        {
+            SelectedTournamentIds.Remove(tournamentId);
+           var entry = await context.Set<TeamTournament>()
+                .FirstOrDefaultAsync(tt => tt.TeamID == Team!.TeamID && tt.TournamentID == tournamentId);
+
+            if (entry != null)
+                context.Remove(entry);
+        }
+        */
+
+        await context.SaveChangesAsync();
+    }
+
+    private bool TeamExists(int teamid)
     {
         using var context = DbFactory.CreateDbContext();
         return context.Teams.Any(e => e.TeamID == teamid);
