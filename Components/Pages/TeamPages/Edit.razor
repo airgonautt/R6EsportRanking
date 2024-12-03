@@ -1,4 +1,5 @@
-﻿@page "/Teams/Edit"
+﻿@page "/Teams/edit"
+
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -8,20 +9,17 @@
 
 <h1>Edit Team</h1>
 
-<h4>Team</h4>
-<hr />
-@if (Team is null)
+@if (Team == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <EditForm Model="Team" OnValidSubmit="UpdateTeam">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                <input type="hidden" name="Team.TeamID" value="@Team.TeamID" />
 
                 <div class="mb-3">
                     <label for="teamname" class="form-label">Team Name:</label>
@@ -36,7 +34,7 @@ else
                 </div>
 
                 <div class="mb-3">
-                    <label for="regionid" class="form-label">Region ID:</label>
+                    <label for="regionid" class="form-label">Region:</label>
                     <InputText id="regionid" @bind-Value="Team.RegionID" class="form-control" />
                     <ValidationMessage For="() => Team.RegionID" class="text-danger" />
                 </div>
@@ -48,42 +46,33 @@ else
                 </div>
 
                 <div class="mb-3">
-                    <label for="createdat" class="form-label">Created At:</label>
-                    <InputDate id="createdat" @bind-Value="Team.CreatedAt" class="form-control" />
-                    <ValidationMessage For="() => Team.CreatedAt" class="text-danger" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="updatedat" class="form-label">Updated At:</label>
-                    <InputDate id="updatedat" @bind-Value="Team.UpdatedAt" class="form-control" />
-                    <ValidationMessage For="() => Team.UpdatedAt" class="text-danger" />
+                    <h3>Assigned Tournaments</h3>
+                    <ul class="list-group">
+                        @foreach (var tournament in TeamTournaments)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @tournament.TournamentName
+                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveTournament(tournament.TournamentID)">Remove</button>
+                            </li>
+                        }
+                    </ul>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
-        </div>
 
-        <div class="col-md-6">
-            <h4>Tournaments</h4>
-            <p>Assign or remove this team from tournaments:</p>
-            @if (Tournaments is null)
-            {
-                <p><em>Loading tournaments...</em></p>
-            }
-            else
-            {
-                @foreach (var tournament in Tournaments)
-                {
-                    <div>
-                        <input type="checkbox"
-                               id="tournament_@tournament.TournamentID"
-                               value="@tournament.TournamentID"
-                               @onchange="eventArgs => ToggleTournament(eventArgs, tournament.TournamentID)"
-                               checked="@SelectedTournamentIds.Contains(tournament.TournamentID)" />
-                        <label for="tournament_@tournament.TournamentID">@tournament.TournamentName</label>
-                    </div>
-                }
-            }
+            <div class="mb-3 mt-4">
+                <h3>Available Tournaments</h3>
+                <ul class="list-group">
+                    @foreach (var tournament in AllTournaments)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @tournament.TournamentName
+                            <button class="btn btn-success btn-sm" @onclick="() => AddTournament(tournament.TournamentID)">Add</button>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     </div>
 }
@@ -97,17 +86,17 @@ else
     public int TeamID { get; set; }
 
     public Team? Team { get; set; }
-    private List<int> SelectedTournamentIds { get; set; } = new();
-    private List<Tournament> Tournaments { get; set; } = new();
+    private List<Tournament> AllTournaments { get; set; } = new();
+    private List<Tournament> TeamTournaments { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
 
-        // Load the team and its associated tournaments
+        // Load team details
         Team = await context.Teams
             .Include(t => t.Tournaments)
-            .FirstOrDefaultAsync(m => m.TeamID == TeamID);
+            .FirstOrDefaultAsync(t => t.TeamID == TeamID);
 
         if (Team == null)
         {
@@ -115,65 +104,61 @@ else
             return;
         }
 
-        // Load all tournaments and mark the ones this team is part of
-        Tournaments = await context.Tournaments.ToListAsync();
-        SelectedTournamentIds = Team.Tournaments.Select(tt => tt.TournamentID).ToList();
+        // Load tournaments associated with the team
+        TeamTournaments = Team.Tournaments.ToList();
+
+        // Load all tournaments
+        AllTournaments = await context.Tournaments.ToListAsync();
     }
 
-    private async Task UpdateTeam()
+    private async Task AddTournament(int tournamentId)
     {
         using var context = DbFactory.CreateDbContext();
-        context.Attach(Team!).State = EntityState.Modified;
+        var tournament = await context.Tournaments.FirstOrDefaultAsync(t => t.TournamentID == tournamentId);
 
-        try
+        if (tournament != null && !TeamTournaments.Contains(tournament))
         {
-            await context.SaveChangesAsync();
+            TeamTournaments.Add(tournament);
         }
-        catch (DbUpdateConcurrencyException)
+    }
+
+    private async Task RemoveTournament(int tournamentId)
+    {
+        var tournamentToRemove = TeamTournaments.FirstOrDefault(t => t.TournamentID == tournamentId);
+
+        if (tournamentToRemove != null)
         {
-            if (!TeamExists(Team!.TeamID))
+            TeamTournaments.Remove(tournamentToRemove);
+        }
+    }
+
+    public async Task UpdateTeam()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        // Reattach and update tournaments
+        var existingTeam = await context.Teams
+            .Include(t => t.Tournaments)
+            .FirstOrDefaultAsync(t => t.TeamID == TeamID);
+
+        if (existingTeam != null)
+        {
+            // Update simple fields
+            existingTeam.TeamName = Team!.TeamName;
+            existingTeam.LogoUrl = Team.LogoUrl;
+            existingTeam.RegionID = Team.RegionID;
+            existingTeam.CurrentElo = Team.CurrentElo;
+
+            // Update relationships
+            existingTeam.Tournaments.Clear();
+            foreach (var tournament in TeamTournaments)
             {
-                NavigationManager.NavigateTo("notfound");
+                existingTeam.Tournaments.Add(await context.Tournaments.FindAsync(tournament.TournamentID)!);
             }
-            else
-            {
-                throw;
-            }
+
+            await context.SaveChangesAsync();
         }
 
         NavigationManager.NavigateTo("/teams");
-    }
-
-    private async Task ToggleTournament(ChangeEventArgs e, int tournamentId)
-    {
-        var isChecked = (bool)e.Value!;
-        using var context = DbFactory.CreateDbContext();
-
-       /* if (isChecked)
-        {
-            if (!SelectedTournamentIds.Contains(tournamentId))
-            {
-                SelectedTournamentIds.Add(tournamentId);
-                context.Add(new Tournament { TeamID = Team!.TeamID, TournamentID = tournamentId });
-            }
-        }
-        else
-        {
-            SelectedTournamentIds.Remove(tournamentId);
-           var entry = await context.Set<TeamTournament>()
-                .FirstOrDefaultAsync(tt => tt.TeamID == Team!.TeamID && tt.TournamentID == tournamentId);
-
-            if (entry != null)
-                context.Remove(entry);
-        }
-        */
-
-        await context.SaveChangesAsync();
-    }
-
-    private bool TeamExists(int teamid)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.Teams.Any(e => e.TeamID == teamid);
     }
 }

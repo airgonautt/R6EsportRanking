@@ -58,6 +58,33 @@ else
                     <InputText id="regionid" @bind-Value="Tournament.RegionID" class="form-control" />
                     <ValidationMessage For="() => Tournament.RegionID" class="text-danger" />
                 </div>
+
+                <div class="col-md-6">
+                    <!-- Teams Currently Associated with Tournament -->
+                    <h3>Assigned Teams</h3>
+                    <ul class="list-group">
+                        @foreach (var team in TournamentTeams)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @team.TeamName
+                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveTeamFromTournament(team.TeamID)">Remove</button>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- Available Teams to Add -->
+                    <h3 class="mt-4">Available Teams</h3>
+                    <ul class="list-group">
+                        @foreach (var team in AllTeams)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @team.TeamName
+                                <button class="btn btn-success btn-sm" @onclick="() => AddTeamToTournament(team.TeamID)">Add</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>
@@ -68,53 +95,87 @@ else
     <a href="/tournaments">Back to List</a>
 </div>
 
+
 @code {
     [SupplyParameterFromQuery]
     public int TournamentID { get; set; }
 
-    [SupplyParameterFromForm]
     public Tournament? Tournament { get; set; }
+    private List<Team> AllTeams { get; set; } = new();
+    private List<Team> TournamentTeams { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Tournament ??= await context.Tournaments.FirstOrDefaultAsync(m => m.TournamentID == TournamentID);
 
-        if (Tournament is null)
+        // Load tournament details
+        Tournament = await context.Tournaments
+            .Include(t => t.Teams)
+            .FirstOrDefaultAsync(t => t.TournamentID == TournamentID);
+
+        if (Tournament == null)
         {
             NavigationManager.NavigateTo("notfound");
+            return;
+        }
+
+        // Load teams currently associated with the tournament
+        TournamentTeams = Tournament.Teams.ToList();
+
+        // Load all teams
+        AllTeams = await context.Teams.ToListAsync();
+    }
+
+    // Add team to tournament
+    private async Task AddTeamToTournament(int teamId)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var team = await context.Teams.FirstOrDefaultAsync(t => t.TeamID == teamId);
+
+        if (team != null && !TournamentTeams.Any(t => t.TeamID == teamId))
+        {
+            TournamentTeams.Add(team);
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see https://aka.ms/RazorPagesCRUD.
+    // Remove team from tournament
+    private async Task RemoveTeamFromTournament(int teamId)
+    {
+        var teamToRemove = TournamentTeams.FirstOrDefault(t => t.TeamID == teamId);
+
+        if (teamToRemove != null)
+        {
+            TournamentTeams.Remove(teamToRemove);
+        }
+    }
+
+    // Update Tournament
     public async Task UpdateTournament()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Attach(Tournament!).State = EntityState.Modified;
 
-        try
+        // Reattach and update teams for the tournament
+        var existingTournament = await context.Tournaments
+            .Include(t => t.Teams)
+            .FirstOrDefaultAsync(t => t.TournamentID == TournamentID);
+
+        if (existingTournament != null)
         {
+            // Update tournament fields
+            existingTournament.TournamentName = Tournament!.TournamentName;
+            existingTournament.StartDate = Tournament.StartDate;
+            existingTournament.EndDate = Tournament.EndDate;
+
+            // Update the team relationship
+            existingTournament.Teams.Clear();
+            foreach (var team in TournamentTeams)
+            {
+                existingTournament.Teams.Add(await context.Teams.FindAsync(team.TeamID)!);
+            }
+
             await context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!TournamentExists(Tournament!.TournamentID))
-            {
-                NavigationManager.NavigateTo("notfound");
-            }
-            else
-            {
-                throw;
-            }
         }
 
         NavigationManager.NavigateTo("/tournaments");
-    }
-
-    bool TournamentExists(int tournamentid)
-    {
-        using var context = DbFactory.CreateDbContext();
-        return context.Tournaments.Any(e => e.TournamentID == tournamentid);
     }
 }

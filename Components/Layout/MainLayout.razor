@@ -1,23 +1,60 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
+    <!-- Header -->
+    <header class="header d-flex align-items-center justify-content-between">
+        <div class="logo">
+            <img src="visuals/background.jpg" alt="R6 Esports Logo" class="logo-img" />
+        </div>
+        <button class="burger-menu" @onclick="ToggleSidebar">
+            <span class="burger-icon"></span>
+        </button>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="sidebar" style="display: @(isSidebarVisible ? "block" : "none")">
+        <nav class="nav flex-column">
+            <NavLink class="nav-link" href="/">
+                <i class="bi bi-house"></i> Home
+            </NavLink>
+            <NavLink class="nav-link" href="/leaderboard">
+                <i class="bi bi-trophy"></i> Leaderboard
+            </NavLink>
+            <div class="dropdown">
+                <button class="dropdown-btn">
+                    <i class="bi bi-grid"></i> More
+                </button>
+                <div class="dropdown-content">
+                    <NavLink class="nav-link" href="/stats">
+                        <i class="bi bi-bar-chart"></i> Stats
+                    </NavLink>
+                    <NavLink class="nav-link" href="/about">
+                        <i class="bi bi-info-circle"></i> About
+                    </NavLink>
+                </div>
+            </div>
+        </nav>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
+    <!-- Main Content -->
+    <main class="content">
+        @Body
     </main>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <p>&copy; 2024 R6 Esports. All rights reserved.</p>
+    </footer>
 </div>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+
+
+@code {
+    private bool isSidebarVisible = false;
+
+    private void ToggleSidebar()
+    {
+        isSidebarVisible = !isSidebarVisible;
+    }
+}
+

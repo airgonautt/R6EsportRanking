@@ -1,7 +1,82 @@
 ﻿@page "/"
+@inherits LayoutComponentBase
 
-<PageTitle>Home</PageTitle>
+<div class="home-content">
+    <!-- Hero Section -->
+    <section class="hero d-flex align-items-center">
+        <div class="hero-text text-white text-center">
+            <h1 class="display-3">Welcome to R6 Esports</h1>
+            <p class="lead">Your source for competitive Rainbow Six Siege rankings, stats, and tournaments.</p>
+            <NavLink class="btn btn-warning btn-lg" href="/leaderboard">View Leaderboard</NavLink>
+        </div>
+        <div class="hero-image">
+            <img src="/visuals/hero-image.jpg" alt="Esports Hero Image" class="img-fluid rounded shadow" />
+        </div>
+    </section>
 
-<h1>Hello, world!</h1>
+    <!-- Leaderboard Preview -->
+    <section class="leaderboard-preview py-5">
+        <h2 class="text-center text-primary mb-4">Top Teams</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-4">
+            @foreach (var team in topTeams)
+            {
+                <div class="card text-center bg-dark text-white team-card shadow">
+                    <img src="@team.LogoUrl" alt="@team.Name" class="team-logo card-img-top" />
+                    <div class="card-body">
+                        <h3 class="card-title">@team.Name</h3>
+                        <p class="card-text">Elo Rating: <span class="text-warning">@team.Elo</span></p>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
 
-Welcome to your new app.
+    <!-- Upcoming Tournaments -->
+    <section class="upcoming-tournaments py-5 bg-secondary text-white">
+        <h2 class="text-center mb-4">Upcoming Tournaments</h2>
+        <div class="d-flex flex-wrap justify-content-center gap-4">
+            @foreach (var tournament in upcomingTournaments)
+            {
+                <div class="card tournament-card bg-dark text-white shadow">
+                    <img src="@tournament.LogoUrl" alt="@tournament.Name" class="tournament-logo card-img-top" />
+                    <div class="card-body text-center">
+                        <h3 class="card-title">@tournament.Name</h3>
+                        <p class="card-text">@tournament.StartDate.ToString("MMMM dd, yyyy")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+
+
+
+@code {
+    // Example data, replace with actual API calls or Blazor service calls
+    private List<Team> topTeams = new List<Team>
+    {
+        new Team { Name = "Team Liquid", Elo = 1500, LogoUrl = "/visuals/team-liquid-logo.png" },
+        new Team { Name = "FaZe Clan", Elo = 1450, LogoUrl = "/visuals/faze-clan-logo.png" }
+    };
+
+    private List<Tournament> upcomingTournaments = new List<Tournament>
+    {
+        new Tournament { Name = "R6 Major", StartDate = DateTime.Now.AddDays(10), LogoUrl = "/visuals/r6-major-logo.png" },
+        new Tournament { Name = "Six Invitational", StartDate = DateTime.Now.AddMonths(2), LogoUrl = "/visuals/six-invitational-logo.png" }
+    };
+
+    public class Team
+    {
+        public string Name { get; set; }
+        public int Elo { get; set; }
+        public string LogoUrl { get; set; }
+    }
+
+    public class Tournament
+    {
+        public string Name { get; set; }
+        public DateTime StartDate { get; set; }
+        public string LogoUrl { get; set; }
+    }
+}
