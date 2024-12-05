@@ -1,60 +1,46 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <!-- Header -->
-    <header class="header d-flex align-items-center justify-content-between">
-        <div class="logo">
-            <img src="visuals/background.jpg" alt="R6 Esports Logo" class="logo-img" />
-        </div>
-        <button class="burger-menu" @onclick="ToggleSidebar">
-            <span class="burger-icon"></span>
-        </button>
-    </header>
-
-    <!-- Sidebar -->
-    <div class="sidebar" style="display: @(isSidebarVisible ? "block" : "none")">
-        <nav class="nav flex-column">
-            <NavLink class="nav-link" href="/">
-                <i class="bi bi-house"></i> Home
-            </NavLink>
-            <NavLink class="nav-link" href="/leaderboard">
-                <i class="bi bi-trophy"></i> Leaderboard
-            </NavLink>
-            <div class="dropdown">
-                <button class="dropdown-btn">
-                    <i class="bi bi-grid"></i> More
-                </button>
-                <div class="dropdown-content">
-                    <NavLink class="nav-link" href="/stats">
-                        <i class="bi bi-bar-chart"></i> Stats
-                    </NavLink>
-                    <NavLink class="nav-link" href="/about">
-                        <i class="bi bi-info-circle"></i> About
-                    </NavLink>
-                </div>
+<div class="main-layout">
+    <header class="navbar navbar-dark bg-dark">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <!-- Left Section: Logo and Title -->
+            <div class="d-flex align-items-center">
+                <img src="bootstrap/Visuals/r6.png" alt="Logo" class="logo">
+                <span class="navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
             </div>
-        </nav>
+
+            <!-- Center Section: Navigation Links -->
+            <nav class="nav">
+                <a class="nav-link" href="/">Home</a>
+                <a class="nav-link" href="/regions">Regions</a>
+                <a class="nav-link" href="/teams">Teams</a>
+                <a class="nav-link" href="/cards">Cards</a>
+                <a class="nav-link" href="/search">Search</a>
+                <a class="nav-link" href="/about">About</a>
+            </nav>
+
+            <!-- Right Section: Widget Button -->
+            <button class="btn widget-button">
+                <img src="bootstrap/Visuals/r6.png" alt="Widget Icon" class="logo">
+            </button>
+        </div>
+    </header>
+    <!--body -->
+    <div class="content-container">
+    @Body
+        <body>
+
+        </body>
     </div>
-
-    <!-- Main Content -->
-    <main class="content">
-        @Body
-    </main>
-
     <!-- Footer -->
-    <footer class="footer text-center">
-        <p>&copy; 2024 R6 Esports. All rights reserved.</p>
+    <footer class="footer bg-dark text-white text-center py-3">
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year R6Ranking. All Rights Reserved.</p>
+        </div>
     </footer>
 </div>
 
 
-
 @code {
-    private bool isSidebarVisible = false;
-
-    private void ToggleSidebar()
-    {
-        isSidebarVisible = !isSidebarVisible;
-    }
+    // No additional functionality required for now.
 }
-

@@ -2,51 +2,45 @@
 @inherits LayoutComponentBase
 
 <div class="home-content">
-    <!-- Hero Section -->
-    <section class="hero d-flex align-items-center">
-        <div class="hero-text text-white text-center">
-            <h1 class="display-3">Welcome to R6 Esports</h1>
-            <p class="lead">Your source for competitive Rainbow Six Siege rankings, stats, and tournaments.</p>
-            <NavLink class="btn btn-warning btn-lg" href="/leaderboard">View Leaderboard</NavLink>
-        </div>
-        <div class="hero-image">
-            <img src="/visuals/hero-image.jpg" alt="Esports Hero Image" class="img-fluid rounded shadow" />
-        </div>
-    </section>
+    
+    <div class="hero-section text-white d-flex flex-column align-items-center">
+        <h1 class="display-3">Welcome to R6 Esports</h1>
+        <p class="lead text-center">Your source for competitive Rainbow Six Siege rankings, stats, and tournaments.</p>
+        <NavLink class="btn btn-warning btn-lg mt-3" href="/leaderboard">View Leaderboard</NavLink>
+    </div>
 
-    <!-- Leaderboard Preview -->
-    <section class="leaderboard-preview py-5">
-        <h2 class="text-center text-primary mb-4">Top Teams</h2>
-        <div class="d-flex flex-wrap justify-content-center gap-4">
+    <section class="leaderboard-preview my-5">
+        <h2 class="text-primary text-center mb-4">Top Teams</h2>
+        <div class="team-container d-flex flex-wrap justify-content-center gap-4">
             @foreach (var team in topTeams)
             {
-                <div class="card text-center bg-dark text-white team-card shadow">
+                <div class="card team-card">
                     <img src="@team.LogoUrl" alt="@team.Name" class="team-logo card-img-top" />
                     <div class="card-body">
-                        <h3 class="card-title">@team.Name</h3>
-                        <p class="card-text">Elo Rating: <span class="text-warning">@team.Elo</span></p>
+                        <h3>@team.Name</h3>
+                        <p>Elo Rating: <span class="text-warning">@team.Elo</span></p>
                     </div>
                 </div>
             }
         </div>
     </section>
 
-    <!-- Upcoming Tournaments -->
-    <section class="upcoming-tournaments py-5 bg-secondary text-white">
-        <h2 class="text-center mb-4">Upcoming Tournaments</h2>
+    <section class="tournaments my-5">
+        <h2 class="text-white text-center mb-4">Upcoming Tournaments</h2>
         <div class="d-flex flex-wrap justify-content-center gap-4">
             @foreach (var tournament in upcomingTournaments)
             {
-                <div class="card tournament-card bg-dark text-white shadow">
-                    <img src="@tournament.LogoUrl" alt="@tournament.Name" class="tournament-logo card-img-top" />
+                <div class="card tournament-card">
+                    <img src="@tournament.LogoUrl" alt="@tournament.Name" class="card-img-top" />
                     <div class="card-body text-center">
-                        <h3 class="card-title">@tournament.Name</h3>
-                        <p class="card-text">@tournament.StartDate.ToString("MMMM dd, yyyy")</p>
+                        <h3 class="text-warning">@tournament.Name</h3>
+                        <p>@tournament.StartDate.ToString("MMMM dd, yyyy")</p>
                     </div>
                 </div>
             }
         </div>
     </section>
+
 </div>
 
 

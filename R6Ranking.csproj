@@ -28,10 +28,6 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\Visuals\background.jpg" />
-  </ItemGroup>
-
  
 
 </Project>
