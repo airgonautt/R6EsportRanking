@@ -6,17 +6,18 @@
             <!-- Left Section: Logo and Title -->
             <div class="d-flex align-items-center">
                 <img src="bootstrap/Visuals/r6.png" alt="Logo" class="logo">
-                <span class="navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
+                <span class="kanit-extrabold-italic navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
             </div>
 
             <!-- Center Section: Navigation Links -->
-            <nav class="nav">
-                <a class="nav-link" href="/">Home</a>
-                <a class="nav-link" href="/regions">Regions</a>
-                <a class="nav-link" href="/teams">Teams</a>
-                <a class="nav-link" href="/cards">Cards</a>
-                <a class="nav-link" href="/search">Search</a>
-                <a class="nav-link" href="/about">About</a>
+            <nav class="nav d-flex justify-content-around w-50">
+                <a class="nav-link kanit-extrabold text-white" href="/">Home</a>
+                <a class="nav-link kanit-extrabold text-white" href="/regions">Regions</a>
+                <a class="nav-link kanit-extrabold text-white" href="/teams">Teams</a>
+                <a class="nav-link kanit-extrabold text-white" href="/cards">Cards</a>
+                <a class="nav-link kanit-extrabold text-white" href="/matches">Matches</a>
+                <a class="nav-link kanit-extrabold text-white" href="/players">Players</a>
+                <a class="nav-link kanit-extrabold text-white" href="/about">About</a>
             </nav>
 
             <!-- Right Section: Widget Button -->
@@ -25,13 +26,12 @@
             </button>
         </div>
     </header>
-    <!--body -->
-    <div class="content-container">
-    @Body
-        <body>
 
-        </body>
+    <!-- Body -->
+    <div class="content-container">
+        @Body
     </div>
+
     <!-- Footer -->
     <footer class="footer bg-dark text-white text-center py-3">
         <div class="container">
@@ -39,7 +39,6 @@
         </div>
     </footer>
 </div>
-
 
 @code {
     // No additional functionality required for now.

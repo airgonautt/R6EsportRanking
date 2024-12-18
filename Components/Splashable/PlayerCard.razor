@@ -16,11 +16,9 @@
     <div class="player-info">
         <h3>@Player.PlayerName</h3>
         <p>Role: @Player.Role</p>
-        <p>Joined: @Player.DateJoined?.ToShortDateString()</p>
+        <p>Country: @Player.CountryID</p>
         <p>Team ID: @Player.TeamID</p>
-        @if (Player.DateLeft.HasValue) {
-            <p>Left: @Player.DateLeft.Value.ToShortDateString()</p>
-        }
+        
     </div>
     <!-- Player Actions -->
     <div class="player-actions">

@@ -27,7 +27,7 @@
                 <InputText id="role" @bind-Value="Player.Role" class="form-control" /> 
                 <ValidationMessage For="() => Player.Role" class="text-danger" /> 
             </div>  
-            
+
             <div class="mb-3">
                 <label for="photourl" class="form-label">PhotoURL:</label> 
                 <InputText id="photourl" @bind-Value="Player.PhotoURL" class="form-control" /> 
@@ -50,7 +50,19 @@
                 </InputSelect>
                 <ValidationMessage For="() => Player.TeamID" class="text-danger" /> 
             </div> 
-                            
+
+            <div class="mb-3">
+                <label for="countryid" class="form-label">Country:</label>
+                <InputSelect id="countryid" @bind-Value="@Player.CountryID" class="form-control">
+                    <option value="">Select a country</option>
+                    @foreach (var country in Countries)
+                    {
+                        <option country="@country.CountryID">@country.CountryName</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Player.CountryID" class="text-danger" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -66,11 +78,13 @@
     public Player Player { get; set; } = new Player(){PlayerName = "Default name"};
 
     private List<Team> Teams { get; set; } = new();
+    private List<Country> Countries { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
         Teams = await context.Teams.ToListAsync();
+        Countries = await context.Countries.ToListAsync();
     }
 
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD

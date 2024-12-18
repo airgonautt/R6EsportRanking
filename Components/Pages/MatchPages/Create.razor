@@ -76,6 +76,13 @@
             </div>
 
             <div class="mb-3">
+                <label>
+                    <InputCheckbox unchecked @bind-value="Match.isBo3"  />
+                    is bo3
+                </label>
+            </div>
+
+            <div class="mb-3">
                 <label>Tournament:</label>
                 <InputSelect @bind-Value="Match.TournamentID" class="form-control">
                     <option value="">Select Tournament</option>
@@ -85,6 +92,51 @@
                     }
                 </InputSelect>
             </div>
+
+            <div class="mb-3">
+                <label for="team1operatorban1">Team 1 Operator Ban 1:</label>
+                <InputSelect @bind-Value="Match.Team1Ban1" class="form-control">
+                    <option value="">Select Operator Ban</option>
+                    @foreach (var ban in OperatorBans)
+                    {
+                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="team2operatorban1">Team 2 Operator Ban 1:</label>
+                <InputSelect @bind-Value="Match.Team2Ban1" class="form-control">
+                    <option value="">Select Operator Ban</option>
+                    @foreach (var ban in OperatorBans)
+                    {
+                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="team1operatorban2">Team 1 Operator Ban 2:</label>
+                <InputSelect @bind-Value="Match.Team1Ban2" class="form-control">
+                    <option value="">Select Operator Ban</option>
+                    @foreach (var ban in OperatorBans)
+                    {
+                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="team2operatorban2">Team 2 Operator Ban 2:</label>
+                <InputSelect @bind-Value="Match.Team2Ban2" class="form-control">
+                    <option value="">Select Operator Ban</option>
+                    @foreach (var ban in OperatorBans)
+                    {
+                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                    }
+                </InputSelect>
+            </div>
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -96,12 +148,27 @@
 
 @code {
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     [SupplyParameterFromForm]
     private Match Match { get; set; } = new();
-
     private List<Team> Teams { get; set; } = new();
     private List<Map> Maps { get; set; } = new();
     private List<Tournament> Tournaments { get; set; } = new();
+    private List<TeamOperatorBan> TeamOperatorBans { get; set; } = new();
+    public List<OperatorBan> OperatorBans { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,6 +176,8 @@
         Teams = await context.Teams.ToListAsync();
         Maps = await context.Maps.ToListAsync();
         Tournaments = await context.Tournaments.ToListAsync();
+        OperatorBans = await context.OperatorBans.ToListAsync();
+        TeamOperatorBans = await context.TeamOperatorBans.ToListAsync();
     }
 
     private async Task AddMatch()
@@ -116,31 +185,24 @@
         using var context = DbFactory.CreateDbContext();
         using var transaction = await context.Database.BeginTransactionAsync();
 
-        
-        
-            // Add the match to the database
-            context.Matches.Add(Match);
-            await context.SaveChangesAsync();
+        //initialized
+        context.Matches.Add(Match);
+        await context.SaveChangesAsync();
 
-            // Update Elo and save history for both teams
-            await UpdateEloAndSaveHistoryAsync(context, Match);
+        //elo logic+history
+        await UpdateEloAndSaveHistoryAsync(context, Match);
 
-            // Commit the transaction
-            await transaction.CommitAsync();
+        //ban history
+        await SaveOperatorBansAsync(context, Match.MatchID);
 
-            // Navigate back to matches
-            NavigationManager.NavigateTo("/matches");
-        
-        //try and catch (Exception ex)
-        {
-            //await transaction.RollbackAsync();
-            //Console.WriteLine($"Transaction rolled back. Error: {ex.Message}");
-        }
+        await transaction.CommitAsync();
+        NavigationManager.NavigateTo("/matches");
+
     }
 
     private async Task UpdateEloAndSaveHistoryAsync(R6EsportsDbContext context, Match match)
     {
-        // Fetch teams from the database
+        // Fetch teams
         var team1 = await context.Teams.FindAsync(match.Team1ID);
         var team2 = await context.Teams.FindAsync(match.Team2ID);
 
@@ -149,73 +211,74 @@
             throw new InvalidOperationException("One or both teams could not be found.");
         }
 
-        // Calculate new Elo ratings for both teams
-        (decimal team1EloChange, decimal team2EloChange) = CalculateEloChange(team1.CurrentElo, team2.CurrentElo, match.Team1Score, match.Team2Score);
-
-        // Update team Elo
+        // Update Elo
+        (decimal team1EloChange, decimal team2EloChange) = CalculateEloChange(Match.isBo3, team1.CurrentElo, team2.CurrentElo, match.Team1Score, match.Team2Score);
         team1.CurrentElo += team1EloChange;
         team2.CurrentElo += team2EloChange;
 
-                /* Save Elo history for both teams
-                var team1History = new TeamEloHistory
-                {
-                TeamID = team1.TeamID,
-                MatchID = match.MatchID,
-                RivalTeamID = team2.TeamID,
-                RivalTeamName = team2.TeamName,
-                EloChange = team1EloChange,
-            CurrentElo = team1.CurrentElo,
-        Date = DateTime.UtcNow
-            };
-
-                var team2History = new TeamEloHistory
-                {
-                TeamID = team2.TeamID,
-                MatchID = match.MatchID,
-                RivalTeamID = team1.TeamID,
-                RivalTeamName = team1.TeamName,
-                EloChange = team2EloChange,
-                CurrentElo = team2.CurrentElo,
-                Date = DateTime.UtcNow
-        };
-
-        context.TeamEloHistories.AddRange(team1History, team2History);
-
-        */
         await context.SaveChangesAsync();
     }
-
-    private (decimal team1EloChange, decimal team2EloChange) CalculateEloChange(decimal team1Elo, decimal team2Elo, decimal team1Score, decimal team2Score)
+    private (decimal team1EloChange, decimal team2EloChange) CalculateEloChange(bool isBo3, decimal team1Elo, decimal team2Elo, decimal team1Score, decimal team2Score)
     {
-        const decimal kFactorBo1 = 65m; // Best of 1 match significance
-        const decimal kFactorBo3 = 32m; // Best of 3+ match significance
+        //K
+        decimal kFactor = isBo3 ? 32m : 65m;
 
-        decimal kFactor = team1Score + team2Score >= 3 ? kFactorBo3 : kFactorBo1;
+        //W
+        decimal actualScoreTeam1 = team1Score > team2Score ? (decimal)1 : (team1Score < team2Score ? (decimal)0 : (decimal)0.5);
+        decimal actualScoreTeam2 = team2Score > team1Score ? (decimal)1 : (team2Score < team1Score ? (decimal)0 : (decimal)0.5);
 
-        // Calculate expected results
+        //E
         decimal expectedTeam1 = 1 / (1 + (decimal)Math.Pow(10, (double)((team2Elo - team1Elo) / 500)));
         decimal expectedTeam2 = 1 / (1 + (decimal)Math.Pow(10, (double)((team1Elo - team2Elo) / 500)));
 
-        // Determine actual results
-        decimal actualTeam1 = CalculateActualResult(team1Score, team2Score);
-        decimal actualTeam2 = 1 - actualTeam1;
-
-        // Calculate Elo changes
-        decimal team1EloChange = kFactor * (actualTeam1 - expectedTeam1);
-        decimal team2EloChange = kFactor * (actualTeam2 - expectedTeam2);
+        // Calculate Elo
+        decimal team1EloChange = kFactor * (actualScoreTeam1 - expectedTeam1);
+        decimal team2EloChange = kFactor * (actualScoreTeam2 - expectedTeam2);
 
         return (team1EloChange, team2EloChange);
     }
 
-    private decimal CalculateActualResult(decimal team1Score, decimal team2Score)
-    {
-        decimal scoreDifference = Math.Abs(team1Score - team2Score);
+    private async Task SaveOperatorBansAsync(R6EsportsDbContext context, int matchId) {
 
-        if (scoreDifference <= 2)
+        Console.WriteLine($"Team1OperatorBan1: {Match.Team1Ban1}, Team2OperatorBan1: {Match.Team2Ban1}");
+        Console.WriteLine($"Team1OperatorBan2: {Match.Team1Ban2}, Team2OperatorBan2: {Match.Team1Ban1}");
+
+        if (Match.Team1Ban1 == null || Match.Team2Ban1 == null ||
+            Match.Team1Ban2 == null || Match.Team2Ban2 == null)
         {
-            return 0.5m; // Statistically a tie for close matches
+            throw new InvalidOperationException("Operator bans must be selected for both teams.");
         }
-        return team1Score > team2Score ? 1m : 0m;
+
+        else {
+            var teamOperatorBans = new List<TeamOperatorBan> {
+                new TeamOperatorBan
+                {
+                    MatchId = matchId,
+                    TeamID = Match.Team1ID,
+                    OperatorBanID = Match.Team1Ban1
+                },
+                new TeamOperatorBan
+                {
+                    MatchId = matchId,
+                    TeamID = Match.Team2ID,
+                    OperatorBanID = Match.Team2Ban1
+                },
+                new TeamOperatorBan
+                {
+                    MatchId = matchId,
+                    TeamID = Match.Team1ID,
+                    OperatorBanID = Match.Team1Ban2
+                },
+                new TeamOperatorBan
+                {
+                    MatchId = matchId,
+                    TeamID = Match.Team2ID,
+                    OperatorBanID = Match.Team2Ban2
+                }
+            };
+
+            context.TeamOperatorBans.AddRange(teamOperatorBans);
+            await context.SaveChangesAsync();
+        }
     }
-    
 }

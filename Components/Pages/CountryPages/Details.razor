@@ -1,0 +1,48 @@
+﻿@page "/countries/details"
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Country</h2>
+    <hr />
+    @if (country is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">CountryName</dt>
+            <dd class="col-sm-10">@country.CountryName</dd>
+            <dt class="col-sm-2">CountryFlag</dt>
+            <dd class="col-sm-10">@country.CountryFlag</dd>
+        </dl>
+        <div>
+            <a href="@($"/countries/edit?countryid={country.CountryID}")">Edit</a> |
+            <a href="@($"/countries")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Country? country;
+
+    [SupplyParameterFromQuery]
+    private int CountryID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        country = await context.Countries.FirstOrDefaultAsync(m => m.CountryID == CountryID);
+
+        if (country is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

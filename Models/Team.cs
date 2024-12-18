@@ -13,8 +13,6 @@ namespace R6Ranking.Models {
 
         [Precision(7,2)]
         public decimal CurrentElo { get; set; } = 500;
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 
         public ICollection<Player>? Players { get; set; }
         public ICollection<TeamEloChange>? TeamEloHistory { get; set; } = new List<TeamEloChange>();
