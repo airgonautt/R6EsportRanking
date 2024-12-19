@@ -13,30 +13,34 @@
 
 <div class="flex-container">
     <p style="margin-left: auto;">
-        <a href="Tournaments/create" class="btn btn-primary">Create New</a>
+        <MudButton Href="Tournaments/create">Create New</MudButton>
     </p>
 </div>
 
-<QuickGrid Class="table" Items="context.Tournaments">
+<MudTable Items="context.Tournaments" Bordered="true" Striped="true" Hover="true">
 
-    <TemplateColumn Context="tournament">
-        <div class="tournament-info">
-            <img src="@tournament.TournamentLogo" alt="@tournament.TournamentName Logo" class="tournament-logo" />
-            <span>@tournament.TournamentName (@tournament.TournamentID)</span>
-            <span>@tournament.RegionID</span>
-            <span>@tournament.TournamentLocation</span>
-        </div>
-    </TemplateColumn>
+    <HeaderContent>
+        <MudTh>Tournament Info</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
 
-    <TemplateColumn Context="tournament">
-        <a href="@($"tournaments/edit?tournamentid={tournament.TournamentID}")">Edit</a> |
-        <a href="@($"tournaments/details?tournamentid={tournament.TournamentID}")">Details</a> |
-        <a href="@($"tournaments/delete?tournamentid={tournament.TournamentID}")">Delete</a>
-    </TemplateColumn>
+    <RowTemplate>
+        <MudTd>
+            <div class="tournament-info">
+                <img src="@context.TournamentLogo" alt="@context.TournamentName Logo" class="tournament-logo" />
+                <span>@context.TournamentName (@context.TournamentID)</span>
+                <span>@context.RegionID</span>
+                <span>@context.TournamentLocation</span>
+            </div>
+        </MudTd>
 
-
-
-</QuickGrid>
+        <MudTd>
+            <MudLink Href="@($"tournaments/edit?tournamentid={context.TournamentID}")">Edit</MudLink> |
+            <MudLink Href="@($"tournaments/details?tournamentid={context.TournamentID}")">Details</MudLink> |
+            <MudLink Href="@($"tournaments/delete?tournamentid={context.TournamentID}")">Delete</MudLink>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
     R6EsportsDbContext context = default!;

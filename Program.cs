@@ -3,6 +3,7 @@ using R6Ranking.Models;
 using R6Ranking.Data;   
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddRazorPages();  // Add Razor Pages
 builder.Services.AddServerSideBlazor();  // Add Blazor Server
 
+builder.Services.AddMudServices();
+
 builder.Services.AddScoped<R6Ranking.Services.MatchService>();
 
 var app = builder.Build();
@@ -38,8 +41,6 @@ if (!app.Environment.IsDevelopment()) {
     app.UseHsts();
     app.UseMigrationsEndPoint();
 }
-
-
 
 app.UseHttpsRedirection();
 

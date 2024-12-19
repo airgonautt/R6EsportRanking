@@ -14,17 +14,27 @@
     <a href="operatorbans/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.OperatorBans">
-    <PropertyColumn Property="operatorban => operatorban.OperatorName" />
-    <PropertyColumn Property="operatorban => operatorban.OperatorLogo" />
-    <PropertyColumn Property="operatorban => operatorban.OperatorSide" />
+<MudTable Items="context.OperatorBans" Bordered="true" Striped="true" Hover="true">
 
-    <TemplateColumn Context="operatorban">
-        <a href="@($"operatorbans/edit?operatorbanid={operatorban.OperatorBanID}")">Edit</a> |
-        <a href="@($"operatorbans/details?operatorbanid={operatorban.OperatorBanID}")">Details</a> |
-        <a href="@($"operatorbans/delete?operatorbanid={operatorban.OperatorBanID}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+    <HeaderContent>
+        <MudTh>Operator Name</MudTh>
+        <MudTh>Operator Logo</MudTh>
+        <MudTh>Operator Side</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd>@context.OperatorName</MudTd>
+        <MudTd><img src="@context.OperatorLogo" alt="@context.OperatorName Logo" class="operator-logo" /></MudTd>
+        <MudTd>@context.OperatorSide</MudTd>
+
+        <MudTd>
+            <MudLink Href="@($"operatorbans/edit?operatorbanid={context.OperatorBanID}")">Edit</MudLink> |
+            <MudLink Href="@($"operatorbans/details?operatorbanid={context.OperatorBanID}")">Details</MudLink> |
+            <MudLink Href="@($"operatorbans/delete?operatorbanid={context.OperatorBanID}")">Delete</MudLink>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
     private R6EsportsDbContext context = default!;

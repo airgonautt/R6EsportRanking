@@ -5,15 +5,15 @@
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 
-<h1>@team?.TeamName</h1>
+<MudText Typo="Typo.h1" Color="Color.Primary">@team?.TeamName</MudText>
 
 @if (team != null)
 {
     <div class="team-info">
         <img src="@team.LogoUrl" alt="Team Logo" class="team-logo" />
-        <p><strong>Region:</strong> @team.Region</p>
-        <p><strong>Current Elo:</strong> @team.CurrentElo</p>
-        <p><strong>Players:</strong></p>
+        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Region:</strong> @team.Region</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Current Elo:</strong> @team.CurrentElo</MudText>
+        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Players:</strong></MudText>
         <ul>
             @foreach (var player in team.Players)
             {
@@ -21,14 +21,44 @@
             }
         </ul>
     </div>
+
+    <MudText Typo="Typo.h2" Color="Color.Primary">Elo History</MudText>
+
+    <div>
+        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index"
+                  XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options" 
+          ShowPoints="true" />
+
+        <MudGrid>
+            <MudItem xs="6">
+                <MudText Typo="Typo.body1" Class="py-3">
+                    Selected: @(Index < 0 ? "None" : Series[Index].Name)
+                </MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudSlider @bind-Value="Options.LineStrokeWidth" Min="1" Max="5" Color="Color.Info">
+                    Line Width: @Options.LineStrokeWidth.ToString()
+                </MudSlider>
+            </MudItem>
+        </MudGrid>
+    </div>
 }
 else
 {
-    <p>Loading team info...</p>
+    <MudText Typo="Typo.body1" Color="Color.Warning">Loading team info...</MudText>
 }
 
 @code {
     private Team? team;
+    private int Index = -1;
+    public ChartOptions Options = new ChartOptions()
+    {
+        LineStrokeWidth = 2
+    };
+
+    public List<ChartSeries> Series = new();
+    public string[] XAxisLabels = Array.Empty<string>();
+    private ChartOptions options = new ChartOptions();
 
     [Parameter]
     public string teamName { get; set; } = default!;
@@ -36,8 +66,37 @@ else
     protected override async Task OnInitializedAsync()
     {
         var context = await DbFactory.CreateDbContextAsync();
+        options.InterpolationOption = InterpolationOption.NaturalSpline;
+        // Fetch the team by name and get its ID
         team = await context.Teams
-                            .Include(t => t.Players)  // Load related players for the team
-                            .FirstOrDefaultAsync(t => t.TeamName == teamName);  // Find the team by its ID
+                            .Include(t => t.Players)
+                            .FirstOrDefaultAsync(t => t.TeamName == teamName);
+
+        if (team != null)
+        {
+            // Fetch Elo changes by TeamID
+            var eloHistory = await context.TeamEloChanges
+                                          .Where(e => e.TeamID == team.TeamID)
+                                          .OrderBy(e => e.Date)
+                                          .ToListAsync();
+
+            PopulateChartData(eloHistory);
+        }
+    }
+
+    private void PopulateChartData(List<TeamEloChange> eloHistory)
+    {
+        ;
+        XAxisLabels = eloHistory.Select(e => e.Date.ToShortDateString()).ToArray();
+
+        Series = new List<ChartSeries>
+        {
+            new ChartSeries
+            {
+                Name = "Elo Rating",
+                Data = eloHistory.Select(e => (double)e.CurrentElo).ToArray(),
+                //Tooltip = eloHistory.Select(e => e.Note ?? "No Details").ToArray()
+            }
+        };
     }
 }

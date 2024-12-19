@@ -14,16 +14,25 @@
     <a href="countries/create">Create New</a>
 </p>
 
-<QuickGrid Class="table" Items="context.Countries">
-    <PropertyColumn Property="country => country.CountryName" />
-    <PropertyColumn Property="country => country.CountryFlag" />
+<MudTable Items="context.Countries" Bordered="true" Striped="true" Hover="true">
 
-    <TemplateColumn Context="country">
-        <a href="@($"countries/edit?countryid={country.CountryID}")">Edit</a> |
-        <a href="@($"countries/details?countryid={country.CountryID}")">Details</a> |
-        <a href="@($"countries/delete?countryid={country.CountryID}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+    <HeaderContent>
+        <MudTh>Country Name</MudTh>
+        <MudTh>Country Flag</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd>@context.CountryName</MudTd>
+        <MudTd><img src="@context.CountryFlag" alt="@context.CountryName Flag" class="country-flag" /></MudTd>
+
+        <MudTd>
+            <MudLink Href="@($"countries/edit?countryid={context.CountryID}")">Edit</MudLink> |
+            <MudLink Href="@($"countries/details?countryid={context.CountryID}")">Details</MudLink> |
+            <MudLink Href="@($"countries/delete?countryid={context.CountryID}")">Delete</MudLink>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
     private R6EsportsDbContext context = default!;

@@ -10,17 +10,23 @@
     --bs-gray-dark-1: #343a40;
     --bs-gray-dark-2: #0e0d0d;
     --bs-body-bg: url(bootstrap/Visuals/bg.jpg);
-}
+    body, h1, h2, h3, h4, h5, h6, p, button
+
+/*Global Style*/
+{
+    font-family: 'Kanit', sans-serif;
+    color: var(--bs-white-1);
+}}
 
 /* Global Styles */
 body {
     margin: 0;
     padding: 0;
-    font-family: "Kanit", sans-serif;
     background-image: var(--bs-body-bg);
     background-size: cover;
-    background-color: var(--bs-gray-dark-2);
-    color: var(--bs-white-1);
+    background-position: center; /* Centers the background */
+    background-attachment: fixed;
+    
 }
 
 /* Page Layout */

@@ -17,21 +17,28 @@
     </p>
 </div>
 
-<QuickGrid Class="table" Items="@context.Regions">
+<MudTable Items="@context.Regions" Bordered="true" Striped="true" Hover="true">
 
-    <TemplateColumn Context="region">
-        <div class="region-info">
-            <img src="@region.LogoUrl" alt="@region.RegionName Logo" class="region-logo" />
-            <span>@region.RegionName (@region.RegionID)</span>
-        </div>
-    </TemplateColumn>
+    <HeaderContent>
+        <MudTh>Region Info</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
 
-    <TemplateColumn Context="region">
-        <a href="@($"regions/edit?regionid={region.RegionID}")">Edit</a> |
-        <a href="@($"regions/details?regionid={region.RegionID}")">Details</a> |
-        <a href="@($"regions/delete?regionid={region.RegionID}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+    <RowTemplate>
+        <MudTd>
+            <div class="region-info">
+                <img src="@context.LogoUrl" alt="@context.RegionName Logo" class="region-logo" />
+                <span>@context.RegionName (@context.RegionID)</span>
+            </div>
+        </MudTd>
+
+        <MudTd>
+            <MudLink Href="@($"regions/edit?regionid={context.RegionID}")">Edit</MudLink> |
+            <MudLink Href="@($"regions/details?regionid={context.RegionID}")">Details</MudLink> |
+            <MudLink Href="@($"regions/delete?regionid={context.RegionID}")">Delete</MudLink>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
 @code {
 
