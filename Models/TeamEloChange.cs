@@ -11,10 +11,8 @@ namespace R6Ranking.Models {
         public int? RivalTeamID { get; set; }
         public Team? RivalTeam { get; set; }
 
-        [Precision(7, 2)]
-        public decimal CurrentElo { get; set; }
-        [Precision(7, 2)]
-        public decimal EloChange { get; set; }
+        public int CurrentElo { get; set; }
+        public int EloChange { get; set; }
 
         public DateTime Date { get; set; }
         public string? Note { get; set; }

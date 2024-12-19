@@ -10,10 +10,9 @@ namespace R6Ranking.Models {
 
         public DateTime ChangeDate { get; set; }
 
-        [Precision(7, 2)]
-        public decimal CurrentElo { get; set; }
-        [Precision(7, 2)]
-        public decimal EloChange { get; set; }
+        public int CurrentElo { get; set; }
+        public int EloChange { get; set; }
+
         public string? Note { get; set; }
 
     }

@@ -11,8 +11,7 @@ namespace R6Ranking.Models {
         public string? RegionID { get; set; }
         public Region? Region { get; set; }
 
-        [Precision(7,2)]
-        public decimal CurrentElo { get; set; } = 500;
+        public int CurrentElo { get; set; } = 500;
 
         public ICollection<Player>? Players { get; set; }
         public ICollection<TeamEloChange>? TeamEloHistory { get; set; } = new List<TeamEloChange>();

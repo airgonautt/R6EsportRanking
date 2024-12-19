@@ -148,20 +148,6 @@
 
 @code {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     [SupplyParameterFromForm]
     private Match Match { get; set; } = new();
     private List<Team> Teams { get; set; } = new();
@@ -212,28 +198,53 @@
         }
 
         // Update Elo
-        (decimal team1EloChange, decimal team2EloChange) = CalculateEloChange(Match.isBo3, team1.CurrentElo, team2.CurrentElo, match.Team1Score, match.Team2Score);
+        (int team1EloChange, int team2EloChange) = CalculateEloChange(Match.isBo3, team1.CurrentElo, team2.CurrentElo, match.Team1Score, match.Team2Score);
         team1.CurrentElo += team1EloChange;
         team2.CurrentElo += team2EloChange;
 
+        var tournament = await context.Tournaments.FindAsync(match.TournamentID);
+
+        var team1EloHistory = new TeamEloChange
+            {
+                TeamID = team1.TeamID,
+                RivalTeamID = team2.TeamID,
+                CurrentElo = team1.CurrentElo,
+                EloChange = team1EloChange,
+                Date = Match.MatchDate,
+                Note = $"{(int)team1EloChange}RP VS {team2.TeamName} on {tournament.TournamentName} - {match.MatchDate:yyyy-MM-dd}"
+            };
+
+        var team2EloHistory = new TeamEloChange
+            {
+                TeamID = team2.TeamID,
+                RivalTeamID = team1.TeamID,
+                CurrentElo = team2.CurrentElo,
+                EloChange = team2EloChange,
+                Date = Match.MatchDate,
+                Note = $"{(int)team2EloChange}RP VS {team1.TeamName} on {tournament.TournamentName} - {match.MatchDate:yyyy-MM-dd}"
+            };
+
+        // Add the history records to the database
+        context.TeamEloChanges.AddRange(team1EloHistory, team2EloHistory);
+
         await context.SaveChangesAsync();
     }
-    private (decimal team1EloChange, decimal team2EloChange) CalculateEloChange(bool isBo3, decimal team1Elo, decimal team2Elo, decimal team1Score, decimal team2Score)
+    private (int team1EloChange, int team2EloChange) CalculateEloChange(bool isBo3, int team1Elo, int team2Elo, int team1Score, int team2Score)
     {
         //K
-        decimal kFactor = isBo3 ? 32m : 65m;
+        int kFactor = isBo3 ? 32 : 65;
 
         //W
-        decimal actualScoreTeam1 = team1Score > team2Score ? (decimal)1 : (team1Score < team2Score ? (decimal)0 : (decimal)0.5);
-        decimal actualScoreTeam2 = team2Score > team1Score ? (decimal)1 : (team2Score < team1Score ? (decimal)0 : (decimal)0.5);
+        int actualScoreTeam1 = (team1Score > team2Score ? (int)1 : (int)(team1Score < team2Score ? 0 : 0.5));
+        int actualScoreTeam2 = team2Score > team1Score ? (int)1 : (int)(team2Score < team1Score ? 0 : 0.5);
 
         //E
-        decimal expectedTeam1 = 1 / (1 + (decimal)Math.Pow(10, (double)((team2Elo - team1Elo) / 500)));
-        decimal expectedTeam2 = 1 / (1 + (decimal)Math.Pow(10, (double)((team1Elo - team2Elo) / 500)));
+        int expectedTeam1 = 1 / (1 + (int)Math.Pow(10, (double)((team2Elo - team1Elo) / 500)));
+        int expectedTeam2 = 1 / (1 + (int)Math.Pow(10, (double)((team1Elo - team2Elo) / 500)));
 
         // Calculate Elo
-        decimal team1EloChange = kFactor * (actualScoreTeam1 - expectedTeam1);
-        decimal team2EloChange = kFactor * (actualScoreTeam2 - expectedTeam2);
+        int team1EloChange = kFactor * (actualScoreTeam1 - expectedTeam1);
+        int team2EloChange = kFactor * (actualScoreTeam2 - expectedTeam2);
 
         return (team1EloChange, team2EloChange);
     }
