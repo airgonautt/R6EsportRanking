@@ -1,9 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Metadata;
-
-namespace R6Ranking.Models
-{
+﻿namespace R6Ranking.Models {
     public class Match {
 
         public int MatchID { get; set; }
@@ -21,15 +16,15 @@ namespace R6Ranking.Models
         public DateTime MatchDate { get; set; }
 
         ///temp var
-        public int Team1Ban1 {  get; set; }
+        public int Team1Ban1 { get; set; }
         public int Team2Ban1 { get; set; }
         public int Team1Ban2 { get; set; }
         public int Team2Ban2 { get; set; }
 
         //navigation
-        public int MapID { get; set; }          
+        public int MapID { get; set; }
         public Map Map { get; set; }
-        
+
         public int TournamentID { get; set; }
         public Tournament? Tournament { get; set; }
 

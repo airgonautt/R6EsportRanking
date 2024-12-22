@@ -1,9 +1,8 @@
-using R6Ranking.Components;
-using R6Ranking.Models;
-using R6Ranking.Data;   
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 using MudBlazor.Services;
+using R6Ranking.Components;
+using R6Ranking.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

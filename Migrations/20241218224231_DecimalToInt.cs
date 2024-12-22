@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class DecimalToInt : Migration
-    {
+    public partial class DecimalToInt : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<int>(
                 name: "CurrentElo",
                 table: "Teams",
@@ -62,8 +59,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<decimal>(
                 name: "CurrentElo",
                 table: "Teams",

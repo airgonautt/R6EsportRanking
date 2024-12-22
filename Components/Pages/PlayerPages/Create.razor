@@ -78,7 +78,7 @@
     public Player Player { get; set; } = new Player(){PlayerName = "Default name"};
 
     private List<Team> Teams { get; set; } = new();
-    private List<Country> Countries { get; set; } = new();
+    private List<OriginCountry> Countries { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {

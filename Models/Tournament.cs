@@ -1,5 +1,4 @@
-﻿namespace R6Ranking.Models
-{
+﻿namespace R6Ranking.Models {
     public class Tournament {
 
         public int TournamentID { get; set; }
@@ -18,7 +17,7 @@
 
 
         // Navigation property for related Matches
-        
+
         public ICollection<Team>? Teams { get; set; } = new List<Team>();
         public Trophy? Trophy { get; set; }
     }

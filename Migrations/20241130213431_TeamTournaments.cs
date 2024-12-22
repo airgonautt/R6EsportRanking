@@ -2,25 +2,20 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class TeamTournaments : Migration
-    {
+    public partial class TeamTournaments : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            
+        protected override void Up(MigrationBuilder migrationBuilder) {
+
 
             migrationBuilder.CreateTable(
                 name: "TeamTournament",
-                columns: table => new
-                {
+                columns: table => new {
                     TeamID = table.Column<int>(type: "int", nullable: false),
                     TournamentID = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_TeamTournament", x => new { x.TeamID, x.TournamentID });
                     table.ForeignKey(
                         name: "FK_TeamTournament_Teams_TeamID",
@@ -43,18 +38,15 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-           
+        protected override void Down(MigrationBuilder migrationBuilder) {
+
             migrationBuilder.CreateTable(
                 name: "TeamTournaments",
-                columns: table => new
-                {
+                columns: table => new {
                     TeamID = table.Column<int>(type: "int", nullable: false),
                     TournamentID = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_TeamTournaments", x => new { x.TeamID, x.TournamentID });
                     table.ForeignKey(
                         name: "FK_TeamTournaments_Teams_TeamID",

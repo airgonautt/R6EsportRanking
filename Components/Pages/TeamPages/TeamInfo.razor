@@ -4,99 +4,135 @@
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+@inject ISnackbar Snackbar
+@using R6Ranking.Components.Splashable
 
-<MudText Typo="Typo.h1" Color="Color.Primary">@team?.TeamName</MudText>
+<MudContainer Class="d-flex justify-content-between align-items-center">
 
-@if (team != null)
-{
-    <div class="team-info">
-        <img src="@team.LogoUrl" alt="Team Logo" class="team-logo" />
-        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Region:</strong> @team.Region</MudText>
-        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Current Elo:</strong> @team.CurrentElo</MudText>
-        <MudText Typo="Typo.body1" Color="Color.Info"><strong>Players:</strong></MudText>
-        <ul>
-            @foreach (var player in team.Players)
-            {
-                <li>@player.PlayerName</li>
-            }
-        </ul>
-    </div>
+    <MudButton EndIcon="@Icons.Material.Filled.ArrowBack"
+    Color="Color.Primary"
+    OnClick="NavigateToLowerEloTeam">
+    </MudButton>
 
-    <MudText Typo="Typo.h2" Color="Color.Primary">Elo History</MudText>
+    <MudItem xs="10" Class="text-center">
+        <MudContainer Class="p-4 text-center">
+            <MudImage Src="@team?.LogoUrl" Alt="Team Logo" Class="team-logo mx-auto" />
+            <MudText Typo="Typo.h4" Class="kanit-extrabold">@team?.TeamName</MudText>
+            <MudText Typo="Typo.h6" Class="text-primary">@team?.CurrentElo RP</MudText>
+            <MudText Typo="Typo.caption" Class="text-secondary">No. 1 Internationally for the past X days</MudText>
+        </MudContainer>
+    </MudItem>
 
-    <div>
-        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index"
-                  XAxisLabels="@XAxisLabels" Width="100%" Height="350px" ChartOptions="@Options" 
-          ShowPoints="true" />
+    <MudButton
+    EndIcon="@Icons.Material.Filled.ArrowForward"
+    Color="Color.Primary" 
+    OnClick="NavigateToHigherEloTeam">
+    </MudButton>
+</MudContainer>
 
-        <MudGrid>
-            <MudItem xs="6">
-                <MudText Typo="Typo.body1" Class="py-3">
-                    Selected: @(Index < 0 ? "None" : Series[Index].Name)
-                </MudText>
-            </MudItem>
-            <MudItem xs="6">
-                <MudSlider @bind-Value="Options.LineStrokeWidth" Min="1" Max="5" Color="Color.Info">
-                    Line Width: @Options.LineStrokeWidth.ToString()
-                </MudSlider>
-            </MudItem>
-        </MudGrid>
-    </div>
-}
-else
-{
-    <MudText Typo="Typo.body1" Color="Color.Warning">Loading team info...</MudText>
-}
+<MudContainer Class="my-5">
+    <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index"
+    XAxisLabels="@XAxisLabels" Width="100%" Height="400px" ChartOptions="@Options" ShowPoints="true" />
+</MudContainer>
+
+<h2>Team Roster</h2>
+
+<div class="cards-container">
+    @if (Players == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!Players.Any())
+    {
+        <p>No players found.</p>
+    }
+    else
+    {
+        @foreach (var player in Players)
+        {
+            <PlayerCard Player="@player" />
+        }
+    }
+</div>
 
 @code {
     private Team? team;
     private int Index = -1;
-    public ChartOptions Options = new ChartOptions()
-    {
-        LineStrokeWidth = 2
-    };
-
+    public ChartOptions Options = new ChartOptions() { LineStrokeWidth = 2 };
     public List<ChartSeries> Series = new();
     public string[] XAxisLabels = Array.Empty<string>();
-    private ChartOptions options = new ChartOptions();
+    private List<Player>? Players;
 
-    [Parameter]
-    public string teamName { get; set; } = default!;
+    [Parameter] public string teamName { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         var context = await DbFactory.CreateDbContextAsync();
-        options.InterpolationOption = InterpolationOption.NaturalSpline;
-        // Fetch the team by name and get its ID
-        team = await context.Teams
-                            .Include(t => t.Players)
-                            .FirstOrDefaultAsync(t => t.TeamName == teamName);
-
+        team = await context.Teams.Include(t => t.Players).FirstOrDefaultAsync(t => t.TeamName == teamName);
         if (team != null)
         {
-            // Fetch Elo changes by TeamID
-            var eloHistory = await context.TeamEloChanges
-                                          .Where(e => e.TeamID == team.TeamID)
-                                          .OrderBy(e => e.Date)
-                                          .ToListAsync();
-
+            var eloHistory = await context.TeamEloChanges.Where(e => e.TeamID == team.TeamID).OrderBy(e => e.Date).ToListAsync();
             PopulateChartData(eloHistory);
+
+            Players = await context.Players.Where(e => e.TeamID == team.TeamID).ToListAsync();
         }
     }
 
     private void PopulateChartData(List<TeamEloChange> eloHistory)
     {
-        ;
         XAxisLabels = eloHistory.Select(e => e.Date.ToShortDateString()).ToArray();
-
-        Series = new List<ChartSeries>
-        {
-            new ChartSeries
-            {
+        Series = new List<ChartSeries> {
+            new ChartSeries {
                 Name = "Elo Rating",
                 Data = eloHistory.Select(e => (double)e.CurrentElo).ToArray(),
-                //Tooltip = eloHistory.Select(e => e.Note ?? "No Details").ToArray()
             }
         };
+    }
+
+    private async Task NavigateToLowerEloTeam()
+    {
+        Snackbar.Add("Lower Elo Button Clicked!", Severity.Info);
+
+        var context = await DbFactory.CreateDbContextAsync();
+        var lowerTeam = await context.Teams.Where(t => t.CurrentElo < team!.CurrentElo)
+                                           .OrderByDescending(t => t.CurrentElo)
+                                           .FirstOrDefaultAsync();
+        if (lowerTeam != null)
+        {
+            Snackbar.Add($"Navigating to {lowerTeam.TeamName}", Severity.Success);
+            NavManager.NavigateTo($"/teams/{lowerTeam.TeamName}");
+        }
+        else
+        {
+            Snackbar.Add("No lower Elo team found!", Severity.Warning);
+        }
+    }
+
+    private async Task NavigateToHigherEloTeam()
+    {
+        Snackbar.Add("Higher Elo Button Clicked!", Severity.Info);
+
+        var context = await DbFactory.CreateDbContextAsync();
+        var higherTeam = await context.Teams.Where(t => t.CurrentElo > team!.CurrentElo)
+                                            .OrderBy(t => t.CurrentElo)
+                                            .FirstOrDefaultAsync();
+        if (higherTeam != null)
+        {
+            Snackbar.Add($"Navigating to {higherTeam.TeamName}", Severity.Success);
+            NavManager.NavigateTo($"/teams/{higherTeam.TeamName}");
+        }
+        else
+        {
+            Snackbar.Add("No lower Elo team found!", Severity.Warning);
+        }
+    }
+
+    private bool HasPlayers() {
+        if(Players != null){
+            return false;
+        }
+        return true;
     }
 }

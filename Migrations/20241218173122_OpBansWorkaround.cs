@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class OpBansWorkaround : Migration
-    {
+    public partial class OpBansWorkaround : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<int>(
                 name: "Team1Ban1",
                 table: "Matches",
@@ -40,8 +37,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "Team1Ban1",
                 table: "Matches");

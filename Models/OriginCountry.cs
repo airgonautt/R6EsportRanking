@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
-
-namespace R6Ranking.Models {
-    public class Country {
+﻿namespace R6Ranking.Models {
+    public class OriginCountry {
 
         public int CountryID { get; set; }
 

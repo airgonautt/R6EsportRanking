@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace R6Ranking.Models {
+﻿namespace R6Ranking.Models {
     public class RegionEloChange {
 
         public int RegionEloHistoryID { get; set; }

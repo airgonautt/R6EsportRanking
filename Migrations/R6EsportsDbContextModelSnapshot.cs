@@ -22,25 +22,6 @@ namespace R6Ranking.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("R6Ranking.Models.Country", b =>
-                {
-                    b.Property<int>("CountryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryID"));
-
-                    b.Property<string>("CountryFlag")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CountryName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CountryID");
-
-                    b.ToTable("Countries");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Map", b =>
                 {
                     b.Property<int>("MapID")
@@ -210,6 +191,25 @@ namespace R6Ranking.Migrations
                     b.ToTable("OperatorBans");
                 });
 
+            modelBuilder.Entity("R6Ranking.Models.OriginCountry", b =>
+                {
+                    b.Property<int>("CountryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryID"));
+
+                    b.Property<string>("CountryFlag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CountryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CountryID");
+
+                    b.ToTable("Countries");
+                });
+
             modelBuilder.Entity("R6Ranking.Models.Player", b =>
                 {
                     b.Property<int>("PlayerID")
@@ -233,6 +233,9 @@ namespace R6Ranking.Migrations
                     b.Property<string>("FlavorText")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("OriginCountryCountryID")
+                        .HasColumnType("int");
+
                     b.Property<string>("PhotoURL")
                         .HasColumnType("nvarchar(max)");
 
@@ -250,7 +253,7 @@ namespace R6Ranking.Migrations
 
                     b.HasKey("PlayerID");
 
-                    b.HasIndex("CountryID");
+                    b.HasIndex("OriginCountryCountryID");
 
                     b.HasIndex("TeamID");
 
@@ -519,15 +522,15 @@ namespace R6Ranking.Migrations
 
             modelBuilder.Entity("R6Ranking.Models.Player", b =>
                 {
-                    b.HasOne("R6Ranking.Models.Country", "Country")
+                    b.HasOne("R6Ranking.Models.OriginCountry", "OriginCountry")
                         .WithMany("CountryPlayers")
-                        .HasForeignKey("CountryID");
+                        .HasForeignKey("OriginCountryCountryID");
 
                     b.HasOne("R6Ranking.Models.Team", "Team")
                         .WithMany("Players")
                         .HasForeignKey("TeamID");
 
-                    b.Navigation("Country");
+                    b.Navigation("OriginCountry");
 
                     b.Navigation("Team");
                 });
@@ -638,11 +641,6 @@ namespace R6Ranking.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("R6Ranking.Models.Country", b =>
-                {
-                    b.Navigation("CountryPlayers");
-                });
-
             modelBuilder.Entity("R6Ranking.Models.Map", b =>
                 {
                     b.Navigation("Matches");
@@ -651,6 +649,11 @@ namespace R6Ranking.Migrations
             modelBuilder.Entity("R6Ranking.Models.Match", b =>
                 {
                     b.Navigation("TeamOperatorBans");
+                });
+
+            modelBuilder.Entity("R6Ranking.Models.OriginCountry", b =>
+                {
+                    b.Navigation("CountryPlayers");
                 });
 
             modelBuilder.Entity("R6Ranking.Models.Region", b =>

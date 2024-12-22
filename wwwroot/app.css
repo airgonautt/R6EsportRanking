@@ -1,3 +1,16 @@
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    gap: 16px; /* Adjust spacing between cards */
+    padding: 16px; /* Add padding around the container */
+}
+
+.player-card {
+    flex: 1 1 calc(50% - 80px); /* Adjust width for a 4-column layout */
+    max-width: 500px; /* Optional: Limit the max width of each card */
+}
+
 /* Variables for consistent styling */
 :root {
     --bs-blue-1: #0d6efd;

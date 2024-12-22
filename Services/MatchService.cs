@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using R6Ranking.Data;
 using R6Ranking.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace R6Ranking.Services {
     public class MatchService {
@@ -44,7 +41,7 @@ namespace R6Ranking.Services {
                 .Where(t => t.TournamentName.Contains(tournamentName))
                 .ToListAsync();
         }
-        
+
         public async Task CalculateEloAsync(Match match) {
 
             using var context = await _dbFactory.CreateDbContextAsync();
@@ -68,7 +65,7 @@ namespace R6Ranking.Services {
         }
 
         private void CalculateElo(Team team1, Team team2, int scoreTeam1, int scoreTeam2) {
-                        
+
             // Basic Elo rating calculation logic
             const int K = 32; // K-factor, which determines the maximum change in rating
 
@@ -82,6 +79,6 @@ namespace R6Ranking.Services {
             team2.CurrentElo += (int)(K * (actualScoreTeam2 - expectedScoreTeam2));
 
         }
-        
+
     }
 }

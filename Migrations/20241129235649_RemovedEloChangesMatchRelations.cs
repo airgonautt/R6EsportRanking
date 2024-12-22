@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class RemovedEloChangesMatchRelations : Migration
-    {
+    public partial class RemovedEloChangesMatchRelations : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_Matches_TeamEloChanges_Team1ID",
                 table: "Matches");
@@ -50,8 +47,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropIndex(
                 name: "IX_Matches_Team1ID",
                 table: "Matches");

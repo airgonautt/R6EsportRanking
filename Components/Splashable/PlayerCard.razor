@@ -1,29 +1,50 @@
 ﻿@using R6Ranking.Models  
 
-<h3>PlayerCard</h3>
+<br />
+<MudCard Style="position: relative; width: 218px; height: 350px; cursor: pointer">
+    <!-- Header -->
+    <MudPaper Elevation="0"
+    Class="rounded-0"
+              Style="position: absolute; display: flex; left: 1%; width: 100%; left:4%; padding: 4px; z-index: 4">
+        <MudImage Src="@Player.Team?.LogoUrl" Width="24" Height="24" Alt="teamlogo" /> 
+        <MudText Typo="Typo.h4">@Player.PlayerName</MudText>
+    </MudPaper>
+
+    <!-- Portrait Layers-->
+    <MudCardMedia Image="@Player.CardURL" Alt="Card Background" Style="position: absolute; top:4%; left: 5%; width: 90%; height: 90%; z-index: 1" />
+    <MudCardMedia Image="@Player.PhotoURL" Alt="Player Photo" Style="position: absolute; top: 20%; width: 100%; height: 80%; z-index: 2; object-fit: cover" />
+    <MudCardMedia Image="/images/CardFrame_basic.png" Alt="Card Frame" Style="position: absolute; width: 100%; height: 100%; z-index: 3" />
+
+    <!-- Footer -->
+    <MudPaper Elevation="0"
+              Class="rounded-0"
+              Style="position: absolute; bottom: 6%; right: 4%; display: flex; justify-content: space-between; align-items: center; width: 90%; padding: 4px; z-index: 4">
+
+        <MudText Typo="Typo.h5">@Player.Role</MudText>
+
+        @if (Enum.TryParse<Blazor.Flags.Country>(Player.OriginCountry?.CountryFlag, out var countryEnum))
+        {
+            <CountryFlag Country="countryEnum" Size="FlagSize.Normal" Style="margin-top: -4px; border-radius: 15px;"></CountryFlag>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2">Flag not available</MudText>
+        }
+    </MudPaper>
+    <MudPaper Elevation="0"
+              Class="rounded-0"
+              Style="position: absolute; bottom: 0; left: 0; width: 100%; left:3%; padding: 10px; z-index: 4">
+
+        <MudText Typo="Typo.h5">
+            Rating: @Player.SkillRating 
+        </MudText>
+    </MudPaper>
+
+</MudCard>
+<br />
 
 @code {
     [Parameter]
-    public Player Player { get; set; } = new Player(); // Player object passed from parent
+    public Player Player { get; set; } = new Player();
+
 }
-<!-- Player card component -->
-<div class="player-card">
-    <!-- Portrait Section: Background and Foreground -->
-    <div class="player-portrait" style="background-image: url('@Player.CardURL')">
-        <img class="player-photo" src="@Player.PhotoURL" alt="@Player.PlayerName" />
-    </div>
-    <!-- Player Information -->
-    <div class="player-info">
-        <h3>@Player.PlayerName</h3>
-        <p>Role: @Player.Role</p>
-        <p>Country: @Player.CountryID</p>
-        <p>Team ID: @Player.TeamID</p>
-        
-    </div>
-    <!-- Player Actions -->
-    <div class="player-actions">
-        <a href="@($"players/edit?playerid={Player.PlayerID}")">Edit</a> |
-        <a href="@($"players/details?playerid={Player.PlayerID}")">Details</a> |
-        <a href="@($"players/delete?playerid={Player.PlayerID}")">Delete</a>
-     </div>
-</div>

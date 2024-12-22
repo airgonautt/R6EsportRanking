@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class alterTeamBanstable : Migration
-    {
+    public partial class alterTeamBanstable : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<int>(
                 name: "SkillRating",
                 table: "Players",
@@ -18,8 +15,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropColumn(
                 name: "SkillRating",
                 table: "Players");

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace R6Ranking.Models {
+﻿namespace R6Ranking.Models {
     public class TeamEloChange {
 
         public int TeamEloChangeID { get; set; }

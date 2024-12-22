@@ -1,0 +1,49 @@
+﻿@page "/cards"
+
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Components.Splashable
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+
+<PageTitle>Cards</PageTitle>
+
+<h3>Player Cards</h3>
+
+<div class="cards-container">
+    @if (Players == null)
+    {
+        <p>Loading...</p>
+    }
+    else if (!Players.Any())
+    {
+        <p>No players found.</p>
+    }
+    else
+    {   string str1 = "Coach";
+        string str2 = "Analyst";
+
+        @foreach (var player in Players)
+        {   if (player.Role == str1 || player.Role == str2)
+            {
+                continue;
+            }
+            else{
+                <PlayerCard Player="@player" />
+            }
+        }
+    }
+</div>
+
+@code {
+    private List<Player>? Players;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Players = await context.Players
+            .Include(p => p.OriginCountry) // Include related data if needed
+            .Include(p => p.Team)
+            .ToListAsync();
+    }
+}

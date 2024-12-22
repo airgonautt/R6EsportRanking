@@ -6,7 +6,7 @@ namespace R6Ranking.Models {
 
         // Foreign Keys
         public int TeamID { get; set; }
-        public Team? Team { get; set; } 
+        public Team? Team { get; set; }
 
         public int OperatorBanID { get; set; }
         public OperatorBan? OperatorBan { get; set; }

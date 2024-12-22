@@ -2,14 +2,11 @@
 
 #nullable disable
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class PlayerCountries : Migration
-    {
+    public partial class PlayerCountries : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<int>(
                 name: "CountryID",
                 table: "Players",
@@ -24,15 +21,13 @@ namespace R6Ranking.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Countries",
-                columns: table => new
-                {
+                columns: table => new {
                     CountryID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CountryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CountryFlag = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Countries", x => x.CountryID);
                 });
 
@@ -50,8 +45,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_Players_Countries_CountryID",
                 table: "Players");

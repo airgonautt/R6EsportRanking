@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using R6Ranking.Models;
-using System.Xml;
 
 namespace R6Ranking.Data;
 
@@ -17,7 +16,8 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
     public DbSet<Trophy> Trophies { get; set; }
-    public DbSet<Country> Countries { get; set; }
+    public DbSet<OriginCountry> Countries { get; set; }
+
     public DbSet<R6Ranking.Models.Map> Map { get; set; } = default!;
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
@@ -33,7 +33,7 @@ public class R6EsportsDbContext : DbContext {
 
         //MAPS
         modelBuilder.Entity<Map>().HasData(
-            new Map { MapID = 100, MapName = "DefaultMap"},
+            new Map { MapID = 100, MapName = "DefaultMap" },
             new Map { MapID = 1, MapName = "Bank" },
             new Map { MapID = 2, MapName = "Border" },
             new Map { MapID = 3, MapName = "Chalet" },
@@ -67,14 +67,13 @@ public class R6EsportsDbContext : DbContext {
                 .HasForeignKey(m => m.Team2ID)
                 .OnDelete(DeleteBehavior.Restrict);
         });
- 
+
         //OPERATOR BANS
         modelBuilder.Entity<OperatorBan>()
             .HasKey(t => t.OperatorBanID);
 
         //TEAM OPERATOR BANS
-        modelBuilder.Entity<TeamOperatorBan>(entity =>
-        {
+        modelBuilder.Entity<TeamOperatorBan>(entity => {
             entity.HasKey(e => e.TeamOperatorBanID);
 
             entity.HasOne(e => e.OperatorBan)
@@ -84,7 +83,7 @@ public class R6EsportsDbContext : DbContext {
         });
 
         //COUNTRY RELATIONSHIPS
-        modelBuilder.Entity<Country>(entity => {
+        modelBuilder.Entity<OriginCountry>(entity => {
             entity.HasKey(c => c.CountryID);
         });
 
@@ -96,14 +95,14 @@ public class R6EsportsDbContext : DbContext {
                .WithOne(t => t.Region)
                .HasForeignKey(t => t.TournamentID);
         });
-        
+
         //REGION ELO HISTORY
         modelBuilder.Entity<RegionEloChange>()
             .HasKey(reh => reh.RegionEloHistoryID);
 
         modelBuilder.Entity<RegionEloChange>()
             .HasOne(reh => reh.Region)
-            .WithMany(r => r    .RegionEloHistory)
+            .WithMany(r => r.RegionEloHistory)
             .HasForeignKey(reh => reh.RegionID);
 
         // TEAM RELATIONSHIPS
@@ -157,7 +156,7 @@ public class R6EsportsDbContext : DbContext {
         modelBuilder.Entity<Tournament>()
             .HasOne(t => t.Region)
             .WithMany(r => r.Tournaments)
-            .HasForeignKey(t => t.RegionID);    
+            .HasForeignKey(t => t.RegionID);
     }
 
 }

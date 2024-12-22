@@ -1,38 +1,31 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace R6Ranking.Migrations
-{
+namespace R6Ranking.Migrations {
     /// <inheritdoc />
-    public partial class SynchronizeTeamOperatorBans : Migration
-    {
+    public partial class SynchronizeTeamOperatorBans : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            
+        protected override void Up(MigrationBuilder migrationBuilder) {
+
             migrationBuilder.CreateTable(
                 name: "OperatorBans",
-                columns: table => new
-                {
+                columns: table => new {
                     OperatorBanID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     OperatorName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OperatorLogo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OperatorSide = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_OperatorBans", x => x.OperatorBanID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "RegionEloChanges",
-                columns: table => new
-                {
+                columns: table => new {
                     RegionEloHistoryID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RegionID = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -41,8 +34,7 @@ namespace R6Ranking.Migrations
                     EloChange = table.Column<decimal>(type: "decimal(7,2)", precision: 7, scale: 2, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_RegionEloChanges", x => x.RegionEloHistoryID);
                     table.ForeignKey(
                         name: "FK_RegionEloChanges_Regions_RegionID",
@@ -54,8 +46,7 @@ namespace R6Ranking.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Matches",
-                columns: table => new
-                {
+                columns: table => new {
                     MatchID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MatchName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -67,8 +58,7 @@ namespace R6Ranking.Migrations
                     MapID = table.Column<int>(type: "int", nullable: false),
                     TournamentID = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Matches", x => x.MatchID);
                     table.ForeignKey(
                         name: "FK_Matches_Map_MapID",
@@ -98,8 +88,7 @@ namespace R6Ranking.Migrations
 
             migrationBuilder.CreateTable(
                 name: "TeamEloChanges",
-                columns: table => new
-                {
+                columns: table => new {
                     TeamEloChangeID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TeamID = table.Column<int>(type: "int", nullable: false),
@@ -110,8 +99,7 @@ namespace R6Ranking.Migrations
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MatchID = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_TeamEloChanges", x => x.TeamEloChangeID);
                     table.ForeignKey(
                         name: "FK_TeamEloChanges_Matches_MatchID",
@@ -135,16 +123,14 @@ namespace R6Ranking.Migrations
 
             migrationBuilder.CreateTable(
                 name: "TeamOperatorBans",
-                columns: table => new
-                {
+                columns: table => new {
                     TeamOperatorBanID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TeamID = table.Column<int>(type: "int", nullable: false),
                     OperatorBanID = table.Column<int>(type: "int", nullable: false),
                     MatchId = table.Column<int>(type: "int", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_TeamOperatorBans", x => x.TeamOperatorBanID);
                     table.ForeignKey(
                         name: "FK_TeamOperatorBans_Matches_MatchId",
@@ -249,8 +235,7 @@ namespace R6Ranking.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_Matches_Map_MapID",
                 table: "Matches");
