@@ -26,16 +26,7 @@
                 <InputText id="logourl" @bind-Value="Region.LogoUrl" class="form-control" /> 
                 <ValidationMessage For="() => Region.LogoUrl" class="text-danger" /> 
             </div>        
-            <div class="mb-3">
-                <label for="createdat" class="form-label">CreatedAt:</label> 
-                <InputDate id="createdat" @bind-Value="Region.CreatedAt" class="form-control" /> 
-                <ValidationMessage For="() => Region.CreatedAt" class="text-danger" /> 
-            </div>        
-            <div class="mb-3">
-                <label for="updatedat" class="form-label">UpdatedAt:</label> 
-                <InputDate id="updatedat" @bind-Value="Region.UpdatedAt" class="form-control" /> 
-                <ValidationMessage For="() => Region.UpdatedAt" class="text-danger" /> 
-            </div>        
+        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>

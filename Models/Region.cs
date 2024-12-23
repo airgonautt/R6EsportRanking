@@ -3,13 +3,11 @@
 
         public required string RegionID { get; set; }
         public required string RegionName { get; set; }
+
         public string? LogoUrl { get; set; }
+        public string? SocialUrl { get; set; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-        public int AggregatedElo => Teams?.Sum(t => t.CurrentElo) ?? 0;
-
+        public int RegionalElo { get; set; } = 0;
 
         public ICollection<Team>? Teams { get; set; }
         public ICollection<Tournament>? Tournaments { get; set; }

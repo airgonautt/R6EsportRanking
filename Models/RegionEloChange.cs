@@ -3,9 +3,6 @@
 
         public int RegionEloHistoryID { get; set; }
 
-        public string RegionID { get; set; }
-        public Region Region { get; set; }
-
         public DateTime ChangeDate { get; set; }
 
         public int CurrentElo { get; set; }
@@ -13,5 +10,7 @@
 
         public string? Note { get; set; }
 
+        public string RegionID { get; set; }
+        public Region Region { get; set; }
     }
 }

@@ -3,7 +3,10 @@
 
         public int MatchID { get; set; }
         public string? MatchName { get; set; }
+        public string? VODURL {  get; set; }
+
         public bool isBo3 { get; set; }
+        public bool isInternational { get; set; }
 
         public int Team1ID { get; set; }
         public Team? Team1 { get; set; }

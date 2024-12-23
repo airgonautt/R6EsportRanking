@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using R6Ranking.Data;
 
@@ -11,9 +12,11 @@ using R6Ranking.Data;
 namespace R6Ranking.Migrations
 {
     [DbContext(typeof(R6EsportsDbContext))]
-    partial class R6EsportsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241223231859_addInternationalMatches")]
+    partial class addInternationalMatches
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,9 +156,6 @@ namespace R6Ranking.Migrations
                     b.Property<int>("TournamentID")
                         .HasColumnType("int");
 
-                    b.Property<string>("VODURL")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("isBo3")
                         .HasColumnType("bit");
 
@@ -271,6 +271,9 @@ namespace R6Ranking.Migrations
                     b.Property<string>("RegionID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("LogoUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -278,11 +281,8 @@ namespace R6Ranking.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RegionalElo")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SocialUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("RegionID");
 
