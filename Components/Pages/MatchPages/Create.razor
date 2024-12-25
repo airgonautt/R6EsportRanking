@@ -19,12 +19,6 @@
             <ValidationSummary class="text-danger" role="alert" />
 
             <div class="mb-3">
-                <label for="matchname" class="form-label">MatchName:</label>
-                <InputText id="matchname" @bind-Value="Match.MatchName" class="form-control" />
-                <ValidationMessage For="() => Match.MatchName" class="text-danger" />
-            </div>
-
-            <div class="mb-3">
                 <label>Team 1:</label>
                 <InputSelect @bind-Value="Match.Team1ID" class="form-control">
                     <option value="">Select Team 1</option>
@@ -78,7 +72,14 @@
             <div class="mb-3">
                 <label>
                     <InputCheckbox unchecked @bind-value="Match.isBo3"  />
-                    is bo3
+                    is BO3?
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox unchecked @bind-value="Match.isInternational" />
+                    is Interantional Match?
                 </label>
             </div>
 
@@ -171,26 +172,29 @@
         using var context = DbFactory.CreateDbContext();
         using var transaction = await context.Database.BeginTransactionAsync();
 
+        // Fetch teams
+        var team1 = await context.Teams.FindAsync(Match.Team1ID);
+        var team2 = await context.Teams.FindAsync(Match.Team2ID);
+
+        Match.MatchName = $"{team1.TeamName} vs {team2.TeamName}";
+
         //initialized
         context.Matches.Add(Match);
         await context.SaveChangesAsync();
 
         //elo logic+history
-        await UpdateEloAndSaveHistoryAsync(context, Match);
+        await UpdateEloAndSaveHistoryAsync(context, team1, team2, Match);
 
         //ban history
-        await SaveOperatorBansAsync(context, Match.MatchID);
+         await SaveOperatorBansAsync(context, Match.MatchID);
 
         await transaction.CommitAsync();
         NavigationManager.NavigateTo("/matches");
 
     }
 
-    private async Task UpdateEloAndSaveHistoryAsync(R6EsportsDbContext context, Match match)
+    private async Task UpdateEloAndSaveHistoryAsync(R6EsportsDbContext context, Team team1, Team team2, Match match )
     {
-        // Fetch teams
-        var team1 = await context.Teams.FindAsync(match.Team1ID);
-        var team2 = await context.Teams.FindAsync(match.Team2ID);
 
         if (team1 == null || team2 == null)
         {
@@ -205,48 +209,79 @@
         var tournament = await context.Tournaments.FindAsync(match.TournamentID);
 
         var team1EloHistory = new TeamEloChange
-            {
-                TeamID = team1.TeamID,
-                RivalTeamID = team2.TeamID,
-                CurrentElo = team1.CurrentElo,
-                EloChange = team1EloChange,
-                Date = Match.MatchDate,
-                Note = $"VS {team2.TeamName} on {tournament.TournamentName} - {match.MatchDate:yyyy-MM-dd}"
-            };
+        {
+            TeamID = team1.TeamID,
+            RivalTeamID = team2.TeamID,
+            CurrentElo = team1.CurrentElo,
+            EloChange = team1EloChange,
+            Date = Match.MatchDate,
+            Note = $"VS {team2.TeamName} on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+        };
 
         var team2EloHistory = new TeamEloChange
-            {
-                TeamID = team2.TeamID,
-                RivalTeamID = team1.TeamID,
-                CurrentElo = team2.CurrentElo,
-                EloChange = team2EloChange,
-                Date = Match.MatchDate,
-                Note = $"{(int)team2EloChange}RP VS {team1.TeamName} on {tournament.TournamentName} - {match.MatchDate:yyyy-MM-dd}"
-            };
+        {
+            TeamID = team2.TeamID,
+            RivalTeamID = team1.TeamID,
+            CurrentElo = team2.CurrentElo,
+            EloChange = team2EloChange,
+            Date = Match.MatchDate,
+            Note = $"VS {team1.TeamName} on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+        };
 
-        // Add the history records to the database
+        // Upload to DB
         context.TeamEloChanges.AddRange(team1EloHistory, team2EloHistory);
+
+        //region elo logic+history
+        if (Match.isInternational)
+        {
+            var team1Region = await context.Regions.FindAsync(team1?.RegionID);
+            var team2Region = await context.Regions.FindAsync(team2?.RegionID);
+
+            team1Region.RegionalElo += team1EloChange;
+            team2Region.RegionalElo += team2EloChange;
+
+            var team1RegionEloHistory = new RegionEloChange
+            {
+                RegionID = team1Region.RegionID,
+                ChangeDate = match.MatchDate,
+                CurrentElo = team1Region.RegionalElo,
+                EloChange = team1EloChange,
+                Note = $"{team1.TeamName}({team1Region.RegionID}) VS {team2.TeamName}({team2Region.RegionID}) on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+            };
+            var team2RegionEloHistory = new RegionEloChange
+            {
+                RegionID = team2Region.RegionID,
+                ChangeDate = match.MatchDate,
+                CurrentElo = team2Region.RegionalElo,
+                EloChange = team2EloChange,
+                Note = $"{team2.TeamName}({team2Region.RegionID}) VS {team1.TeamName}({team1Region.RegionID}) on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+            };
+            context.RegionEloChanges.AddRange(team1RegionEloHistory, team2RegionEloHistory);
+
+        }
 
         await context.SaveChangesAsync();
     }
+
     private (int team1EloChange, int team2EloChange) CalculateEloChange(bool isBo3, int team1Elo, int team2Elo, int team1Score, int team2Score)
     {
-        //K
-        int kFactor = isBo3 ? 32 : 65;
+        // K-factor
+        int kFactor = isBo3 ? 30 : 45;
 
-        //W
-        int actualScoreTeam1 = (team1Score > team2Score ? (int)1 : (int)(team1Score < team2Score ? 0 : 0.5));
-        int actualScoreTeam2 = team2Score > team1Score ? (int)1 : (int)(team2Score < team1Score ? 0 : 0.5);
+        // Actual scores
+        double actualScoreTeam1 = team1Score > team2Score
+            ? (team1Score - team2Score < 2 ? 0.75 : 1.0): 0.0;
+        double actualScoreTeam2 = 1.0 - actualScoreTeam1;
 
-        //E
-        int expectedTeam1 = 1 / (1 + (int)Math.Pow(10, (double)((team2Elo - team1Elo) / 500)));
-        int expectedTeam2 = 1 / (1 + (int)Math.Pow(10, (double)((team1Elo - team2Elo) / 500)));
+        // Expected scores
+        double expectedTeam1 = 1.0 / (1.0 + Math.Pow(10, (team2Elo - team1Elo) / 500.0));
+        double expectedTeam2 = 1.0 - expectedTeam1; 
 
-        // Calculate Elo
-        int team1EloChange = kFactor * (actualScoreTeam1 - expectedTeam1);
-        int team2EloChange = kFactor * (actualScoreTeam2 - expectedTeam2);
+        // Calculate Elo changes
+        double team1EloChange = kFactor * (actualScoreTeam1 - expectedTeam1);
+        double team2EloChange = kFactor * (actualScoreTeam2 - expectedTeam2);
 
-        return (team1EloChange, team2EloChange);
+        return ((int)Math.Round(team1EloChange), (int)Math.Round(team2EloChange));
     }
 
     private async Task SaveOperatorBansAsync(R6EsportsDbContext context, int matchId) {
