@@ -6,6 +6,7 @@
 @using R6Ranking.Components.Splashable
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
 <div style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); padding: 16px; color: white; border-radius: 8px">
     
@@ -115,7 +116,7 @@
                                            .OrderByDescending(t => t.CurrentElo)
                                            .FirstOrDefaultAsync();
 
-        NavManager.NavigateTo($"/teams/{lowerTeam?.TeamName}", forceLoad: true);
+        NavManager.NavigateTo($"/teams/{lowerTeam?.TeamName}");
     }
 
     private async Task NavigateToHigherEloTeam()
@@ -125,7 +126,7 @@
                                             .OrderBy(t => t.CurrentElo)
                                             .FirstOrDefaultAsync();
 
-        NavManager.NavigateTo($"/teams/{higherTeam?.TeamName}", forceLoad: true);
+        NavManager.NavigateTo($"/teams/{higherTeam?.TeamName}");
     }
 
     private bool HasPlayers() {

@@ -30,12 +30,6 @@
             </div>
 
             <div class="mb-3">
-                <label for="team1score" class="form-label">Team1Score:</label>
-                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
-                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
-            </div>
-
-            <div class="mb-3">
                 <label>Team 2:</label>
                 <InputSelect @bind-Value="Match.Team2ID" class="form-control">
                     <option value="">Select Team 2</option>
@@ -44,6 +38,12 @@
                         <option value="@team.TeamID">@team.TeamName</option>
                     }
                 </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="team1score" class="form-label">Team1Score:</label>
+                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
+                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
             </div>
 
             <div class="mb-3">
@@ -59,6 +59,12 @@
             </div>
 
             <div class="mb-3">
+                <label for="matchURL" class="form-label">MatchURL:</label>
+                <InputText id="matchURL" @bind-Value="Match.VODURL" class="form-control" />
+                <ValidationMessage For="() => Match.VODURL" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
                 <label>Map:</label>
                 <InputSelect @bind-Value="Match.MapID" class="form-control">
                     <option value="">Select Map</option>
@@ -67,20 +73,6 @@
                         <option value="@map.MapID">@map.MapName</option>
                     }
                 </InputSelect>
-            </div>
-
-            <div class="mb-3">
-                <label>
-                    <InputCheckbox unchecked @bind-value="Match.isBo3"  />
-                    is BO3?
-                </label>
-            </div>
-
-            <div class="mb-3">
-                <label>
-                    <InputCheckbox unchecked @bind-value="Match.isInternational" />
-                    is Interantional Match?
-                </label>
             </div>
 
             <div class="mb-3">
@@ -138,6 +130,20 @@
                 </InputSelect>
             </div>
 
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox unchecked @bind-value="Match.isBo3" />
+                    is BO3?
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label>
+                    <InputCheckbox unchecked @bind-value="Match.isInternational" />
+                    is Interantional Match?
+                </label>
+            </div>
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -160,9 +166,13 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Teams = await context.Teams.ToListAsync();
+        Teams = await context.Teams
+            .Where(t => t.IsActive)
+            .ToListAsync();
         Maps = await context.Maps.ToListAsync();
-        Tournaments = await context.Tournaments.ToListAsync();
+        Tournaments = await context.Tournaments
+            .Where(t => t.IsCurrentTournament)
+            .ToListAsync();
         OperatorBans = await context.OperatorBans.ToListAsync();
         TeamOperatorBans = await context.TeamOperatorBans.ToListAsync();
     }
@@ -246,7 +256,7 @@
                 ChangeDate = match.MatchDate,
                 CurrentElo = team1Region.RegionalElo,
                 EloChange = team1EloChange,
-                Note = $"{team1.TeamName}({team1Region.RegionID}) VS {team2.TeamName}({team2Region.RegionID}) on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+                Note = $"{team1.TeamName}({team1Region.RegionID}) VS {team2.TeamName}({team2Region.RegionID}) on {tournament.TournamentName}"
             };
             var team2RegionEloHistory = new RegionEloChange
             {
@@ -254,7 +264,7 @@
                 ChangeDate = match.MatchDate,
                 CurrentElo = team2Region.RegionalElo,
                 EloChange = team2EloChange,
-                Note = $"{team2.TeamName}({team2Region.RegionID}) VS {team1.TeamName}({team1Region.RegionID}) on {tournament.TournamentName} - {match.MatchDate:MM/dd/yy}"
+                Note = $"{team2.TeamName}({team2Region.RegionID}) VS {team1.TeamName}({team1Region.RegionID}) on {tournament.TournamentName}"
             };
             context.RegionEloChanges.AddRange(team1RegionEloHistory, team2RegionEloHistory);
 

@@ -1,76 +1,168 @@
 ﻿@page "/"
-@inherits LayoutComponentBase
 
-<div class="home-content">
-    
-    <div class="hero-section text-white d-flex flex-column align-items-center">
-        <h1 class="display-3">Welcome to R6 Esports</h1>
-        <p class="lead text-center">Your source for competitive Rainbow Six Siege rankings, stats, and tournaments.</p>
-        <NavLink class="btn btn-warning btn-lg mt-3" href="/leaderboard">View Leaderboard</NavLink>
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@using R6Ranking.Components.Splashable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+
+<br />
+<div class="container">
+    <div class="grid">
+        <!--Matches History -->
+        <div class="grid-item news">
+            <h2>Recent Results</h2>
+            <MudTable T="Match" Items="@Matches" Hover="false" Bordered="false">
+                <HeaderContent>
+                    <MudTh>Match Name</MudTh>
+                    <MudTh>Match Date</MudTh>
+                    <MudTh>Tournament ID</MudTh>
+                </HeaderContent>
+
+                <RowTemplate>
+                    <MudTd>
+                        <div class="row-container" @onclick="@(() => NavigateToMatch(context))">
+                            <img src="@GetTeamLogo(context.Team1ID)" class="team-logo" />
+                            <span class="team-name">@($"{context.MatchName.Split(" vs ")[0]} {context.Team1Score} : {context.Team2Score} ") </span>
+                            <img src="@GetTeamLogo(context.Team2ID)" class="team-logo" />
+                            <span class="team-name">@($"{context.MatchName.Split(" vs ")[1]} ")</span>
+                        </div>
+                    </MudTd>
+                    <MudTd>@context.MatchDate.ToShortDateString()</MudTd>
+                    <MudTd>@context.TournamentID</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+
+        <!-- Upcoming Matches -->
+        <div class="grid-item upcoming-matches">
+            <h2>Player Drafts</h2>
+            <p>Cards</p>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="grid-item leaderboard">
+            <h2>Leaderboard</h2>
+            <MudTable T="Team" Items="@Teams" Hover="false" Bordered="false" Class="custom-leaderboard-table">
+                <RowTemplate>
+                    <MudTd>
+                        <div class="row-container" @onclick="@(() => NavigateToTeam(context))">
+                            <span class="position">@Teams.IndexOf(context) + 1</span>
+                            <img src="@context.LogoUrl" alt="@context.TeamName Logo" class="team-logo" />
+                            <span class="team-name">@context.TeamName</span>
+                            <span class="elo">@($"{context.CurrentElo} RP")</span>
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+            <p> Last Updated @DateTime.Now.Day</p>
+        </div>
+
+        <!-- Recent Matches -->
+        <div class="grid-item recent-matches">
+            <h2>Team Metrics</h2>
+            <h6>Study and compare teams </h6>
+            <MudImage Src="Images/Teams/teamGraphs2023.png" Alt="Team Graphs"
+            Style="width: 400px; height: auto; display: block; margin: 0 auto;" />
+
+        </div>
+
+        <!-- Card Draft -->
+        <div class="grid-item card-draft">
+            <h2>Region Performance</h2>
+            <p>region graphs</p>
+        </div>
+
+        <!-- Regional Leaderboard -->
+        <div class="grid-item regional-leaderboard">
+            <h2>About Elo Engine</h2>
+            <p>elo article</p>
+        </div>
+
+        <!-- Team of the Week -->
+        <div class="grid-item team-week">
+            <h2>Ubisoft Newsletter</h2>
+            <p>news articles</p>
+        </div>
+
+        <!-- Match Replay -->
+        <div class="grid-item match-replay">
+            <p>Match Replay</p>
+        </div>
     </div>
-
-    <section class="leaderboard-preview my-5">
-        <h2 class="text-primary text-center mb-4">Top Teams</h2>
-        <div class="team-container d-flex flex-wrap justify-content-center gap-4">
-            @foreach (var team in topTeams)
-            {
-                <div class="card team-card">
-                    <img src="@team.LogoUrl" alt="@team.Name" class="team-logo card-img-top" />
-                    <div class="card-body">
-                        <h3>@team.Name</h3>
-                        <p>Elo Rating: <span class="text-warning">@team.Elo</span></p>
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
-
-    <section class="tournaments my-5">
-        <h2 class="text-white text-center mb-4">Upcoming Tournaments</h2>
-        <div class="d-flex flex-wrap justify-content-center gap-4">
-            @foreach (var tournament in upcomingTournaments)
-            {
-                <div class="card tournament-card">
-                    <img src="@tournament.LogoUrl" alt="@tournament.Name" class="card-img-top" />
-                    <div class="card-body text-center">
-                        <h3 class="text-warning">@tournament.Name</h3>
-                        <p>@tournament.StartDate.ToString("MMMM dd, yyyy")</p>
-                    </div>
-                </div>
-            }
-        </div>
-    </section>
-
 </div>
 
-
-
-
 @code {
-    // Example data, replace with actual API calls or Blazor service calls
-    private List<Team> topTeams = new List<Team>
-    {
-        new Team { Name = "Team Liquid", Elo = 1500, LogoUrl = "/visuals/team-liquid-logo.png" },
-        new Team { Name = "FaZe Clan", Elo = 1450, LogoUrl = "/visuals/faze-clan-logo.png" }
-    };
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    private List<Team> Teams = new List<Team>();
+    private List<Match> Matches = new List<Match>();
+    private Dictionary<int, string> TeamLogoCache = new();
 
-    private List<Tournament> upcomingTournaments = new List<Tournament>
+    private void NavigateToMatch(Match match)
     {
-        new Tournament { Name = "R6 Major", StartDate = DateTime.Now.AddDays(10), LogoUrl = "/visuals/r6-major-logo.png" },
-        new Tournament { Name = "Six Invitational", StartDate = DateTime.Now.AddMonths(2), LogoUrl = "/visuals/six-invitational-logo.png" }
-    };
-
-    public class Team
-    {
-        public string Name { get; set; }
-        public int Elo { get; set; }
-        public string LogoUrl { get; set; }
+        NavigationManager.NavigateTo($"/matches/details?matchid={match.MatchID}");
     }
 
-    public class Tournament
+    protected override async Task OnInitializedAsync()
     {
-        public string Name { get; set; }
-        public DateTime StartDate { get; set; }
-        public string LogoUrl { get; set; }
+        using var context = await DbFactory.CreateDbContextAsync();
+        Teams = await context.Teams
+            .Where(t => t.IsActive)
+            .OrderByDescending(t => t.CurrentElo)
+            .Take(12)
+            .ToListAsync();
+
+        Matches = await context.Matches
+            .OrderByDescending(m => m.MatchDate)
+            .Take(10)
+            .ToListAsync();
+    }
+
+    private void NavigateToTeam(Team team)
+    {
+        var teamName = team.TeamName;
+        NavigationManager.NavigateTo($"/teams/{teamName}");
+    }
+
+    private async Task<string> ToTeamLogo(int teamID)
+    {
+        // Check cache first
+        if (TeamLogoCache.TryGetValue(teamID, out var logoUrl))
+        {
+            return logoUrl;
+        }
+
+        // Fetch from database
+        using var context = await DbFactory.CreateDbContextAsync();
+        var team = await context.Teams.FirstOrDefaultAsync(t => t.TeamID == teamID);
+
+        // Cache the result
+        logoUrl = team?.LogoUrl ?? "default-logo.png";
+        TeamLogoCache[teamID] = logoUrl;
+
+        return logoUrl;
+    }
+    private string GetTeamLogo(int teamID)
+    {
+    // Use default placeholder while fetching
+    if (!TeamLogoCache.ContainsKey(teamID))
+    {
+        _ = FetchAndCacheLogo(teamID); 
+        return "defaultlogo.png";
+    }
+
+    return TeamLogoCache[teamID];
+    }
+
+    private async Task FetchAndCacheLogo(int teamID)
+    {
+        var logoUrl = await ToTeamLogo(teamID);
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
     }
 }

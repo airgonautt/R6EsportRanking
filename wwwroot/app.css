@@ -1,4 +1,163 @@
-.cards-container {
+.container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.grid {
+    display: grid;
+    height: 100%;
+    width: 100%;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 16px;
+    padding: 8px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Individual Grid Items */
+.grid-item {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.1);
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px)
+}
+
+/* Specific Item Styling */
+.news {
+    grid-column: span 2;
+    grid-row: span 2;
+    background-color: rgba(255, 182, 193, 0.5);
+}
+
+.leaderboard {
+    grid-column: span 2;
+    grid-row: span 3;
+}
+
+.recent-matches {
+    grid-column: span 2;
+    grid-row: span 1;
+    background-color: rgba(210, 180, 140, 0.5);
+}
+
+.upcoming-matches {
+    grid-column: span 2;
+    grid-row: span 1;
+    background-color: rgba(255, 222, 173, 0.5);
+}
+
+.card-draft {
+    grid-column: span 3;
+    grid-row: span 2;
+    background-color: rgba(135, 206, 250, 0.5);
+}
+
+.regional-leaderboard {
+    grid-column: span 1;
+    grid-row: span 1;
+    background-color: rgba(255, 255, 224, 0.5);
+}
+
+.team-week {
+    grid-column: span 3;
+    grid-row: span 2;
+    background-color: rgba(255, 165, 0, 0.5);
+}
+
+.match-replay {
+    grid-column: span 3;
+    grid-row: span 1;
+    background-color: rgba(154, 205, 50, 0.5);
+}
+
+/* Leaderboard Specifics */
+.custom-leaderboard-table .row-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.custom-leaderboard-table .position {
+    font-weight: bold;
+}
+
+.custom-leaderboard-table .team-logo {
+    width: 25px;
+    height: 25px;
+}
+
+.custom-leaderboard-table .team-name {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.custom-leaderboard-table .elo {
+    margin-left: auto;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.row-container {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    transition: transform 0.4s ease-out;
+    cursor: pointer;
+    position: relative;
+}
+
+    .row-container:hover {
+        transform: translateX(-20px);
+    }
+
+    .row-container:not(:hover) ~ .row-container {
+        transform: translateX(-10px);
+    }
+
+    .row-container img {
+        width: 60px;
+        height: 60px;
+        margin-right: 8px;
+    }
+
+.position {
+    font-size: 1.5rem;
+    margin-right: 16px;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+}
+
+.team-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #e0e0e0;
+    margin-right: auto;
+}
+
+.elo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #00e676;
+    margin-left: auto;
+    text-align: right;
+}
+
+.custom-leaderboard-table tbody tr:hover {
+    background: none; /* No default hover effect */
+}
+
+
+
+cards-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr); /* 5 columns */
     gap: 16px; /* Adjust spacing between cards */
@@ -10,6 +169,93 @@
     /* Add other styling for individual cards if necessary */
 }
 
+.team-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease-in-out;
+}
+
+    .team-card:hover {
+        transform: scale(1.02);
+    }
+
+.team-info {
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.leaderboard-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+}
+
+.mud-avatar {
+    border: 1px solid #ccc;
+    border-radius: 50%;
+}
+/* Leaderboard Styling */
+.leaderboard-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #202020;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Angular Table */
+.mud-table {
+    background-color: #1f1f1f;
+    color: #fff;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.6);
+    border-radius: 0; /* Removes rounded corners */
+}
+
+    .mud-table th, .mud-table td {
+        border: 1px solid #555; /* Sharper borders */
+        font-size: 1rem;
+        padding: 8px 12px;
+        text-align: left;
+    }
+
+    /* Interactive Rows */
+    .mud-table tbody tr:hover {
+        background-color: #303f9f;
+        color: #ffffff;
+        cursor: pointer;
+    }
+
+/* Team Logo */
+.team-logo-angular {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border: 2px solid #e0e0e0;
+}
+
+/* Team Name Hover Effect */
+.team-name-hover {
+    font-weight: bold;
+    color: #e0e0e0;
+    transition: color 0.2s ease-in-out;
+}
+
+    .team-name-hover:hover {
+        color: #ff5722;
+        text-decoration: underline;
+    }
+
+/* Elo Badge */
+.elo-badge {
+    font-weight: bold;
+    color: #00e676;
+    text-align: right;
+}
 /* Variables for consistent styling */
 :root {
     --bs-blue-1: #0d6efd;

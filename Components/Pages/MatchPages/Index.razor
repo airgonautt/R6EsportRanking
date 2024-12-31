@@ -14,28 +14,22 @@
     <a href="matches/create">Create New</a>
 </p>
 
-<MudTable Items="context.Matches" Bordered="true" Striped="true" Hover="true">
+<MudTable Items="@context.Matches" Bordered="true" Striped="true" Hover="true">
 
     <HeaderContent>
         <MudTh>Match Name</MudTh>
-        <MudTh>Team 1 ID</MudTh>
         <MudTh>Team 1 Score</MudTh>
-        <MudTh>Team 2 ID</MudTh>
         <MudTh>Team 2 Score</MudTh>
         <MudTh>Match Date</MudTh>
-        <MudTh>Map ID</MudTh>
         <MudTh>Tournament ID</MudTh>
         <MudTh>Actions</MudTh>
     </HeaderContent>
 
     <RowTemplate>
         <MudTd>@context.MatchName</MudTd>
-        <MudTd>@context.Team1ID</MudTd>
         <MudTd>@context.Team1Score</MudTd>
-        <MudTd>@context.Team2ID</MudTd>
         <MudTd>@context.Team2Score</MudTd>
         <MudTd>@context.MatchDate.ToShortDateString()</MudTd>
-        <MudTd>@context.MapID</MudTd>
         <MudTd>@context.TournamentID</MudTd>
 
         <MudTd>

@@ -4,7 +4,8 @@
         public int TournamentID { get; set; }
         public string? TournamentName { get; set; }
         public string? TournamentLocation { get; set; }
-        public string? TournamentLogo { get; set; } // URL to the logo
+        public string? TournamentLogo { get; set; } 
+        public bool IsCurrentTournament { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -14,9 +15,6 @@
 
         public string? RegionID { get; set; }
         public Region? Region { get; set; }
-
-
-        // Navigation property for related Matches
 
         public ICollection<Team>? Teams { get; set; } = new List<Team>();
         public Trophy? Trophy { get; set; }
