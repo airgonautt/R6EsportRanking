@@ -1,4 +1,4 @@
-﻿@page "/teamsgraphs"
+﻿@page "/teams/graphs"
 
 @using R6Ranking.Models
 @using Microsoft.EntityFrameworkCore
@@ -12,7 +12,7 @@
     <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Elo History of Top 10 Teams</h2>
     <MudContainer Style="margin-bottom: 32px;">
         <MudChart ChartType="ChartType.Line" ChartSeries="@Series"
-                  XAxisLabels="@XAxisLabels" Width="100%" Height="400px"
+                  XAxisLabels="@XAxisLabels" Width="100%" Height="700px"
                   ChartOptions="@Options" ShowPoints="true" />
     </MudContainer>
 </div>

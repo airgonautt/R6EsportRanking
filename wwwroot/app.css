@@ -10,74 +10,69 @@
     display: grid;
     height: 100%;
     width: 100%;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 16px;
-    padding: 8px;
+    grid-template-columns: repeat(18, 1fr);
+    grid-template-rows: fit-content();
+    gap: 10px;
+    padding: 1px;
     border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Individual Grid Items */
+.mud-table {
+    width: 100%;
+    table-layout: auto;
+    overflow-x: auto;
+}
+
+
+@media (max-width: 768px) {
+    .mud-table {
+        font-size: 0.9rem; 
+    }
+
+    .mud-table .mud-td,
+    .mud-table .mud-th {
+        padding: 8px; 
+    }
+}
+
 .grid-item {
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.1);
     display: grid;
+    width: 100%;
+    overflow: hidden;
     align-items: center;
     justify-content: center;
     background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px)
+    backdrop-filter: blur(5px) ;
+    transition: border 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+}
+.grid-item:hover {
+    border: 2px solid gold;
 }
 
-/* Specific Item Styling */
-.news {
-    grid-column: span 2;
-    grid-row: span 2;
-    background-color: rgba(255, 182, 193, 0.5);
+.b6x4 {
+    grid-column: span 6;
+    grid-row: span 4;
+    width: 100%;
 }
-
-.leaderboard {
-    grid-column: span 2;
+.b6x3 {
+    grid-column: span 6;
     grid-row: span 3;
+    background-color: rgba(255, 182, 193, 0.5);  
 }
-
-.recent-matches {
-    grid-column: span 2;
+.b6x1 {
+    grid-column: span 6;
     grid-row: span 1;
     background-color: rgba(210, 180, 140, 0.5);
 }
-
-.upcoming-matches {
-    grid-column: span 2;
-    grid-row: span 1;
-    background-color: rgba(255, 222, 173, 0.5);
-}
-
-.card-draft {
+.b3x1 {
     grid-column: span 3;
-    grid-row: span 2;
-    background-color: rgba(135, 206, 250, 0.5);
-}
-
-.regional-leaderboard {
-    grid-column: span 1;
     grid-row: span 1;
-    background-color: rgba(255, 255, 224, 0.5);
-}
-
-.team-week {
-    grid-column: span 3;
-    grid-row: span 2;
     background-color: rgba(255, 165, 0, 0.5);
 }
 
-.match-replay {
-    grid-column: span 3;
-    grid-row: span 1;
-    background-color: rgba(154, 205, 50, 0.5);
-}
 
-/* Leaderboard Specifics */
 .custom-leaderboard-table .row-container {
     display: flex;
     align-items: center;
@@ -128,45 +123,29 @@
         margin-right: 8px;
     }
 
-.position {
-    font-size: 1.5rem;
-    margin-right: 16px;
-    color: #fff;
-    font-weight: bold;
-    text-align: center;
-}
-
-.team-name {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #e0e0e0;
-    margin-right: auto;
-}
-
-.elo {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #00e676;
-    margin-left: auto;
-    text-align: right;
-}
-
-.custom-leaderboard-table tbody tr:hover {
-    background: none; /* No default hover effect */
-}
-
 
 
 cards-container {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 columns */
-    gap: 16px; /* Adjust spacing between cards */
-    padding: 16px; /* Add padding around the container */
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 16px; 
+    padding: 16px; 
 }
 
 .player-card {
-    max-width: 100%; /* Allow grid to control the width */
-    /* Add other styling for individual cards if necessary */
+    max-width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.player-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.player-card:hover, .player-card:focus, .player-card:active {
+    box-shadow: 0 8px 16px 3px rgba(0, 0, 0, 0.6);
+    transform: translateY(-3px) scale(1.05) rotateX(15deg);
 }
 
 .team-card {
@@ -176,9 +155,9 @@ cards-container {
     transition: transform 0.2s ease-in-out;
 }
 
-    .team-card:hover {
-        transform: scale(1.02);
-    }
+.team-card:hover {
+    transform: scale(1.02);
+}
 
 .team-info {
     font-size: 1.2rem;
@@ -198,14 +177,7 @@ cards-container {
     border: 1px solid #ccc;
     border-radius: 50%;
 }
-/* Leaderboard Styling */
-.leaderboard-section {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #202020;
-    border: 2px solid #e0e0e0;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
-}
+
 
 /* Angular Table */
 .mud-table {
@@ -309,5 +281,6 @@ body {
     color: white;
     font-weight: bold;
 }
+
 
 

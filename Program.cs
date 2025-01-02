@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using R6Ranking.Components;
 using R6Ranking.Data;
+using R6Ranking.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +30,6 @@ builder.Services.AddServerSideBlazor();  // Add Blazor Server
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped<R6Ranking.Services.MatchService>();
 
 var app = builder.Build();
 

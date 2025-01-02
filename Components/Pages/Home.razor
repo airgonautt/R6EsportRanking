@@ -12,47 +12,48 @@
 <br />
 <div class="container">
     <div class="grid">
-        <!--Matches History -->
-        <div class="grid-item news">
-            <h2>Recent Results</h2>
-            <MudTable T="Match" Items="@Matches" Hover="false" Bordered="false">
-                <HeaderContent>
-                    <MudTh>Match Name</MudTh>
-                    <MudTh>Match Date</MudTh>
-                    <MudTh>Tournament ID</MudTh>
-                </HeaderContent>
 
-                <RowTemplate>
-                    <MudTd>
-                        <div class="row-container" @onclick="@(() => NavigateToMatch(context))">
-                            <img src="@GetTeamLogo(context.Team1ID)" class="team-logo" />
-                            <span class="team-name">@($"{context.MatchName.Split(" vs ")[0]} {context.Team1Score} : {context.Team2Score} ") </span>
-                            <img src="@GetTeamLogo(context.Team2ID)" class="team-logo" />
-                            <span class="team-name">@($"{context.MatchName.Split(" vs ")[1]} ")</span>
-                        </div>
-                    </MudTd>
-                    <MudTd>@context.MatchDate.ToShortDateString()</MudTd>
-                    <MudTd>@context.TournamentID</MudTd>
-                </RowTemplate>
-            </MudTable>
+        <!-- Team Metrics -->
+        <div class="grid-item b6x1" style="text-align: center; padding: 10px; display: flex; flex-direction: column; align-items: center;">
+            <h2 style="margin-bottom: 10px;">Team Metrics</h2>
+            <img src="Images/Teams/teamGraphs2023.png"
+                 alt="Team Metrics Graph"
+                 style="max-width: 335px; width: 100%; height: 150%; max-height: 3200px; height: auto; border-radius: 8px; margin-bottom: 10px;" />
+            <p style="margin: 10px 0;">Study and compare team statistics.</p>
+            <div>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/teams/compare">
+                    Learn More
+                </MudButton>
+            </div>
         </div>
-
-        <!-- Upcoming Matches -->
-        <div class="grid-item upcoming-matches">
-            <h2>Player Drafts</h2>
-            <p>Cards</p>
+                
+        <!-- Player Draft -->
+        <div class="grid-item b6x1" style="text-align: start; padding: 1px; display: flex; flex-direction: column; align-items: center;">
+            <h2 style="margin-bottom: 2px;">Player Draft</h2>
+            <div style="width: 100%; max-width: 335px; height: 60%; max-height: 320px; overflow: hidden; border-radius: 8px; margin-bottom: 1px;">
+                <img src="Images/Players/players.png"
+                     alt="Player Draft Image"
+                     style="width: 100%; height: auto; object-fit: cover;" />
+            </div>
+            <p style="margin: 2px 0;">Collect, track, and upgrade player cards.</p>
+            <div>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Href="/player-draft">
+                    Try it now
+                </MudButton>
+            </div>
         </div>
 
         <!-- Leaderboard -->
-        <div class="grid-item leaderboard">
+        <div class="grid-item b6x4">
             <h2>Leaderboard</h2>
             <MudTable T="Team" Items="@Teams" Hover="false" Bordered="false" Class="custom-leaderboard-table">
                 <RowTemplate>
                     <MudTd>
                         <div class="row-container" @onclick="@(() => NavigateToTeam(context))">
-                            <span class="position">@Teams.IndexOf(context) + 1</span>
+                            <span class="position">@(@Teams.IndexOf(context) + 1)</span>
                             <img src="@context.LogoUrl" alt="@context.TeamName Logo" class="team-logo" />
                             <span class="team-name">@context.TeamName</span>
+                            <span> </span>
                             <span class="elo">@($"{context.CurrentElo} RP")</span>
                         </div>
                     </MudTd>
@@ -62,34 +63,44 @@
         </div>
 
         <!-- Recent Matches -->
-        <div class="grid-item recent-matches">
-            <h2>Team Metrics</h2>
-            <h6>Study and compare teams </h6>
-            <MudImage Src="Images/Teams/teamGraphs2023.png" Alt="Team Graphs"
-            Style="width: 400px; height: auto; display: block; margin: 0 auto;" />
-
+        <div class="grid-item b6x3">
+            <h2>Recent Results</h2>
+            <MudTable T="Match" Items="@Matches" Hover="false" Bordered="false" Class="custom-leaderboard-table" Style="width: 100%; max-width: 800px;">
+                <RowTemplate>
+                    <MudTd>
+                        <div class="row-container" @onclick="@(() => NavigateToMatch(context))" style="white-space: nowrap;">
+                            <img src="@GetTeamLogo(context.Team1ID)" style="width: 25px; height: 25px;" />
+                            <span>
+                                @($"{context.MatchName.Split(" vs ")[0]} {context.Team1Score} : {context.Team2Score} {context.MatchName.Split(" vs ")[1]} ")
+                            </span>
+                            <span>@context.MatchDate.ToShortDateString()</span>
+                            <span>@context.TournamentID</span>
+                        </div>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         </div>
 
-        <!-- Card Draft -->
-        <div class="grid-item card-draft">
-            <h2>Region Performance</h2>
-            <p>region graphs</p>
+        
+        <!-- Ubisoft Newsletter -->
+        <div class="grid-item b6x1" style="position: relative; text-align: center; padding: 10px; display: flex; 
+                flex-direction: column; align-items: center; background-color: rgba(245, 245, 245, 0.8); border-radius: 8px; 
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); height: 300px; width: 100%;">
+            <ArticleDisplay /> 
         </div>
 
-        <!-- Regional Leaderboard -->
-        <div class="grid-item regional-leaderboard">
+        <!-- About -->
+        <div class="grid-item b3x1">
             <h2>About Elo Engine</h2>
             <p>elo article</p>
         </div>
-
-        <!-- Team of the Week -->
-        <div class="grid-item team-week">
-            <h2>Ubisoft Newsletter</h2>
-            <p>news articles</p>
+        <!-- Region Performance -->
+        <div class="grid-item b3x1">
+            <h2>Region Performance</h2>
+            <p>region graphs</p>
         </div>
-
         <!-- Match Replay -->
-        <div class="grid-item match-replay">
+        <div class="grid-item b6x1">
             <p>Match Replay</p>
         </div>
     </div>
@@ -100,15 +111,11 @@
     private List<Team> Teams = new List<Team>();
     private List<Match> Matches = new List<Match>();
     private Dictionary<int, string> TeamLogoCache = new();
-
-    private void NavigateToMatch(Match match)
-    {
-        NavigationManager.NavigateTo($"/matches/details?matchid={match.MatchID}");
-    }
-
+    
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
+
         Teams = await context.Teams
             .Where(t => t.IsActive)
             .OrderByDescending(t => t.CurrentElo)
@@ -117,7 +124,7 @@
 
         Matches = await context.Matches
             .OrderByDescending(m => m.MatchDate)
-            .Take(10)
+            .Take(8)
             .ToListAsync();
     }
 
@@ -125,6 +132,10 @@
     {
         var teamName = team.TeamName;
         NavigationManager.NavigateTo($"/teams/{teamName}");
+    }
+    private void NavigateToMatch(Match match)
+    {
+        NavigationManager.NavigateTo($"/matches/details?matchid={match.MatchID}");
     }
 
     private async Task<string> ToTeamLogo(int teamID)
@@ -140,23 +151,20 @@
         var team = await context.Teams.FirstOrDefaultAsync(t => t.TeamID == teamID);
 
         // Cache the result
-        logoUrl = team?.LogoUrl ?? "default-logo.png";
+        logoUrl = team?.LogoUrl ?? "Images/Logos/default-logo.png";
         TeamLogoCache[teamID] = logoUrl;
 
         return logoUrl;
     }
-    private string GetTeamLogo(int teamID)
-    {
-    // Use default placeholder while fetching
-    if (!TeamLogoCache.ContainsKey(teamID))
-    {
-        _ = FetchAndCacheLogo(teamID); 
-        return "defaultlogo.png";
-    }
+    private string GetTeamLogo(int teamID){
+        if (!TeamLogoCache.ContainsKey(teamID))
+        {
+            _ = FetchAndCacheLogo(teamID); 
+            return "defaultlogo.png";
+        }
 
-    return TeamLogoCache[teamID];
+        return TeamLogoCache[teamID];
     }
-
     private async Task FetchAndCacheLogo(int teamID)
     {
         var logoUrl = await ToTeamLogo(teamID);
@@ -165,4 +173,5 @@
             StateHasChanged();
         });
     }
+
 }

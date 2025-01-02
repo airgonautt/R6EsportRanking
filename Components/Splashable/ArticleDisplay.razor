@@ -1,0 +1,86 @@
+﻿@inject NavigationManager NavigationManager
+
+<div class="article-container">
+    <h2 class="article-header">Ubisoft Newsletter</h2>
+    <div class="article-image-container">
+        <img src="@CurrentArticle.ImageUrl"
+             alt="@CurrentArticle.Title"
+             class="article-image" />
+        <div class="article-overlay">
+            <h3>@CurrentArticle.Title</h3>
+            <p>@CurrentArticle.Date.ToShortDateString()</p>
+        </div>
+    </div>
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="@(() => NavigateToExternalSite(CurrentArticle.Url))">
+        Read More
+    </MudButton>
+</div>
+
+@code {
+    public class Article
+    {
+        public string Title { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string Url { get; set; } = string.Empty;
+    }
+
+    private Article CurrentArticle = new();
+    private int CurrentIndex = 0;
+    private Timer? RotationTimer;
+
+    private List<Article> Articles = new List<Article>
+    {
+        new Article
+        {
+            Title = "R6 Share Program Drops New Pro Team Skins",
+            ImageUrl = "",
+            Date = new DateTime(2023,12,19),
+            Url = "https://www.ubisoft.com/en-us/esports/rainbow-six/siege/news-updates/2BoKGEek8RCtTuheXTlfXQ/r6-share-program-drops-new-pro-team-skins"
+        },
+        new Article
+        {
+            Title = "Introducing the Six Invitational 2025 Regional Qualifiers",
+            ImageUrl = "",
+            Date = new DateTime(2023,11,26),
+            Url = "https://www.ubisoft.com/en-us/esports/rainbow-six/siege/news-updates/3TTCyLz5w1EP4g8RvVnLJe/introducing-the-six-invitational-2025-regional-qualifiers"
+        },
+        new Article
+        {
+            Title = "R6 North Rainbow Rumble Finals",
+            ImageUrl = "",
+            Date = new DateTime(2023,12,03),
+            Url = "https://www.ubisoft.com/en-us/esports/rainbow-six/siege/news-updates/1q4imuDcG3vcIIvpfqfAdA/r6-north-rainbow-rumble-finals"
+        }
+    };
+
+
+    protected override void OnInitialized()
+    {
+        CurrentArticle = Articles[0];
+        StartRotation();
+    }
+
+    private void StartRotation()
+    {
+        RotationTimer = new Timer(ChangeArticle, null, 0, 15000); 
+    }
+
+    private void ChangeArticle(object? state)
+    {
+        CurrentIndex = (CurrentIndex + 1) % Articles.Count;
+        CurrentArticle = Articles[CurrentIndex];
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void NavigateToExternalSite(string url)
+    {
+        NavigationManager.NavigateTo(url, true); 
+    }
+
+    public void Dispose()
+    {
+        RotationTimer?.Dispose();
+    }
+}
+
