@@ -2,6 +2,7 @@
 
 <div class="main-layout">
     <MudThemeProvider IsDarkMode=true />
+    
     <!-- Header/Nav Bar -->
     <header class="navbar navbar-dark bg-dark">
         <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -9,23 +10,26 @@
                 <img src="bootstrap/Visuals/r6.png" alt="Logo" class="logo">
                 <span class="kanit-extrabold-italic navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
             </div>
-            <nav class="nav d-flex justify-content-around w-50">
-                <a class="nav-link kanit-extrabold text-white" href="/">Home</a>
-                <a class="nav-link kanit-extrabold text-white" href="/regions">Regions</a>
-                <a class="nav-link kanit-extrabold text-white" href="/teams">Teams</a>
-                <a class="nav-link kanit-extrabold text-white" href="/cards">Cards</a>
-                <a class="nav-link kanit-extrabold text-white" href="/matches">Matches</a>
-                <a class="nav-link kanit-extrabold text-white" href="/players">Players</a>
-                <a class="nav-link kanit-extrabold text-white" href="/about">About</a>
+            <nav class="nav d-flex justify-content-around w-50" style="color:var(--bs-white--1)">
+                <a class="nav-link kanit-extrabold" href="/">Home</a>
+                <a class="nav-link kanit-extrabold" href="/regions">Regions</a>
+                <a class="nav-link kanit-extrabold" href="/teams">Teams</a>
+                <a class="nav-link kanit-extrabold" href="/cards">Cards</a>
+                <a class="nav-link kanit-extrabold" href="/matches">Matches</a>
+                <a class="nav-link kanit-extrabold" href="/players">Players</a>
+                <a class="nav-link kanit-extrabold" href="/about">About</a>
             </nav>
             <button class="btn widget-button">
                 <img src="bootstrap/Visuals/r6.png" alt="Widget Icon" class="logo">
             </button>
+
         </div>
     </header>
 
     <!-- Body -->
     <div class="body">
+        <MudPopoverProvider />
+
         @Body
     </div>
 

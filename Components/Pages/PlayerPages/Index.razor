@@ -15,7 +15,7 @@
 </p>
 
 <!-- Flex container for players -->
-<div class="player-container">
+<div class="cards-container">
     @if (players != null) {
         @foreach (var player in players) {
             <div class="player-card">
@@ -54,9 +54,7 @@
     private List<Player> players = new List<Player>();
 
     private R6EsportsDbContext context = default!;
-
-
-
+    
     protected override async Task OnInitializedAsync() {
 
         context = DbFactory.CreateDbContext();
@@ -64,8 +62,6 @@
         players = await context.Players.ToListAsync();
 
     }
-
-
 
     public async ValueTask DisposeAsync() {
 

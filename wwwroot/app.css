@@ -3,7 +3,6 @@
     height: 100%;
     width: 100%;
     align-items: center;
-    justify-content: center;
 }
 
 .grid {
@@ -22,8 +21,6 @@
     table-layout: auto;
     overflow-x: auto;
 }
-
-
 @media (max-width: 768px) {
     .mud-table {
         font-size: 0.9rem; 
@@ -42,15 +39,28 @@
     overflow: hidden;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px) ;
+    background-color: var(--bs-black--1);
+    border: 8px;
+    border-color: var(--bs-black--3);
+    backdrop-filter: blur(5px);
     transition: border 0.3s ease, transform 0.3s ease;
     cursor: pointer;
 }
 .grid-item:hover {
-    border: 2px solid gold;
+    border: 8px;
+    border-color: var(--bs-gold---1);
 }
 
+.b18x3 {
+    grid-column: span 18;
+    grid-row: span 3;
+    width: 100%;
+}
+.b8x1 {
+    grid-column: span 8;
+    grid-row: span 1;
+    width: 100%;
+}
 .b6x4 {
     grid-column: span 6;
     grid-row: span 4;
@@ -59,17 +69,23 @@
 .b6x3 {
     grid-column: span 6;
     grid-row: span 3;
-    background-color: rgba(255, 182, 193, 0.5);  
 }
 .b6x1 {
     grid-column: span 6;
     grid-row: span 1;
-    background-color: rgba(210, 180, 140, 0.5);
+}
+.b4x1 {
+    grid-column: span 4;
+    grid-row: span 1;
+    width: 100%;
 }
 .b3x1 {
     grid-column: span 3;
     grid-row: span 1;
-    background-color: rgba(255, 165, 0, 0.5);
+}
+.b1x1 {
+    grid-column: span 1;
+    grid-row: span 1;
 }
 
 
@@ -79,27 +95,22 @@
     gap: 0.5rem;
     font-size: 0.85rem;
 }
-
 .custom-leaderboard-table .position {
     font-weight: bold;
 }
-
 .custom-leaderboard-table .team-logo {
     width: 25px;
     height: 25px;
 }
-
 .custom-leaderboard-table .team-name {
     font-size: 1rem;
     font-weight: bold;
 }
-
 .custom-leaderboard-table .elo {
     margin-left: auto;
     font-size: 0.85rem;
     font-weight: bold;
 }
-
 .row-container {
     display: flex;
     align-items: center;
@@ -108,28 +119,55 @@
     cursor: pointer;
     position: relative;
 }
-
     .row-container:hover {
         transform: translateX(-20px);
     }
-
     .row-container:not(:hover) ~ .row-container {
         transform: translateX(-10px);
     }
-
     .row-container img {
         width: 60px;
         height: 60px;
         margin-right: 8px;
     }
 
+@keyframes riseFromBottom {
+    from {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
 
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
-cards-container {
+.packs_grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); 
-    gap: 16px; 
-    padding: 16px; 
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: fit-content();
+    gap: 10px;
+    padding: 1px;
+    border-radius: 10px;
+}
+.pack-grid-item {
+    display: flex;
+    flex-direction: column; /* Ensures consistent alignment for both packs and cards */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.animate-rise {
+    animation: riseFromBottom 10s ease-in-out forwards;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto;
+    gap: 16px;
+    padding: 16px;
 }
 
 .player-card {
@@ -148,12 +186,6 @@ cards-container {
     transform: translateY(-3px) scale(1.05) rotateX(15deg);
 }
 
-.team-card {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s ease-in-out;
-}
 
 .team-card:hover {
     transform: scale(1.02);
@@ -166,12 +198,6 @@ cards-container {
     justify-content: center;
 }
 
-.leaderboard-section {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 10px;
-}
 
 .mud-avatar {
     border: 1px solid #ccc;
@@ -181,9 +207,9 @@ cards-container {
 
 /* Angular Table */
 .mud-table {
-    background-color: #1f1f1f;
-    color: #fff;
-    border: 2px solid #e0e0e0;
+    background-color: var(--bs-blue---1);
+    color: var(--bs-white--2);
+    border: 2px solid var(--bs-blue---1);
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.6);
     border-radius: 0; /* Removes rounded corners */
 }
@@ -197,50 +223,32 @@ cards-container {
 
     /* Interactive Rows */
     .mud-table tbody tr:hover {
-        background-color: #303f9f;
-        color: #ffffff;
+        background-color: var(--bs-cream--2);
+        color: var(--bs-black--2);
         cursor: pointer;
     }
 
-/* Team Logo */
-.team-logo-angular {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border: 2px solid #e0e0e0;
-}
 
-/* Team Name Hover Effect */
-.team-name-hover {
-    font-weight: bold;
-    color: #e0e0e0;
-    transition: color 0.2s ease-in-out;
-}
-
-    .team-name-hover:hover {
-        color: #ff5722;
-        text-decoration: underline;
-    }
-
-/* Elo Badge */
-.elo-badge {
-    font-weight: bold;
-    color: #00e676;
-    text-align: right;
-}
 /* Variables for consistent styling */
 :root {
-    --bs-blue-1: #0d6efd;
-    --bs-blue-2: #3da2ff;
-    --bs-blue-dark: #161a26;
-    --bs-gold-1: #c29b65;
-    --bs-gold-2: #ffc271;
-    --bs-white-1: #dedbd5;
-    --bs-dark-1: #181717;
-    --bs-gray-dark-1: #343a40;
-    --bs-gray-dark-2: #0e0d0d;
-    --bs-body-bg: url(bootstrap/Visuals/bg.jpg);
+    --bs-white--1: #FFFFFF;
+    --bs-white--2: #dedbd5;
 
+    --bs-blue---1: #343A40;
+
+    --bs-black--1: #1D1E21; 
+    --bs-black--2: #181717;
+    --bs-black--3: #0E0D0D;
+    --bs-black--4: #000000;
+
+    --bs-gold---1: #fbac40;
+    --bs-cream--1: #FFC271;
+    --bs-cream--2: #C29B65;
+
+    --bs-red----1: #CC2828;
+    --bs-green--1: #2d8656;
+    --bs-orange-1: #BD5B05; 
+    --bs-body-bg: url(bootstrap/Visuals/bg.jpg);
     font-family: 'Kanit', sans-serif;
     color: var(--bs-white-1);
 }

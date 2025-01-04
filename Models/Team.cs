@@ -7,6 +7,7 @@
         public bool IsActive { get; set; }
 
         public string TwitterUrl { get; set; }
+        public string PrimaryColor { get; set; }
         
         public string? RegionID { get; set; }
         public Region? Region { get; set; }

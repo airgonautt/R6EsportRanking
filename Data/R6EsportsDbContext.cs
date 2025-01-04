@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using R6Ranking.Migrations;
 using R6Ranking.Models;
 
 namespace R6Ranking.Data;
@@ -15,6 +16,7 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Team> Teams { get; set; }
     public DbSet<TeamEloChange> TeamEloChanges { get; set; }
     public DbSet<Tournament> Tournaments { get; set; }
+    public DbSet<TournamentTeam>TournamentTeams { get; set; }
     public DbSet<Trophy> Trophies { get; set; }
     public DbSet<OriginCountry> Countries { get; set; }
 
@@ -131,13 +133,23 @@ public class R6EsportsDbContext : DbContext {
             .HasOne(tec => tec.Team)
             .WithMany(t => t.TeamEloHistory)
             .HasForeignKey(tec => tec.TeamID)
-            .OnDelete(DeleteBehavior.Restrict); // Ensure no cascade delete conflicts
+            .OnDelete(DeleteBehavior.Restrict); 
 
         modelBuilder.Entity<TeamEloChange>()
             .HasOne(tec => tec.RivalTeam)
             .WithMany()
             .HasForeignKey(tec => tec.RivalTeamID)
-            .OnDelete(DeleteBehavior.Restrict); // Avoids circular cascade delete
+            .OnDelete(DeleteBehavior.Restrict); 
+
+        ////TOURNAMENT TEAM
+        modelBuilder.Entity<TournamentTeam>(entity => {
+            entity.HasKey(e => e.TournamentTeamID);
+
+            entity.HasOne(e => e.Tournament)
+                  .WithMany()
+                  .HasForeignKey(e => e.TournamentID)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
         //TOURNAMENT RELATIONSHIPS
         modelBuilder.Entity<Tournament>()

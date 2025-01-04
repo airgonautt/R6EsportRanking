@@ -8,63 +8,79 @@
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
 
-<div style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); padding: 16px;
-    color: white; border-radius: 8px" class="container">
-    
-    <!-- Header Section -->
-    <MudContainer Style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+<div class="container">
+    <div class="grid">
+        <span></span>
 
-        <MudButton EndIcon="@Icons.Material.Filled.ArrowBack"
-            Color="Color.Primary"
-            OnClick="NavigateToLowerEloTeam">
-        </MudButton>
+        <div class="grid-item b3x1" Style="background-color: transparent;"> <br /> </div>
 
-        <MudItem xs="10" Style="text-align: center;">
-            <MudImage Src="@team?.LogoUrl" Alt="Team Logo" 
-                      Style="width: 100px; height: auto; display: block; margin: 0 auto;" />
-            <MudText Typo="Typo.h2" Style="font-size: 2.5rem; font-weight: bold;">@team?.TeamName</MudText>
-            <MudText Typo="Typo.h5" Style="color: #007BFF;">@team?.CurrentElo RP</MudText>
-            <MudText Typo="Typo.caption" Style="color: #6c757d;">No. 1 Internationally for the past X days</MudText>
-        </MudItem>
+        <!-- Header -->
+        <div class="grid-item b1x1">
+            <MudButton EndIcon="@Icons.Material.Filled.ArrowBack"
+                       Color="Color.Primary"
+                       OnClick="NavigateToLowerEloTeam">
+            </MudButton>
+        </div>
+        <div class="grid-item b8x1" style="border: 5px; border-color: var(--bs-gold---1);">
+            <MudItem xs="10" Style="display: flex; align-items: center; text-align: left;">
+                <div Style="flex: 1; display: flex; min-width: 150px; max-width: 200px; justify-content: flex-start; align-items: center;">
+                    <MudImage Src="@team?.LogoUrl" Alt="Team Logo"
+                              Style="width: 100%; max-width: 150px; height: auto;"  />
+                </div>
+                <div Style="flex: 2; min-width: 200px; display: flex; flex-direction: column; justify-content: center;">
+                    <MudText Typo="Typo.h2" Style="font-size: 2.8rem; font-weight: bold; color: var(--bs-white--1); margin-bottom: 8px; white-space: nowrap;">
+                        @team?.TeamName
+                    </MudText>
+                    <MudText Typo="Typo.h4" Style="padding-left: 5px; color: var(--bs-gold---1); font-size: 1.7rem; margin-bottom: 4px; margin-left: 16px; white-space: nowrap;">
+                        @team?.CurrentElo RP
+                    </MudText>
+                </div>
+            </MudItem>
+        </div>
+        <div class="grid-item b1x1">
+            <MudButton EndIcon="@Icons.Material.Filled.ArrowForward"
+                       Color="Color.Primary"
+                       OnClick="NavigateToHigherEloTeam">
+            </MudButton>
+        </div>
 
-        <MudButton
-            EndIcon="@Icons.Material.Filled.ArrowForward"
-            Color="Color.Primary" 
-            OnClick="NavigateToHigherEloTeam">
-        </MudButton>
-    </MudContainer>
+        <div class="grid-item b3x1" Style="background-color: transparent;"> <br /> </div>
 
-    <!-- Elo History Section -->
-    <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Elo History</h2>
-    <MudContainer Style="margin-bottom: 32px;">
-        <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index"
-                  XAxisLabels="@XAxisLabels" Width="100%" Height="400px" ChartOptions="@Options" ShowPoints="true" />
-    </MudContainer>
+        <!-- Elo History Section -->
+        <div class="grid-item b18x3">    
+            <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Elo History</h2>
+            <MudContainer Style="margin-bottom: 32px;">
+                <MudChart ChartType="ChartType.Line" ChartSeries="@Series" @bind-SelectedIndex="Index"
+                          XAxisLabels="@XAxisLabels" Width="100%" Height="400px" ChartOptions="@Options" ShowPoints="true" />
+            </MudContainer>
+        </div>
 
-    <!-- Roster Section -->
-    <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Team Roster</h2>
-    <MudContainer Style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 32px;">
-        @if (Players == null)
-        {
-            <p>Loading...</p>
-        }
-        else if (!Players.Any())
-        {
-            <p>No players found.</p>
-        }
-        else
-        {
-            @foreach (var player in Players)
-            {
-                <PlayerCard Player="@player" />
-            }
-        }x
-    </MudContainer>
-    <!-- Match History Section -->
-    <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Match History</h2>
-    <MudTable Items="@Matches" Hover="true" Striped="true" Dense="true">
+        <!-- Roster Section -->
+        <div class="grid-item b18x3">
+            <div class="cards-container">
+                @if (Players != null)
+                {
+                    @foreach (var player in Players)
+                    {
+                        <PlayerCard Player="@player" />
+                    }
+                }
+                else
+                {
+                    <p>No Players available.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Match History Section -->
+        <div class="grid-item b18x3">
+            <h2 style="font-size: 1.8rem; margin: 24px 0 16px;">Match History</h2>
+            <MudTable Items="@Matches" Hover="true" Striped="true" Dense="true">
         
-    </MudTable>
+            </MudTable>
+        </div>
+
+    </div>
 </div>
 
 @code {
