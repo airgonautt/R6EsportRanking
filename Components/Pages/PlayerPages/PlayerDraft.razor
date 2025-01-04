@@ -1,0 +1,141 @@
+﻿@page "/players/draft"
+
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Components.Splashable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@rendermode InteractiveServer
+
+<h3>Player Draft</h3>
+<div style="padding: 16px; background: rgba(0, 0, 0, 0.3); color: white; border-radius: 8px;">
+    <h1>Select Tournament</h1>
+
+    <!-- Tournament Dropdown -->
+    <label for="tournamentSelect" class="form-label">Tournaments:</label>
+    <select id="tournamentSelect" class="form-control" @bind="SelectedTournamentID">
+        <option value="">(All Tournaments)</option>
+        @foreach (var tournament in Tournaments)
+        {
+            <option value="@tournament.TournamentID">@tournament.TournamentName</option>
+        }
+    </select>
+
+    <!-- Max Players Input -->
+    <label for="maxPlayers" class="form-label">Max Players (1-10):</label>
+    <input id="maxPlayers" type="number" class="form-control" min="1" max="10" @bind-value="maxPlayers" />
+
+
+    <!-- Load Players Button -->
+    <button class="btn btn-primary" @onclick="LoadPlayers" disabled="@IsLoading">
+        @if (IsLoading)
+        {
+            <span>Loading...</span>
+        }
+        else
+        {
+            <span>Load Players</span>
+        }
+    </button>
+    <h2>Players</h2>
+
+    @if (IsAnimationPlaying)
+    {
+        <div class="card-pack animate-rise" @onclick="OpenCardPack" style="position: relative">
+            <img src="Images/CardUI/card-pack.png" class="card-pack-main" alt="Card Pack" style="z-index: 2; position: absolute" />
+            <img src="Images/CardUI/card-pack-tear.png" class="card-pack-tear" alt="Card Pack Tear" style="z-index: 3; position: relative; top: 4%" />
+
+        </div>
+    }
+
+    <!-- Players List -->
+   @if (IsPackOpened && Players != null)
+{
+    <div class="cards-container">
+        @if (!Players.Any())
+        {
+            <p>No players found for the selected tournament.</p>
+        }
+        else
+        {
+            @foreach (var player in Players)
+            {
+                <PlayerCard Player="@player" />
+            }
+        }
+    </div>
+}
+
+</div>
+
+@code {
+
+    private List<Tournament>? Tournaments = new();
+    private int? SelectedTournamentID = null; 
+    private List<Player>? Players = null;
+    private bool IsLoading = false;
+    private int maxPlayers = 1;
+    private bool IsAnimationPlaying = false;
+    private bool IsPackOpened = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = await DbFactory.CreateDbContextAsync();
+
+        // Load all tournaments
+        Tournaments = await context.Tournaments
+            .OrderBy(t => t.TournamentName)
+            .ToListAsync();
+    }
+
+    private async Task LoadPlayers()
+    {
+        IsLoading = true;
+        Players = null;
+
+        using var context = await DbFactory.CreateDbContextAsync();
+
+        if (SelectedTournamentID == null)
+        {
+            IsLoading = false;
+            return;
+        }
+
+        var teamIDs = await context.TournamentTeams
+            .Where(tt => tt.TournamentID == SelectedTournamentID)
+            .Select(tt => tt.TeamID)
+            .ToListAsync();
+
+        if (!teamIDs.Any())
+        {
+            Players = new List<Player>(); 
+            IsLoading = false;
+            return;
+        }
+
+        Players = await context.Players
+            .Where(p => p.TeamID.HasValue && teamIDs.Contains(p.TeamID.Value))
+            .Include(p => p.OriginCountry)
+            .OrderBy(p => p.PlayerName)
+            .ToListAsync();
+
+        if (Players.Any())
+        {
+            var random = new Random();
+            Players = Players.OrderBy(x => random.Next()).Take(maxPlayers).ToList();
+        }
+
+        IsLoading = false;
+
+        // Show the card pack
+        IsAnimationPlaying = true;
+        IsPackOpened = false;
+        StateHasChanged();
+    }
+
+    private void OpenCardPack()
+    {
+        IsAnimationPlaying = false;
+        IsPackOpened = true; // Ensure cards appear after the pack is clicked
+    }
+}

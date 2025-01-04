@@ -9,6 +9,7 @@
         public string? CardURL { get; set; }
         public string? FlavorText { get; set; }
         public int? SkillRating { get; set; }
+        public int? EloRating { get; set; }
 
         public int? TeamID { get; set; }
         public Team? Team { get; set; }

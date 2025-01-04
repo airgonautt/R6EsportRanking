@@ -2,6 +2,7 @@
 
 <div class="main-layout">
     <MudThemeProvider IsDarkMode=true />
+    
     <!-- Header/Nav Bar -->
     <header class="navbar navbar-dark bg-dark">
         <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -26,6 +27,7 @@
 
     <!-- Body -->
     <div class="body">
+        <MudPopoverProvider />
         @Body
     </div>
 
