@@ -48,20 +48,31 @@
            @foreach(var player in Players){
                 <div class="pack-grid-item">
                     @if (!OpenedPacks[player.PlayerID])
-                    {
-                        <div class="player-card" @onclick="() => OpenCardPack(player.PlayerID)" style="position: relative; cursor: pointer;">
-                            <img src="Images/CardUI/card-pack.png" class="card-pack-main" alt="Card Pack" style="z-index: 2; position: absolute" />
-                            <img src="Images/CardUI/card-pack-tear.png" class="card-pack-tear" alt="Card Pack Tear" style="z-index: 3; position: relative; top: 4%" />
-                        </div>
-                    }
-                    else
-                    {
-                        <PlayerCard Player="@player" />
-                    }
-                </div>
+    {
+            <img src="Images/CardUI/card-pack.png" class="card-pack-main" alt="Card Pack" style="z-index: 2; position: absolute" />
+            <img src="Images/CardUI/card-pack-tear.png" class="card-pack-tear" alt="Card Pack Tear" style="z-index: 3; position: relative; top: 4%" />
+
+        </div>
+    }
+
+    <!-- Players List -->
+   @if (IsPackOpened && Players != null)
+{
+    <div class="cards-container">
+        @if (!Players.Any())
+        {
+            <p>No players found for the selected tournament.</p>
+        }
+        else
+        {
+            @foreach (var player in Players)
+            {
+                <PlayerCard Player="@player" />
             }
-       }
+        }
     </div>
+}
+</div>
 </div>
 
 @code {
@@ -74,6 +85,7 @@
     private bool IsAnimationPlaying = false;
     private bool IsPackOpened = false;
     private Dictionary<int, bool> OpenedPacks = new();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,11 +144,6 @@
         StateHasChanged();
     }
 
-    private void OpenCardPack(int playerId)
     {
-        if (OpenedPacks.ContainsKey(playerId))
-        {
-            OpenedPacks[playerId] = true; // Mark the pack as opened
-        }
     }
 }
