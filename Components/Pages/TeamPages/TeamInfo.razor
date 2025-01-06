@@ -126,6 +126,11 @@
         };
     }
 
+    // NAVIGATION ----------------------------------------------------------------------------
+    private void NavigateToMatch(Match match)
+    {
+        NavManager.NavigateTo($"/matches/details?matchid={match.MatchID}");
+    }
     private async Task NavigateToLowerEloTeam()
     {
         var context = await DbFactory.CreateDbContextAsync();
