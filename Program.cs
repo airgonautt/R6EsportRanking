@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using MudBlazor.Services;
 using R6Ranking.Components;
 using R6Ranking.Data;
 using System.Text.Json.Serialization;
@@ -25,11 +24,10 @@ builder.Services.AddControllers()
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddRazorPages();  // Add Razor Pages
-builder.Services.AddServerSideBlazor();  // Add Blazor Server
+builder.Services.AddRazorPages();  
+builder.Services.AddServerSideBlazor();
 
-builder.Services.AddMudServices();
-
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 

@@ -1,24 +1,37 @@
-﻿@inherits LayoutComponentBase
+﻿
+    <Button Type="ButtonType.Button" Color="ButtonColor.Light" class="toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </Button>
+    <Collapse @ref="collapse" class="collapse-menu">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/regions">Regions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/teams">Teams</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/cards">Cards</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/matches">Matches</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/players">Players</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </Collapse>
 
-<!-- Header/Nav Bar -->
-<header class="navbar navbar-dark bg-dark">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center">
-            <img src="bootstrap/Visuals/r6.png" alt="Logo" class="logo">
-            <span class="kanit-extrabold-italic navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
-        </div>
-        <nav class="nav d-flex justify-content-around w-50">
-            <a class="nav-link kanit-extrabold text-white" href="/">Home</a>
-            <a class="nav-link kanit-extrabold text-white" href="/regions">Regions</a>
-            <a class="nav-link kanit-extrabold text-white" href="/teams">Teams</a>
-            <a class="nav-link kanit-extrabold text-white" href="/cards">Cards</a>
-            <a class="nav-link kanit-extrabold text-white" href="/matches">Matches</a>
-            <a class="nav-link kanit-extrabold text-white" href="/players">Players</a>
-            <a class="nav-link kanit-extrabold text-white" href="/about">About</a>
-        </nav>
-        <button class="btn widget-button">
-            <img src="bootstrap/Visuals/r6.png" alt="Widget Icon" class="logo">
-        </button>
-    </div>
-</header>
+
+@code {
+    Collapse collapse = default!;
+
+    private async Task ToggleNavMenu() => await collapse.ToggleAsync();
+}
 

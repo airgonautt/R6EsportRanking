@@ -6,6 +6,7 @@
 
         public string? LogoUrl { get; set; }
         public string? SocialUrl { get; set; }
+        public string? RegionMap { get; set; }
 
         public int RegionalElo { get; set; } = 0;
 

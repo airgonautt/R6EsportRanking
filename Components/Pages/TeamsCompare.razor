@@ -1,0 +1,148 @@
+﻿@page "/teams/compare"
+
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+<div class="container mt-5 bg-dark text-white p-4 rounded">
+    <h1 class="text-center mb-4">Compare Teams</h1>
+
+    <!-- Team Search Section -->
+    <div class="mb-4">
+        
+
+        <div class="d-flex gap-2">
+            @if (TeamSearches.Count < MaxTeams)
+            {
+                <button class="btn btn-primary" @onclick="AddSearchBar">+ Add Team</button>
+            }
+            <button class="btn btn-secondary" @onclick="FetchTeams">Retrieve Teams</button>
+        </div>
+    </div>
+
+   
+    <!-- Team Comparison Details -->
+    @if (SelectedTeams.Count == 2)
+    {
+        <div class="row mt-5">
+            <!-- Left Team -->
+            <div class="col-md-6">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <h3 class="card-title">@SelectedTeams[0]?.TeamName</h3>
+                        <h5>Roster:</h5>
+                        <ul class="list-group">
+                            @foreach (var player in SelectedTeams[0]?.Players ?? new List<Player>())
+                            {
+                                <li class="list-group-item bg-dark text-white">@player.Name</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Team -->
+            <div class="col-md-6">
+                <div class="card bg-secondary text-white">
+                    <div class="card-body">
+                        <h3 class="card-title">@SelectedTeams[1]?.TeamName</h3>
+                        <h5>Roster:</h5>
+                        <ul class="list-group">
+                            @foreach (var player in SelectedTeams[1]?.Players ?? new List<Player>())
+                            {
+                                <li class="list-group-item bg-dark text-white">@player.Name</li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Head-to-Head Matches -->
+        <div class="mt-5">
+            <h3>Head-to-Head Matches</h3>
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Match</th>
+                        <th>Date</th>
+                        <th>Score</th>
+                        <th>Tournament</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var match in Matches)
+                    {
+                        <tr>
+                            <td>@match.MatchName</td>
+                            <td>@match.MatchDate.ToShortDateString()</td>
+                            <td>@($"{match.Team1Score} - {match.Team2Score}")</td>
+                            <td>@match.TournamentID</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private const int MaxTeams = 5; // Maximum number of teams to compare
+    private List<string> TeamSearches = new List<string> { "" }; // Initial search bar with an empty value
+    private List<Team> SelectedTeams = new(); // Stores fetched team data
+    private List<Match> Matches = new(); // Stores match data for comparison
+    public string[] XAxisLabels = Array.Empty<string>();
+
+    private async Task AddSearchBar()
+    {
+        if (TeamSearches.Count < MaxTeams)
+        {
+            TeamSearches.Add("");
+        }
+    }
+
+    private async Task FetchTeams()
+    {
+        // Filter out empty or invalid search bars
+        var validSearches = TeamSearches.Where(search => !string.IsNullOrWhiteSpace(search)).ToList();
+
+        if (!validSearches.Any())
+        {
+            // Show a message or handle no valid inputs appropriately
+            Console.WriteLine("No valid team names entered.");
+            return;
+        }
+
+        var context = await DbFactory.CreateDbContextAsync();
+        var teams = await Task.WhenAll(validSearches.Select(async search =>
+            await context.Teams.Include(t => t.Players)
+                               .FirstOrDefaultAsync(t => t.TeamName == search)));
+
+        // Filter null results and populate SelectedTeams
+        SelectedTeams = teams.Where(t => t != null).ToList();
+
+        // Populate Elo history data for chart
+        if (SelectedTeams.Count > 0)
+        {
+            var teamIds = SelectedTeams.Select(t => t!.TeamID).ToList();
+            var eloHistory = await context.TeamEloChanges
+                .Where(e => teamIds.Contains(e.TeamID))
+                .OrderBy(e => e.Date)
+                .ToListAsync();
+
+        }
+
+        // If exactly two teams are selected, fetch head-to-head match data
+        if (SelectedTeams.Count == 2)
+        {
+            var teamIds = SelectedTeams.Select(t => t!.TeamID).ToList();
+            Matches = await context.Matches
+                .Where(m => teamIds.Contains(m.Team1ID) && teamIds.Contains(m.Team2ID))
+                .OrderByDescending(m => m.MatchDate)
+                .ToListAsync();
+        }
+    }
+
+ 
+}

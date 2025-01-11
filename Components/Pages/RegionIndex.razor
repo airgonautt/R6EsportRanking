@@ -1,0 +1,146 @@
+﻿@page "/regions"
+
+@using Microsoft.CodeAnalysis
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Regions</PageTitle>
+
+<h1>Regions</h1>
+
+<div class="container-fluid d-flex">
+    <!-- Map Section -->
+    <div class="map-container position-relative me-4">
+        @foreach (var region in Regions)
+        {
+            <img src="/Images/Region/@region.RegionMap"
+                 alt="@region.RegionName Map"
+                 class="region-map"
+                 style="filter: brightness(0);"
+                 data-region="@region.RegionID" />
+        }
+        <img src="/Images/Region/map.png"
+             alt="wolrd map"
+             class="region-map"
+             style="filter: brightness(0);" />
+    </div>
+
+    <!-- Regions List -->
+    <div class="regions-list">
+        @foreach (var region in Regions)
+        {
+            <div class="region-item"
+                 @onmouseover="@(() => HighlightRegion(region.RegionID, region.SocialUrl))"
+                 @onmouseout="ResetMapFilters">
+                @region.RegionName
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Additional Content -->
+<div class="flex-container">
+    <p style="margin-left: auto;">
+        <a href="regions/create" class="btn btn-primary">Create New</a>
+    </p>
+</div>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Region Info</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var region in Regions)
+        {
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="@region.LogoUrl" alt="@region.RegionName Logo" class="region-logo me-3" />
+                        <div>
+                            <div>@region.RegionName (@region.RegionID)</div>
+                            <div>@region.RegionalElo</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <a href="@($"regions/edit?regionid={region.RegionID}")" class="btn btn-link">Edit</a> |
+                    <a href="@($"regions/details?regionid={region.RegionID}")" class="btn btn-link">Details</a> |
+                    <a href="@($"regions/delete?regionid={region.RegionID}")" class="btn btn-link">Delete</a>
+                </td>
+            </tr>
+        }
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Region> Regions = new();
+
+    R6EsportsDbContext context = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        Regions = await context.Regions.ToListAsync();
+    }
+
+    private async Task HighlightRegion(string regionId, string colorHex)
+    {
+        await JSRuntime.InvokeVoidAsync("regionMap.highlightRegion", regionId, colorHex);
+    }
+
+    private async Task ResetMapFilters()
+    {
+        await JSRuntime.InvokeVoidAsync("regionMap.resetMapFilters");
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
+
+<style>
+    .map-container {
+        position: relative;
+        width: 70%; /* Adjust as needed */
+        height: auto;
+    }
+
+    .region-map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        transition: filter 0.3s ease;
+        z-index: 1;
+    }
+
+    .regions-list {
+        width: 30%; /* Adjust as needed */
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .region-item {
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+        .region-item:hover {
+            color: var(--bs-gold---1); /* Adjust as needed */
+        }
+
+    .region-logo {
+        width: 40px;
+        height: auto;
+        margin-right: 10px;
+    }
+</style>

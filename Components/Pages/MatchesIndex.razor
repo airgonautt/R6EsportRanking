@@ -1,0 +1,55 @@
+﻿@page "/matches"
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@using R6Ranking.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="matches/create" class="btn btn-primary">Create New</a>
+</p>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Match Name</th>
+            <th>Team 1 Score</th>
+            <th>Team 2 Score</th>
+            <th>Match Date</th>
+            <th>Tournament ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var match in context.Matches)
+        {
+            <tr>
+                <td>@match.MatchName</td>
+                <td>@match.Team1Score</td>
+                <td>@match.Team2Score</td>
+                <td>@match.MatchDate.ToShortDateString()</td>
+                <td>@match.TournamentID</td>
+                <td>
+                    <a href="@($"matches/edit?matchid={match.MatchID}")" class="btn btn-link">Edit</a> |
+                    <a href="@($"matches/details?matchid={match.MatchID}")" class="btn btn-link">Details</a> |
+                    <a href="@($"matches/delete?matchid={match.MatchID}")" class="btn btn-link">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private R6EsportsDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

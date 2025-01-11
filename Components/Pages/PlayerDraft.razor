@@ -1,6 +1,5 @@
 ﻿@page "/players/draft"
 
-@using R6Ranking.Data
 @using R6Ranking.Models
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Components.Splashable
@@ -25,7 +24,6 @@
     <label for="maxPlayers" class="form-label">Max Players (1-10):</label>
     <input id="maxPlayers" type="number" class="form-control" min="1" max="10" @bind-value="maxPlayers" />
 
-
     <!-- Load Players Button -->
     <button class="btn btn-primary" @onclick="LoadPlayers" disabled="@IsLoading">
         @if (IsLoading)
@@ -39,53 +37,37 @@
     </button>
     <h2>Players</h2>
 
-
     <!-- Players List -->
     <div class="cards-container">
-       @if (Players != null)
-       {
-           
-           @foreach(var player in Players){
-                <div class="pack-grid-item">
-                    @if (!OpenedPacks[player.PlayerID])
-    {
-            <img src="Images/CardUI/card-pack.png" class="card-pack-main" alt="Card Pack" style="z-index: 2; position: absolute" />
-            <img src="Images/CardUI/card-pack-tear.png" class="card-pack-tear" alt="Card Pack Tear" style="z-index: 3; position: relative; top: 4%" />
-
-        </div>
-    }
-
-    <!-- Players List -->
-   @if (IsPackOpened && Players != null)
-{
-    <div class="cards-container">
-        @if (!Players.Any())
-        {
-            <p>No players found for the selected tournament.</p>
-        }
-        else
+        @if (Players != null)
         {
             @foreach (var player in Players)
             {
-                <PlayerCard Player="@player" />
+                <div class="pack-grid-item">
+                    @if (!OpenedPacks[player.PlayerID])
+                    {
+                        <div class="player-card" @onclick="() => OpenCardPack(player.PlayerID)" style="position: relative; cursor: pointer;">
+                            <img src="Images/CardUI/card-pack.png" class="card-pack-main" alt="Card Pack" style="z-index: 2; position: absolute;" />
+                            <img src="Images/CardUI/card-pack-tear.png" class="card-pack-tear" alt="Card Pack Tear" style="z-index: 3; position: relative; top: 4%;" />
+                        </div>
+                    }
+                    else
+                    {
+                        <PlayerCard Player="@player" />
+                    }
+                </div>
             }
         }
     </div>
-}
-</div>
 </div>
 
 @code {
-
     private List<Tournament>? Tournaments = new();
-    private int? SelectedTournamentID = null; 
+    private int? SelectedTournamentID = null;
     private List<Player>? Players = null;
     private bool IsLoading = false;
     private int maxPlayers = 1;
-    private bool IsAnimationPlaying = false;
-    private bool IsPackOpened = false;
     private Dictionary<int, bool> OpenedPacks = new();
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -118,7 +100,7 @@
 
         if (!teamIDs.Any())
         {
-            Players = new List<Player>(); 
+            Players = new List<Player>();
             IsLoading = false;
             return;
         }
@@ -126,6 +108,7 @@
         Players = await context.Players
             .Where(p => p.TeamID.HasValue && teamIDs.Contains(p.TeamID.Value))
             .Include(p => p.OriginCountry)
+            .Include(p => p.Team)
             .OrderBy(p => p.PlayerName)
             .ToListAsync();
 
@@ -133,17 +116,20 @@
         {
             var random = new Random();
             Players = Players.OrderBy(x => random.Next()).Take(maxPlayers).ToList();
-            OpenedPacks = Players.ToDictionary(p => p.PlayerID, p => false);
         }
 
-        IsLoading = false;
+        // Initialize opened packs dictionary
+        OpenedPacks = Players.ToDictionary(p => p.PlayerID, p => false);
 
-        // Show the card pack
-        IsAnimationPlaying = true;
-        IsPackOpened = false;
+        IsLoading = false;
         StateHasChanged();
     }
 
+    private void OpenCardPack(int playerId)
     {
+        if (OpenedPacks.ContainsKey(playerId))
+        {
+            OpenedPacks[playerId] = true; // Mark the pack as opened
+        }
     }
 }

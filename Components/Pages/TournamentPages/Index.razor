@@ -1,7 +1,6 @@
 ﻿@page "/tournaments"
 
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using R6Ranking.Models
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
@@ -11,36 +10,40 @@
 
 <h1>Tournaments</h1>
 
-<div class="flex-container">
-    <p style="margin-left: auto;">
-        <MudButton Href="Tournaments/create">Create New</MudButton>
-    </p>
+<div class="d-flex justify-content-end mb-3">
+    <a href="Tournaments/create" class="btn btn-primary">Create New</a>
 </div>
 
-<MudTable Items="context.Tournaments" Bordered="true" Striped="true" Hover="true">
-
-    <HeaderContent>
-        <MudTh>Tournament Info</MudTh>
-        <MudTh>Actions</MudTh>
-    </HeaderContent>
-
-    <RowTemplate>
-        <MudTd>
-            <div class="tournament-info">
-                <img src="@context.TournamentLogo" alt="@context.TournamentName Logo" class="tournament-logo" />
-                <span>@context.TournamentName (@context.TournamentID)</span>
-                <span>@context.RegionID</span>
-                <span>@context.TournamentLocation</span>
-            </div>
-        </MudTd>
-
-        <MudTd>
-            <MudLink Href="@($"tournaments/edit?tournamentid={context.TournamentID}")">Edit</MudLink> |
-            <MudLink Href="@($"tournaments/details?tournamentid={context.TournamentID}")">Details</MudLink> |
-            <MudLink Href="@($"tournaments/delete?tournamentid={context.TournamentID}")">Delete</MudLink>
-        </MudTd>
-    </RowTemplate>
-</MudTable>
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Tournament Info</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tournament in context.Tournaments)
+        {
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="@tournament.TournamentLogo" alt="@tournament.TournamentName Logo" class="tournament-logo me-3" />
+                        <div>
+                            <div>@tournament.TournamentName (@tournament.TournamentID)</div>
+                            <div>@tournament.RegionID</div>
+                            <div>@tournament.TournamentLocation</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <a href="@($"tournaments/edit?tournamentid={tournament.TournamentID}")" class="btn btn-link">Edit</a> |
+                    <a href="@($"tournaments/details?tournamentid={tournament.TournamentID}")" class="btn btn-link">Details</a> |
+                    <a href="@($"tournaments/delete?tournamentid={tournament.TournamentID}")" class="btn btn-link">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
     R6EsportsDbContext context = default!;

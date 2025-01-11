@@ -9,8 +9,8 @@
 @rendermode InteractiveServer
 
 
-<br />
 <div class="container">
+
     <div class="grid">
 
         <!-- Team Metrics -->
@@ -18,73 +18,67 @@
             <h2 style="margin-bottom: 10px;">Team Metrics</h2>
             <img src="Images/Teams/teamGraphs2023.png"
                  alt="Team Metrics Graph"
-                 style="max-width: 335px; width: 100%; height: 150%; max-height: 3200px; height: auto; border-radius: 8px; margin-bottom: 10px;" />
-            <p style="margin: 10px 0;">Study and compare team statistics.</p>
-            <div>
-                <MudButton Variant="Variant.Outlined" Style="background-color:var(--bs-cream--1)" Href="/teams/compare">
-                    Learn More
-                </MudButton>
-            </div>
+                 class="img-fluid rounded mb-3" />
+            <p>Study and compare team statistics.</p>
+            <a class="btn btn-outline-secondary" href="/teams/compare">Learn More</a>
         </div>
-                
+
         <!-- Player Draft -->
         <div class="grid-item b6x1" style="text-align: start; padding: 1px; display: flex; flex-direction: column; align-items: center;">
-            <h2 style="margin-bottom: 2px;">Player Draft</h2>
-            <div style="width: 100%; max-width: 335px; height: 60%; max-height: 320px; overflow: hidden; border-radius: 8px; margin-bottom: 1px;">
+            <h2 style="margin-bottom: 10px;">Player Draft</h2>
+            <div class="mb-3">
                 <img src="Images/Players/players.png"
                      alt="Player Draft Image"
-                     style="width: 100%; height: auto; object-fit: cover;" />
+                     class="img-fluid rounded" />
             </div>
-            <p style="margin: 2px 0;">Collect, track, and upgrade player cards.</p>
-            <div>
-                <MudButton Variant="Variant.Outlined" Href="/players/draft" Style="background-color:var(--bs-cream--1)">
-                    Try it now
-                </MudButton>
-            </div>
+            <p>Collect, track, and upgrade player cards.</p>
+            <a class="btn btn-outline-secondary" href="/players/draft">Try it now</a>
         </div>
 
         <!-- Leaderboard -->
         <div class="grid-item b6x4">
             <h2>Leaderboard</h2>
-            <MudTable T="Team" Items="@Teams" Hover="false" Bordered="false" Class="custom-leaderboard-table">
-                <RowTemplate>
-                    <MudTd>
-                        <div class="row-container" @onclick="@(() => NavigateToTeam(context))">
-                            <span class="position">@(@Teams.IndexOf(context) + 1)</span>
-                            <img src="@context.LogoUrl" alt="@context.TeamName Logo" class="team-logo" />
-                            <span class="team-name">@context.TeamName</span>
-                            <span> </span>
-                            <span class="elo">@($"{context.CurrentElo} RP")</span>
-                        </div>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
-            <p> Last Updated @DateTime.Now.Day</p>
+            <table class="table table-hover custom-leaderboard-table">
+                <tbody>
+                    @foreach (var team in Teams)
+                    {
+                        <tr @onclick="() => NavigateToTeam(team)">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">@(@Teams.IndexOf(team) + 1)</span>
+                                    <img src="@team.LogoUrl" alt="@team.TeamName Logo" class="team-logo me-2" />
+                                    <span class="me-auto">@team.TeamName</span>
+                                    <span>@($"{team.CurrentElo} RP")</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p>Last Updated @DateTime.Now.Day</p>
         </div>
 
         <!-- Recent Matches -->
         <div class="grid-item b6x3">
-            <h2>Recent Results</h2>
-            <MudTable T="Match" Items="@Matches" Hover="false" Bordered="false" Class="custom-leaderboard-table" Style="width: 100%; max-width: 800px;">
-                <RowTemplate>
-                    <MudTd>
-                        <div class="row-container" @onclick="@(() => NavigateToMatch(context))" style="white-space: nowrap;">
-                            <img src="@GetTeamLogo(context.Team1ID)" style="width: 25px; height: 25px;" />
-                            <span>
-                                @($"{context.MatchName.Split(" vs ")[0]} {context.Team1Score} : {context.Team2Score} {context.MatchName.Split(" vs ")[1]} ")
-                            </span>
-                            <span>@context.MatchDate.ToShortDateString()</span>
-                            <span>@context.TournamentID</span>
-                        </div>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
+            <h2>Recent Matches</h2>
+            <table class="table table-hover custom-leaderboard-table">
+                <tbody>
+                    @foreach (var match in Matches)
+                    {
+                        <tr @onclick="() => NavigateToMatch(match)">
+                            <td>
+                                
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-        
+
         <!-- Ubisoft Newsletter -->
-        <div class="grid-item b6x1" style="position: relative; text-align: center; padding: 10px; display: flex; 
+        <div class="grid-item b6x1" style="position: relative; text-align: center; padding: 10px; display: flex;
                 flex-direction: column; align-items: center; height: 300px; width: 100%;">
-            <ArticleDisplay /> 
+            <ArticleDisplay />
         </div>
 
         <!-- About -->
@@ -109,7 +103,7 @@
     private List<Team> Teams = new List<Team>();
     private List<Match> Matches = new List<Match>();
     private Dictionary<int, string> TeamLogoCache = new();
-    
+
     protected override async Task OnInitializedAsync()
     {
         using var context = await DbFactory.CreateDbContextAsync();
@@ -154,10 +148,11 @@
 
         return logoUrl;
     }
-    private string GetTeamLogo(int teamID){
+    private string GetTeamLogo(int teamID)
+    {
         if (!TeamLogoCache.ContainsKey(teamID))
         {
-            _ = FetchAndCacheLogo(teamID); 
+            _ = FetchAndCacheLogo(teamID);
             return "defaultlogo.png";
         }
 

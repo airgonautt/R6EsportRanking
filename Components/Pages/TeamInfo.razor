@@ -1,0 +1,241 @@
+﻿@page "/teams/{teamName}"
+
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="grid">
+        <div class="grid-item b3x1" style="background-color: transparent;"> <br /> </div>
+
+        <div class="grid-item b1x1">
+            <button class="btn btn-primary" @onclick="NavigateToLowerEloTeam">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
+
+        <div class="grid-item b8x1">
+            <img src="@team?.LogoUrl" alt="Team Logo" class="img-fluid" style="max-width: 150px; height: auto; margin-right: 16px;">
+            <div>
+                <h2 class="fw-bold text-white mb-2">@team?.TeamName</h2>
+                <h4 class="text-warning mb-0">@team?.CurrentElo RP</h4>
+            </div>
+        </div>
+
+        <div class="grid-item b1x1">
+            <button class="btn btn-primary" @onclick="NavigateToHigherEloTeam">
+                <i class="bi bi-arrow-right"></i> Next
+            </button>
+        </div>
+
+        <div class="grid-item b3x1" style="background-color: transparent;"> <br /> </div>
+
+        <!-- Elo History Section -->
+        <div class="grid-item b18x3">
+            <div class="container-fluid overflow-x-auto">
+                <LineChart @ref="lineChart" Width="850" />
+            </div>
+        </div>
+
+        <!-- Player Roster Section -->
+        <!-- Player Roster Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingRoster">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRoster" aria-expanded="true" aria-controls="collapseRoster" @onclick="LoadRoster">
+                    Player Roster
+                </button>
+            </h2>
+            <div id="collapseRoster" class="accordion-collapse collapse show" aria-labelledby="headingRoster" data-bs-parent="#teamSections">
+                <div class="accordion-body">
+                    @if (Players == null)
+                    {
+                        <p>Loading players...</p>
+                    }
+                    else if (!Players.Any())
+                    {
+                        <p>No players available for this team.</p>
+                    }
+                    else
+                    {
+                        <div class="cards-container">
+                            @foreach (var player in Players)
+                            {
+                                <div class="pack-grid-item">
+                                    <PlayerCard Player="@player" />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Match History Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingHistory">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory" aria-expanded="false" aria-controls="collapseHistory" @onclick="LoadMatchHistory">
+                    Match History
+                </button>
+            </h2>
+            <div id="collapseHistory" class="accordion-collapse collapse" aria-labelledby="headingHistory" data-bs-parent="#teamSections">
+                <div class="accordion-body">
+                    @if (Matches == null)
+                    {
+                        <p>Loading match history...</p>
+                    }
+                    else if (!Matches.Any())
+                    {
+                        <p>No match history available for this team.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-hover table-striped table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Tournament</th>
+                                    <th scope="col">Team 1</th>
+                                    <th scope="col">Team 2</th>
+                                    <th scope="col">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var match in Matches)
+                                {
+                                    <tr>
+                                        <td>@match.MatchDate.ToShortDateString()</td>
+                                        <td>@match.Tournament.Name</td>
+                                        <td>@match.Team1?.TeamName</td>
+                                        <td>@match.Team2?.TeamName</td>
+                                        <td>@match.Team1Score - @match.Team2Score</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+        </div>
+</div>
+@code {
+    [Parameter] public string teamName { get; set; } = default!;
+    private Team? team;
+    private List<TeamEloChange> EloHistory = new();
+    private List<Player>? Players = new();
+    private List<Match> Matches = new();
+
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+
+    private bool IsRosterLoaded = false;
+    private bool IsHistoryLoaded = false;
+
+    private async Task LoadRoster()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        if (!IsRosterLoaded & team!=null)
+        {
+            Players = await context.Players
+                .Where(e => e.TeamID == team.TeamID)
+                .Include(p => p.OriginCountry)
+                .ToListAsync();
+            IsRosterLoaded = true;
+        }
+    }
+    private async Task LoadMatchHistory()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        if (!IsHistoryLoaded)
+        {
+            Matches = await context.Matches
+                .Where(m => m.Team1ID == team.TeamID || m.Team2ID == team.TeamID)
+                .OrderByDescending(m => m.MatchDate)
+                .ToListAsync();
+            IsHistoryLoaded = true;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        team = await context.Teams
+        .Include(t => t.Players)
+        .FirstOrDefaultAsync(team=>team.TeamName == teamName);
+
+        if (team != null)
+        {
+            EloHistory = await context.TeamEloChanges
+                .Where(e => e.TeamID == team.TeamID)
+                .OrderBy(e => e.Date)
+                .ToListAsync();
+
+            InitializeChartData(EloHistory);
+        }
+    }
+
+    private void InitializeChartData(List<TeamEloChange> data)
+    {
+        // Prepare chart labels and datasets
+        chartData = new ChartData
+            {
+                Labels = data.Select(e => e.Date.ToShortDateString()).ToList(),
+                Datasets = new List<IChartDataset>
+            {
+                new LineChartDataset
+                {
+                    Label = $"{team?.TeamName} Elo History",
+                    Data = data.Select(e => (double?)e.CurrentElo).ToList(),
+                    //BackgroundColor = var(-bs--black--1),
+                    //BorderColor = ColorUtility.CategoricalTwelveColors[0].ToRgbString(),
+                    PointRadius = new List<double> { 5 },
+                    PointHoverRadius = new List<double> { 8 },
+                }
+            }
+            };
+
+        lineChartOptions = new LineChartOptions
+            {
+                IndexAxis = "x",
+                Interaction = new Interaction { Mode = InteractionMode.Index, Intersect = false },
+                Responsive = true,
+                
+            };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500); // Delay to ensure scripts are loaded
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+    }
+
+    private async Task NavigateToLowerEloTeam()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        var lowerTeam = await context.Teams
+            .Where(t => t.CurrentElo < team!.CurrentElo)
+            .OrderByDescending(t => t.CurrentElo)
+            .FirstOrDefaultAsync();
+
+        NavManager.NavigateTo($"/teams/{lowerTeam?.TeamName}");
+    }
+    private async Task NavigateToHigherEloTeam()
+    {
+        var context = await DbFactory.CreateDbContextAsync();
+        var higherTeam = await context.Teams
+            .Where(t => t.CurrentElo > team!.CurrentElo)
+            .OrderBy(t => t.CurrentElo)
+            .FirstOrDefaultAsync();
+
+        NavManager.NavigateTo($"/teams/{higherTeam?.TeamName}");
+    }
+}

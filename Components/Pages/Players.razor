@@ -1,0 +1,59 @@
+﻿@page "/players"
+
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@using R6Ranking.Components.Splashable
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@implements IAsyncDisposable
+
+<PageTitle>Players</PageTitle>
+
+<h1>Players</h1>
+
+<p>
+    <a href="players/create">Create New</a>
+</p>
+
+<!-- Flex container for players -->
+<div class="cards-container">
+    @if (players != null) {
+        @foreach (var player in players) {
+            <div class="pack-grid-item">
+                <PlayerCard Player="@player" />
+            </div>
+        }
+    }
+
+    else {
+        <p>Loading players...</p>
+    }
+</div>
+
+@code {
+
+    private List<Player> players = new List<Player>();
+    private List<Team> teams = new();
+    private R6EsportsDbContext context = default!;
+    
+    protected override async Task OnInitializedAsync() {
+
+        context = DbFactory.CreateDbContext();
+
+        players = await context.Players
+            .Include(p => p.OriginCountry)
+            .Include(p => p.Team)
+            .OrderBy(p=> p.EloRating)
+            .ToListAsync();
+        
+    }
+
+    public async ValueTask DisposeAsync() {
+
+        if (context != null) {
+
+            await context.DisposeAsync();
+
+        }
+    }
+}

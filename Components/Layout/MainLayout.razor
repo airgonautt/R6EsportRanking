@@ -1,46 +1,55 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="main-layout">
-    <MudThemeProvider IsDarkMode=true />
-    
-    <!-- Header/Nav Bar -->
-    <header class="navbar navbar-dark bg-dark">
+
+    <!-- Header -->
+    <header class="navbar mb-4">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <img src="bootstrap/Visuals/r6.png" alt="Logo" class="logo">
-                <span class="kanit-extrabold-italic navbar-brand mb-0 h1 ms-2">R6 Global Ranking</span>
+                <img src="~/Images/CardUI/r6.png" alt="Logo" class="logo">
+                <div class="d-flex flex-column ms-2" style="line-height: 1;">
+                    <span class="kanit-extrabold">R6 Global</span>
+                    <span class="kanit-bold" style="font-style: italic; color: var(--bs-gold---1); font-size: 1.2rem;">Ranking</span>
+                </div>
             </div>
-            <nav class="nav d-flex justify-content-around w-50" style="color:var(--bs-white--1)">
+            <nav class="nav d-flex justify-content-around">
                 <a class="nav-link kanit-extrabold" href="/">Home</a>
                 <a class="nav-link kanit-extrabold" href="/regions">Regions</a>
                 <a class="nav-link kanit-extrabold" href="/teams">Teams</a>
-                <a class="nav-link kanit-extrabold" href="/cards">Cards</a>
-                <a class="nav-link kanit-extrabold" href="/matches">Matches</a>
                 <a class="nav-link kanit-extrabold" href="/players">Players</a>
+                <a class="nav-link kanit-extrabold" href="/matches">Matches</a>
                 <a class="nav-link kanit-extrabold" href="/about">About</a>
             </nav>
             <button class="btn widget-button">
-                <img src="bootstrap/Visuals/r6.png" alt="Widget Icon" class="logo">
+                <i class="bi bi-list"></i>
             </button>
-
         </div>
     </header>
 
     <!-- Body -->
     <div class="body">
-        <MudPopoverProvider />
-
         @Body
     </div>
 
     <!-- Footer -->
-    <footer class="footer bg-dark text-white text-center py-3">
-        <div class="container">
-            <p>&copy; @DateTime.Now.ToString("dddd, dd MMMM yyyy") R6Ranking. All Rights Reserved.</p>
+    <footer class="footer text-center py-3 mt-4">
+        <div class="container d-flex flex-column align-items-center">
+            <!-- Back to Top Button -->
+            <button class="btn btn-outline-light mb-3" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                Back to top
+            </button>
+            <!-- Navigation Links -->
+            <div class="d-flex justify-content-center mb-3">
+                <a href="/" class="text-white mx-3">Home</a>
+                <a href="/about" class="text-white mx-3">About</a>
+                <a href="/contact" class="text-white mx-3">Contact</a>
+            </div>
+            <!-- Copyright -->
+            <p class="mb-0">&copy; @DateTime.Now.ToString("yyyy") R6Ranking. All Rights Reserved.</p>
         </div>
     </footer>
 </div>
 
 @code {
-    
+
 }
