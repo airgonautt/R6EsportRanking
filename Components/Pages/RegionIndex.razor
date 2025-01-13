@@ -1,103 +1,273 @@
 ﻿@page "/regions"
 
-@using Microsoft.CodeAnalysis
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @using R6Ranking.Data
+@using BlazorBootstrap
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @implements IAsyncDisposable
+@rendermode InteractiveServer
 
 <PageTitle>Regions</PageTitle>
 
 <h1>Regions</h1>
 
 <div class="container-fluid d-flex">
-    <!-- Map Section -->
-    <div class="map-container position-relative me-4">
-        @foreach (var region in Regions)
-        {
-            <img src="/Images/Region/@region.RegionMap"
-                 alt="@region.RegionName Map"
-                 class="region-map"
-                 style="filter: brightness(0);"
-                 data-region="@region.RegionID" />
-        }
-        <img src="/Images/Region/map.png"
-             alt="wolrd map"
-             class="region-map"
-             style="filter: brightness(0);" />
-    </div>
-
-    <!-- Regions List -->
-    <div class="regions-list">
-        @foreach (var region in Regions)
-        {
-            <div class="region-item"
-                 @onmouseover="@(() => HighlightRegion(region.RegionID, region.SocialUrl))"
-                 @onmouseout="ResetMapFilters">
-                @region.RegionName
+    <div class="row">
+        <!-- Map Section -->
+        <div class="col-md-6">
+            <div class="map-container">
+                @foreach (var region in Regions)
+                {
+                    <img src="/Images/Region/@region.RegionMap"
+                    alt="@region.RegionName Map"
+                    class="region-map"
+                    style="filter: @((HoveredRegionID == region.RegionID)
+                                ? $"brightness(1) drop-shadow(1px 1px 2px {region.SocialUrl})"
+                                : "brightness(0)");"
+                    data-region="@region.RegionID" />
+                }
+                <img src="/Images/Region/map.png"
+                alt="World Map"
+                class="region-map"
+                style="filter: brightness(0);" />
             </div>
-        }
+        </div>
+
+        <!-- Right: Regions List -->
+        <div class="col-md-6">
+            <table class="table table-hover">
+                <tbody>
+                    @foreach (var region in Regions)
+                    {
+                        <tr @onmouseover="@(() => HoverRegion(region.RegionID))"
+                        @onmouseout="@ClearHoverRegion"
+                        style="background-color: @region.SocialUrl;">
+                            <td>
+                                <img src="/Images/Logos/region.png" alt="@region.RegionName Logo"
+                                class="region-logo me-3" />
+                                @region.RegionName
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- Additional Content -->
-<div class="flex-container">
-    <p style="margin-left: auto;">
-        <a href="regions/create" class="btn btn-primary">Create New</a>
-    </p>
+<div class="container-fluid d-flex">
+    <!-- Bottom Section: Graph and Chart -->
+    <div class="row mt-5">
+        <!-- Line Graph -->
+        <div class="col-md-6">
+            <h3>Elo Changes Over Time</h3>
+            <LineChart @ref="lineChart" Width="500" Height="300" />
+        </div>
+
+        <!-- Doughnut Chart -->
+        <div class="col-md-6">
+            <DoughnutChart @ref="doughnutChart" Width="300" />
+        </div>
+    </div>
+</div>
+<!-- Region RP History -->
+<div class="mt-4">
+    <Accordion>
+        <AccordionItem Header="Regional RP History">
+            <Content>
+                <Grid TItem="RegionEloChange"
+                      Class="table table-hover table-bordered table-striped custom-grid"
+                      DataProvider="RegionEloChangesDataProvider"
+                      AllowFiltering="true"
+                      AllowPaging="true"
+                      AllowSorting="true"
+                      Responsive="true">
+
+                    <GridColumn TItem="RegionEloChange" HeaderText="ID" PropertyName="RegionEloHistoryID" SortString="RegionEloHistoryID" SortKeySelector="item => item.RegionEloHistoryID" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        @context.RegionEloHistoryID
+                    </GridColumn>
+                    <GridColumn TItem="RegionEloChange" HeaderText="Change Date" PropertyName="ChangeDate" SortString="ChangeDate" SortKeySelector="item => item.ChangeDate" FilterTextboxWidth="120">
+                        @context.ChangeDate.ToString("yyyy-MM-dd")
+                    </GridColumn>
+                    <GridColumn TItem="RegionEloChange" HeaderText="Current Elo" PropertyName="CurrentElo" SortString="CurrentElo" SortKeySelector="item => item.CurrentElo" FilterTextboxWidth="100">
+                        @context.CurrentElo
+                    </GridColumn>
+                    <GridColumn TItem="RegionEloChange" HeaderText="Elo Change" PropertyName="EloChange" SortString="EloChange" SortKeySelector="item => item.EloChange" FilterTextboxWidth="100">
+                        @context.EloChange
+                    </GridColumn>
+                    <GridColumn TItem="RegionEloChange" HeaderText="Note" PropertyName="Note" SortString="Note" SortKeySelector="item => item.Note" FilterTextboxWidth="200">
+                        @context.Note
+                    </GridColumn>
+                    <GridColumn TItem="RegionEloChange" HeaderText="Region ID" PropertyName="RegionID" SortString="RegionID" SortKeySelector="item => item.RegionID" FilterTextboxWidth="100">
+                        @context.RegionID
+                    </GridColumn>
+
+                </Grid>
+            </Content>
+        </AccordionItem>
+    </Accordion>
 </div>
 
-<table class="table table-bordered table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Region Info</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var region in Regions)
-        {
-            <tr>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <img src="@region.LogoUrl" alt="@region.RegionName Logo" class="region-logo me-3" />
-                        <div>
-                            <div>@region.RegionName (@region.RegionID)</div>
-                            <div>@region.RegionalElo</div>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <a href="@($"regions/edit?regionid={region.RegionID}")" class="btn btn-link">Edit</a> |
-                    <a href="@($"regions/details?regionid={region.RegionID}")" class="btn btn-link">Details</a> |
-                    <a href="@($"regions/delete?regionid={region.RegionID}")" class="btn btn-link">Delete</a>
-                </td>
-            </tr>
-        }
-        }
-    </tbody>
-</table>
+
 
 @code {
     private List<Region> Regions = new();
-
     R6EsportsDbContext context = default!;
+    private string? HoveredRegionID;
+    private List<RegionEloChange> eloHistory = new(); 
+    private DoughnutChart doughnutChart = default!;
+    private ChartData chartData = new();
+
+    private LineChart lineChart = default!;
+    private ChartData lineChartData = new();
 
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
-        Regions = await context.Regions.ToListAsync();
+        Regions = await context.Regions
+            .OrderByDescending(r => r.RegionalElo)    
+            .ToListAsync();
+        if (Regions.Any())
+        {
+            InitializeDoughnutChart();
+            await InitializeLineChartAsync();
+        }
     }
 
-    private async Task HighlightRegion(string regionId, string colorHex)
+
+    private void HoverRegion(string regionId)
     {
-        await JSRuntime.InvokeVoidAsync("regionMap.highlightRegion", regionId, colorHex);
+        HoveredRegionID = regionId;
+    }
+    private void ClearHoverRegion()
+    {
+        HoveredRegionID = null;
     }
 
-    private async Task ResetMapFilters()
+    private void InitializeDoughnutChart()
     {
-        await JSRuntime.InvokeVoidAsync("regionMap.resetMapFilters");
+        chartData = new ChartData
+            {
+                Labels = Regions.Select(r => r.RegionName).ToList(),
+                Datasets = new List<IChartDataset>
+            {
+                new DoughnutChartDataset
+                {
+                    Data = Regions.Select(r => (double?)r.RegionalElo).ToList(),
+                    BackgroundColor = Regions.Select(r => r.SocialUrl).ToList()
+                }
+            }
+            };
+    }
+    private void UpdateDoughnutChart(string regionId)
+    {
+        var selectedRegion = Regions.FirstOrDefault(r => r.RegionID == regionId);
+        if (selectedRegion is not null)
+        {
+            chartData = new ChartData
+                {
+                    Labels = new List<string> { "Elo" },
+                    Datasets = new List<IChartDataset>
+                {
+                    new DoughnutChartDataset
+                    {
+                        Data = new List<double?> { selectedRegion.RegionalElo },
+                        BackgroundColor = new List<string> { selectedRegion.SocialUrl }
+                    }
+                }
+                };
+
+            doughnutChart?.UpdateAsync(chartData, new DoughnutChartOptions { Responsive = true });
+        }
+    }
+
+    private async Task InitializeLineChartAsync()
+    {
+        
+        // Fetching Elo change data from database
+        eloHistory = await context.RegionEloChanges
+            .Include(h => h.Region)
+            .OrderBy(h => h.ChangeDate)
+            .ToListAsync();
+
+        // Grouping by RegionID for dataset creation
+        var groupedData = eloHistory.GroupBy(h => h.RegionID);
+
+        var datasets = new List<IChartDataset>();
+        foreach (var group in groupedData)
+        {
+            var region = Regions.FirstOrDefault(r => r.RegionID == group.Key);
+            if (region is not null)
+            {
+                datasets.Add(new LineChartDataset
+                    {
+                        Label = region.RegionName,
+                        Data = group.Select(h => (double?)h.CurrentElo).ToList(),
+                        BorderColor = region.SocialUrl,
+                        BackgroundColor = region.SocialUrl,
+                        Fill = false
+                    });
+            }
+        }
+
+        lineChartData = new ChartData
+            {
+                Labels = eloHistory
+                    .Select(h => h.ChangeDate.ToString("MMM dd"))
+                    .Distinct()
+                    .ToList(),
+                Datasets = datasets
+            };
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Regions.Any())
+            {
+                await doughnutChart.InitializeAsync(chartData, new DoughnutChartOptions
+                    {
+                        Responsive = true
+                    });
+
+                await lineChart.InitializeAsync(lineChartData, new LineChartOptions
+                    {
+                        Responsive = true
+
+                    });
+            }
+            
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task<GridDataProviderResult<RegionEloChange>> RegionEloChangesDataProvider(GridDataProviderRequest<RegionEloChange> request)
+    {
+        var query = eloHistory.AsQueryable();
+
+        if (request.Sorting is not null && request.Sorting.Any())
+        {
+            var sort = request.Sorting.First();
+            query = sort.SortDirection == SortDirection.Ascending
+                ? query.OrderBy(sort.SortKeySelector)
+                : query.OrderByDescending(sort.SortKeySelector);
+        }
+        else
+        {
+            query = query.OrderByDescending(item => item.ChangeDate); // Default render on load
+        }
+
+        var totalCount = query.Count();
+        var data = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
+
+        return await Task.FromResult(new GridDataProviderResult<RegionEloChange>
+            {
+                Data = data,
+                TotalCount = totalCount
+            });
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
@@ -106,7 +276,7 @@
 <style>
     .map-container {
         position: relative;
-        width: 70%; /* Adjust as needed */
+        width: 35%;
         height: auto;
     }
 
@@ -121,7 +291,7 @@
     }
 
     .regions-list {
-        width: 30%; /* Adjust as needed */
+        width: 40%; 
         display: flex;
         flex-direction: column;
         gap: 1rem;
@@ -134,13 +304,17 @@
         transition: color 0.2s ease;
     }
 
-        .region-item:hover {
-            color: var(--bs-gold---1); /* Adjust as needed */
-        }
+    .region-item:hover {
+        color: var(--bs-gold---1);
+    }
 
     .region-logo {
         width: 40px;
         height: auto;
         margin-right: 10px;
+    }
+
+    .chart-container {
+        text-align: center;
     }
 </style>

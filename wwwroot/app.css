@@ -271,7 +271,7 @@ body {
 }
 
 .logo {
-    max-height: 20px;
+    max-height: 40px;
     max-width: auto;
 }
 
@@ -299,4 +299,24 @@ body {
 .nav-link:active {
     color: var(--bs-white--2);
     outline: none; 
+}
+
+custom-grid {
+    color: var(--bs-white--1);
+    background-color: var(--bs-blue---1);
+}
+
+.custom-grid th {
+    background-color: var(--bs-gold---1);
+    color: white;
+}
+.custom-grid td {
+    padding: 10px; 
+}
+
+.custom-grid tr:nth-child(even) {
+    background-color: var(--bs-red----1);
+}
+.custom-grid tr:hover {
+    background-color: var(--bs-blue---1);
 }

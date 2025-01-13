@@ -43,7 +43,8 @@
         players = await context.Players
             .Include(p => p.OriginCountry)
             .Include(p => p.Team)
-            .OrderBy(p=> p.EloRating)
+            .OrderByDescending(p=> p.EloRating)
+            .ThenBy(p => p.Role)
             .ToListAsync();
         
     }
