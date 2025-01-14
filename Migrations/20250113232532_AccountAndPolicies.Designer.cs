@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using R6Ranking.Data;
 
@@ -11,9 +12,11 @@ using R6Ranking.Data;
 namespace R6Ranking.Migrations
 {
     [DbContext(typeof(R6EsportsDbContext))]
-    partial class R6EsportsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250113232532_AccountAndPolicies")]
+    partial class AccountAndPolicies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,35 +43,6 @@ namespace R6Ranking.Migrations
                     b.HasKey("MapID");
 
                     b.ToTable("Maps");
-                });
-
-            modelBuilder.Entity("R6Ranking.Models.MapStat", b =>
-                {
-                    b.Property<int>("MapStatsID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MapStatsID"));
-
-                    b.Property<int>("Losses")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MapID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TeamID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Wins")
-                        .HasColumnType("int");
-
-                    b.HasKey("MapStatsID");
-
-                    b.HasIndex("MapID");
-
-                    b.HasIndex("TeamID");
-
-                    b.ToTable("MapStats");
                 });
 
             modelBuilder.Entity("R6Ranking.Models.Match", b =>
@@ -499,6 +473,20 @@ namespace R6Ranking.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("UserAccounts");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            Password = "userPassword",
+                            UserName = "public user"
+                        },
+                        new
+                        {
+                            ID = 505,
+                            Password = "adminPassword",
+                            UserName = "admin1"
+                        });
                 });
 
             modelBuilder.Entity("R6Ranking.Models.UserAccountPolicy", b =>
@@ -521,6 +509,64 @@ namespace R6Ranking.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("UserAccountsPolicies");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 1,
+                            IsEnabled = false,
+                            UserAccountID = 1,
+                            UserPolicy = "VIEW_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 2,
+                            IsEnabled = false,
+                            UserAccountID = 1,
+                            UserPolicy = "ADD_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 3,
+                            IsEnabled = false,
+                            UserAccountID = 1,
+                            UserPolicy = "EDIT_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 4,
+                            IsEnabled = false,
+                            UserAccountID = 1,
+                            UserPolicy = "DELETE_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 5,
+                            IsEnabled = true,
+                            UserAccountID = 505,
+                            UserPolicy = "VIEW_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 6,
+                            IsEnabled = true,
+                            UserAccountID = 505,
+                            UserPolicy = "VIEW_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 7,
+                            IsEnabled = true,
+                            UserAccountID = 505,
+                            UserPolicy = "VIEW_PRODUCT"
+                        },
+                        new
+                        {
+                            ID = 8,
+                            IsEnabled = true,
+                            UserAccountID = 505,
+                            UserPolicy = "VIEW_PRODUCT"
+                        });
                 });
 
             modelBuilder.Entity("TeamTournament", b =>
@@ -536,25 +582,6 @@ namespace R6Ranking.Migrations
                     b.HasIndex("TournamentID");
 
                     b.ToTable("TeamTournament");
-                });
-
-            modelBuilder.Entity("R6Ranking.Models.MapStat", b =>
-                {
-                    b.HasOne("R6Ranking.Models.Map", "Map")
-                        .WithMany()
-                        .HasForeignKey("MapID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("R6Ranking.Models.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Map");
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("R6Ranking.Models.Match", b =>

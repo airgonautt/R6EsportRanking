@@ -23,7 +23,7 @@
     overflow: hidden;
     align-items: center;
     justify-content: center;
-    background-color: var(--bs-blue---1);
+    background-color: var(--bs-gray---2);
     border: 8px;
     border-color: var(--bs-black--3);
     backdrop-filter: blur(5px);
@@ -208,7 +208,8 @@
 :root {
     --bs-white--1: #FFFFFF;
     --bs-white--2: #dedbd5;
-    --bs-blue---1: #343A40;
+    --bs-gray---1: #343A40;
+    --bs-gray---2: #40474F;
     --bs-black--1: #1D1E21;
     --bs-black--2: #181717;
     --bs-black--3: #0E0D0D;
@@ -218,6 +219,7 @@
     --bs-cream--2: #C29B65;
     --bs-red----1: #CC2828;
     --bs-green--1: #2d8656;
+    --bs-green--2: #053838;
     --bs-orange-1: #BD5B05;
     --bs-body-bg: url(Images/CardUI/bg.jpg);
     font-family: 'Kanit', sans-serif;
@@ -303,11 +305,11 @@ body {
 
 custom-grid {
     color: var(--bs-white--1);
-    background-color: var(--bs-blue---1);
+    background-color: var(--bs-green--2);
 }
 
 .custom-grid th {
-    background-color: var(--bs-gold---1);
+    background-color: var(--bs-green--2);
     color: white;
 }
 .custom-grid td {
@@ -315,8 +317,14 @@ custom-grid {
 }
 
 .custom-grid tr:nth-child(even) {
-    background-color: var(--bs-red----1);
+    color: var(--bs-white--1);
+    background-color: var(--bs-gray---1);
+}
+.custom-grid tr:nth-child(odd) {
+    color: var(--bs-white--1);
+    background-color: var(--bs-gray---2);
 }
 .custom-grid tr:hover {
-    background-color: var(--bs-blue---1);
+    color: var(--bs-white--1);
+    background-color: var(--bs-green--2);
 }

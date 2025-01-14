@@ -19,8 +19,10 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<TournamentTeam>TournamentTeams { get; set; }
     public DbSet<Trophy> Trophies { get; set; }
     public DbSet<OriginCountry> Countries { get; set; }
+    public DbSet<MapStat> MapStats { get; set; }
 
-    public DbSet<R6Ranking.Models.Map> Map { get; set; } = default!;
+    public DbSet<UserAccount> UserAccounts { get; set; }
+    public DbSet<UserAccountPolicy> UserAccountsPolicies { get; set; }
 
     public R6EsportsDbContext(DbContextOptions<R6EsportsDbContext> options)
         : base(options) {
@@ -32,23 +34,6 @@ public class R6EsportsDbContext : DbContext {
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
-
-        //MAPS
-        modelBuilder.Entity<Map>().HasData(
-            new Map { MapID = 100, MapName = "DefaultMap" },
-            new Map { MapID = 1, MapName = "Bank" },
-            new Map { MapID = 2, MapName = "Border" },
-            new Map { MapID = 3, MapName = "Chalet" },
-            new Map { MapID = 4, MapName = "Clubhouse" },
-            new Map { MapID = 5, MapName = "Consulate" },
-            new Map { MapID = 6, MapName = "Kafe Dostoyevksy" },
-            new Map { MapID = 7, MapName = "Lair" },
-            new Map { MapID = 8, MapName = "Nighthaven Labs" },
-            new Map { MapID = 9, MapName = "Oregon" },
-            new Map { MapID = 10, MapName = "Skyscraper" },
-            new Map { MapID = 11, MapName = "Theme Park" },
-            new Map { MapID = 12, MapName = "Villa" }
-        );
 
         //MATCH RELATIONSHIPS
         modelBuilder.Entity<Match>(entity => {
@@ -133,13 +118,13 @@ public class R6EsportsDbContext : DbContext {
             .HasOne(tec => tec.Team)
             .WithMany(t => t.TeamEloHistory)
             .HasForeignKey(tec => tec.TeamID)
-            .OnDelete(DeleteBehavior.Restrict); 
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TeamEloChange>()
             .HasOne(tec => tec.RivalTeam)
             .WithMany()
             .HasForeignKey(tec => tec.RivalTeamID)
-            .OnDelete(DeleteBehavior.Restrict); 
+            .OnDelete(DeleteBehavior.Restrict);
 
         ////TOURNAMENT TEAM
         modelBuilder.Entity<TournamentTeam>(entity => {
@@ -169,6 +154,22 @@ public class R6EsportsDbContext : DbContext {
             .HasOne(t => t.Region)
             .WithMany(r => r.Tournaments)
             .HasForeignKey(t => t.RegionID);
+
+        //MAP STATS
+        modelBuilder.Entity<MapStat>(entity =>
+        {
+            entity.HasKey(ms => ms.MapStatsID);
+
+            entity.HasOne(ms => ms.Team)
+                .WithMany()
+                .HasForeignKey(ms => ms.TeamID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ms => ms.Map)
+                .WithMany()
+                .HasForeignKey(ms => ms.MapID)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
     }
 
 }

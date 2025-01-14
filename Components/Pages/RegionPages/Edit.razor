@@ -1,5 +1,7 @@
 ﻿@page "/Regions/edit"
+@attribute [Authorize(Policy = UserPolicy.EDIT)]
 
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory

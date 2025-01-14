@@ -1,5 +1,7 @@
 ﻿@page "/regions/create"
+@attribute [Authorize(Policy = UserPolicy.ADD)]
 
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory

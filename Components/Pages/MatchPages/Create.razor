@@ -1,8 +1,11 @@
 ﻿@page "/matches/create"
+@attribute [Authorize(Policy = UserPolicy.ADD)]
+
 @using Microsoft.EntityFrameworkCore
 @using System.Text.Json
 @using R6Ranking.Data
 @using R6Ranking.Models
+@using Microsoft.AspNetCore.Authorization
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
 

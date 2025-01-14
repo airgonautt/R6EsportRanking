@@ -1,4 +1,7 @@
 ﻿@page "/matches/delete"
+@attribute [Authorize(Policy = UserPolicy.DELETE)]
+
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory

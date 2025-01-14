@@ -1,7 +1,10 @@
 ﻿@page "/teams/create"
+@attribute [Authorize(Policy = UserPolicy.ADD)]
 
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavigationManager
 

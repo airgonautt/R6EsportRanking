@@ -1,0 +1,83 @@
+﻿@page "/login"
+
+@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-lg-4 offset-lg4 pt-4 pb-4 border">
+        <EditForm Model="LoginAccount" OnSubmit="Authenticate" FormName="LoginForm">
+            <DataAnnotationsValidator />
+            <div class="mb-3 text-center flew-column">
+                <img src="/images/Players/default.png" style="max-height:5rem;">
+                <h3>LOGIN</h3>
+            </div>
+            <div class="mb-3">
+                <label>User Name</label>
+                <InputText @bind-Value="LoginAccount.UserName" class="form-control" placholder="Username"/>
+                <ValidationMessage For="() => LoginAccount.UserName"/>
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <InputText @bind-Value="LoginAccount.Password" type="password" class="form-control" placholder="Password" />
+                <ValidationMessage For="() => LoginAccount.Password" />
+            </div>
+            <div class="mb-3 text-center">
+                <span class="text-danger">@errorMessage</span>
+            </div>
+            <div class="mb-3 grid gap-2">
+                <button type="submit" class="bt btn-primary">Login</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext {get; set;}
+
+    [SupplyParameterFromForm]
+    private UserAccount LoginAccount { get; set; } = new();
+    private string? errorMessage;
+
+    private async Task Authenticate(){
+
+        if(string.IsNullOrWhiteSpace(LoginAccount.UserName) || 
+            string.IsNullOrWhiteSpace(LoginAccount.Password)){
+            errorMessage = "Invalid User Name or Password";
+            return;
+        }
+        using var context = DbFactory.CreateDbContext();
+        var userAccount = context.UserAccounts
+            .Where(a => a.UserName == LoginAccount.UserName)
+            .FirstOrDefault();
+        if(userAccount is null || userAccount.Password != LoginAccount.Password){
+            errorMessage = "Invalid User Name or Password";
+            return;
+        }
+
+        var claims = new List<Claim>{
+            new Claim(ClaimTypes.Name, LoginAccount.UserName)
+        };
+
+        //Add Policies
+        var userAccountPolicies = await context.UserAccountsPolicies
+            .Where(a => a.UserAccountID == userAccount.ID && a.IsEnabled)
+            .ToListAsync();
+        foreach (var userAccountPolicy in userAccountPolicies)
+            claims.Add(new Claim(userAccountPolicy.UserPolicy, "true"));
+
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext!.SignInAsync(principal);
+        NavManager.NavigateTo("/",true);
+
+    }
+}

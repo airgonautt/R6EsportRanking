@@ -8,7 +8,11 @@
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
 
-
+<AuthorizeView>
+    <Authorized>
+        <h4>Logged in as <b>@context.User.Identity.Name</b></h4>
+    </Authorized>
+</AuthorizeView>
 <div class="container">
 
     <div class="grid">
