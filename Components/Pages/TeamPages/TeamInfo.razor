@@ -229,12 +229,8 @@
                 .OrderBy(e => e.Date)
                 .ToListAsync();
 
-            InitializeChartData(EloHistory);
-
-            
-        }
-
-        
+            InitializeChartData(EloHistory);  
+        }        
     }
 
     private void InitializeChartData(List<TeamEloChange> data)

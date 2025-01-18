@@ -59,9 +59,6 @@ if (!app.Environment.IsDevelopment()) {
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
-app.MapDefaultControllerRoute();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();

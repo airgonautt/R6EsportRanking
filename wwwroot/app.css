@@ -48,31 +48,34 @@
     width: 100%;
 }
 
-.b6x4 {
+.b6x6 {
     grid-column: span 6;
-    grid-row: span 4;
+    grid-row: span 6;
     width: 100%;
 }
 
-.b6x3 {
+.b6x4 {
     grid-column: span 6;
-    grid-row: span 3;
+    grid-row: span 4;
 }
 
 .b6x1 {
     grid-column: span 6;
     grid-row: span 1;
 }
-
+.b6x2 {
+    grid-column: span 6;
+    grid-row: span 2;
+}
 .b4x1 {
     grid-column: span 4;
     grid-row: span 1;
     width: 100%;
 }
 
-.b3x1 {
+.b3x2 {
     grid-column: span 3;
-    grid-row: span 1;
+    grid-row: span 2;
 }
 
 .b1x1 {

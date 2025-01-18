@@ -18,52 +18,83 @@
     <div class="grid">
 
         <!-- Team Metrics -->
-        <div class="grid-item b6x1" style="text-align: center; padding: 10px; display: flex; flex-direction: column; align-items: center;">
-            <h2 style="margin-bottom: 10px;">Team Metrics</h2>
-            <img src="Images/Teams/teamGraphs2023.png"
-                 alt="Team Metrics Graph"
-                 class="img-fluid rounded mb-3" />
-            <p>Study and compare team statistics.</p>
-            <a class="btn btn-outline-secondary" href="/teams/compare">Learn More</a>
+        <div class="grid-item b6x1" style="text-align: center; padding: 5px;">
+            <Card style="padding: 5px;">
+                <CardHeader style="padding: 5px 10px;">
+                    <h3 class="mb-1" style="color: var(--bs-white--1); font-size: 1.2rem;">Team Metrics</h3>
+                </CardHeader>
+                <CardBody class="text-center" style="padding: 5px;">
+                    <img src="Images/Teams/teamGraphs2023.png"
+                         alt="Team Metrics Graph"
+                         class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
+                </CardBody>
+                <CardFooter style="padding: 5px 10px;">
+                    <p style="color: var(--bs-white--1); font-size: 0.9rem; margin-bottom: 5px;">Study and compare team statistics.</p>
+                    <a class="btn btn-outline-secondary btn-sm"
+                       style="color: var(--bs-white--1); font-size: 0.85rem;"
+                       href="/teams/compare">Learn More</a>
+                </CardFooter>
+            </Card>
         </div>
 
         <!-- Player Draft -->
-        <div class="grid-item b6x1" style="text-align: start; padding: 1px; display: flex; flex-direction: column; align-items: center;">
-            <h2 style="margin-bottom: 10px;">Player Draft</h2>
-            <div class="mb-3">
-                <img src="Images/Players/players.png"
-                     alt="Player Draft Image"
-                     class="img-fluid rounded" />
-            </div>
-            <p>Collect, track, and upgrade player cards.</p>
-            <a class="btn btn-outline-secondary" href="/players/draft">Try it now</a>
+        <div class="grid-item b6x1" style="text-align: center; padding: 5px;">
+            <Card style="padding: 5px;">
+                <CardHeader style="padding: 5px 10px;">
+                    <h3 class="mb-1" style="color: var(--bs-white--1); font-size: 1.2rem;">Player Draft</h3>
+                </CardHeader>
+                <CardBody class="text-center" style="padding: 5px;">
+                    <img src="Images/Players/players.png"
+                         alt="Player Draft Image"
+                         class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
+                </CardBody>
+                <CardFooter style="padding: 5px 10px;">
+                    <p style="color: var(--bs-white--1); font-size: 0.9rem; margin-bottom: 5px;">Collect, track, and upgrade player cards.</p>
+                    <a class="btn btn-outline-secondary btn-sm"
+                       style="color: var(--bs-white--1); font-size: 0.85rem;"
+                       href="/players/draft">Try it now</a>
+                </CardFooter>
+            </Card>
         </div>
 
         <!-- Leaderboard -->
-        <div class="grid-item b6x4">
-            <h2>Leaderboard</h2>
-            <table class="table table-hover custom-leaderboard-table">
-                <tbody>
-                    @foreach (var team in Teams)
-                    {
-                        <tr @onclick="() => NavigateToTeam(team)">
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <span class="me-2">@(@Teams.IndexOf(team) + 1)</span>
-                                    <img src="@team.LogoUrl" alt="@team.TeamName Logo" class="team-logo me-2" />
-                                    <span class="me-auto">@team.TeamName</span>
-                                    <span>@($"{team.CurrentElo} RP")</span>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <p>Last Updated @DateTime.Now.Day</p>
+        <div class="grid-item b6x6" style="text-align: center; padding: 5px;">
+            <Card style="padding: 5px;">
+                <CardHeader style="padding: 5px 10px;">
+                    <h4 class="mb-1" style="color: var(--bs-white--1); font-size: 1.5rem;">Leaderboard</h4>
+                </CardHeader>
+                <CardBody class="text-center" style="padding: 5px;">
+                    <table class="table table-hover custom-leaderboard-table" style="margin-bottom: 5px; width: 100%;">
+                        <tbody>
+                            @foreach (var team in Teams)
+                            {
+                                <tr @onclick="() => NavigateToTeam(team)" style="cursor: pointer; color: var(--bs-white--1);">
+                                    <td style="padding: 10px;">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <!-- Rank -->
+                                            <span class="me-3" style="font-size: 1.2rem; font-weight: bold;">@(@Teams.IndexOf(team) + 1)</span>
+                                            <!-- Team Logo -->
+                                            <img src="@team.LogoUrl" alt="@team.TeamName Logo"
+                                                 class="team-logo me-3 rounded" style="height: 40px; width: 40px;" />
+                                            <!-- Team Name -->
+                                            <span class="me-auto" style="font-size: 1.2rem; font-weight: 500;">@team.TeamName</span>
+                                            <!-- Current Elo -->
+                                            <span style="font-size: 1.2rem; font-weight: 400; margin-left: 20px;">@($"{team.CurrentElo} RP")</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </CardBody>
+                <CardFooter style="padding: 5px 10px;">
+                    <p class="mb-0" style="font-size: 0.9rem; color: var(--bs-white--1);">Last Updated: @DateTime.Now.Day</p>
+                </CardFooter>
+            </Card>
         </div>
 
         <!-- Recent Matches -->
-        <div class="grid-item b6x3">
+        <div class="grid-item b6x4">
             <h2>Recent Matches</h2>
             <table class="table table-hover custom-leaderboard-table">
                 <tbody>
@@ -80,23 +111,23 @@
         </div>
 
         <!-- Ubisoft Newsletter -->
-        <div class="grid-item b6x1" style="position: relative; text-align: center; padding: 10px; display: flex;
+        <div class="grid-item b6x2" style="position: relative; text-align: center; padding: 10px; display: flex;
                 flex-direction: column; align-items: center; height: 300px; width: 100%;">
             <ArticleDisplay />
         </div>
 
         <!-- About -->
-        <div class="grid-item b3x1">
+        <div class="grid-item b3x2">
             <h2>About Elo Engine</h2>
             <p>elo article</p>
         </div>
         <!-- Region Performance -->
-        <div class="grid-item b3x1">
+        <div class="grid-item b3x2">
             <h2>Region Performance</h2>
             <p>region graphs</p>
         </div>
         <!-- Match Replay -->
-        <div class="grid-item b6x1">
+        <div class="grid-item b6x2">
             <p>Match Replay</p>
         </div>
     </div>
@@ -172,3 +203,4 @@
     }
 
 }
+
