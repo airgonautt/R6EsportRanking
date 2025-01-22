@@ -3,217 +3,78 @@
 @using R6Ranking.Models
 @using Microsoft.EntityFrameworkCore
 @using R6Ranking.Data
+
+@using R6Ranking.Components.Splashable
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavManager
-@rendermode InteractiveServer
 
-@using System.Linq
-@using System.Collections.Generic
+<div class="main-layout container" style="background-color: #343A40; border:8px solid; border-radius:5px; border-color: @(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor);">
+    <!-- Header and Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4" style="background-color:@(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor);
+            border-bottom-left-radius:15px; border-bottom-right-radius:15px;">
 
-<div class="container">
-    <div class="grid">
-        <div class="grid-item b3x1" style="background-color: transparent;"> <br /> </div>
+        <!-- Back Button -->
+        <button class="custom-btn" @onclick="NavigateToLowerEloTeam" title="Back">
+            <i class="bi bi-caret-left fa-6x"></i>
+        </button>
 
-        <div class="grid-item b1x1">
-            <button class="btn btn-primary" @onclick="NavigateToLowerEloTeam">
-                <i class="bi bi-arrow-left"></i> Back
-            </button>
-        </div>
-
-        <div class="grid-item b8x1">
-            <img src="@team?.LogoUrl" alt="Team Logo" class="img-fluid" style="max-width: 150px; height: auto; margin-right: 16px;">
+        <div class="d-flex align-items-center">
+            <img src="@team?.LogoUrl" alt="Team Logo" class="img-fluid me-3 team-logo" style="filter: drop-shadow(3px 3px 2px var(--bs-black--3))">
             <div>
-                <h2 class="fw-bold text-white mb-2">@team?.TeamName</h2>
-                <h4 class="text-warning mb-0">@team?.CurrentElo RP</h4>
+                <h2 class="fw-bold text-white mb-1" style="filter: drop-shadow(3px 3px 1px var(--bs-black--3))">@team?.TeamName</h2>
+                <h4 class="text-warning mb-0" style="filter: drop-shadow(3px 3px 1px var(--bs-black--3))">@team?.CurrentElo RP</h4>
             </div>
         </div>
 
-        <div class="grid-item b1x1">
-            <button class="btn btn-primary" @onclick="NavigateToHigherEloTeam">
-                <i class="bi bi-arrow-right"></i> Next
-            </button>
-        </div>
+        <!-- Next Button -->
+        <button class="custom-btn" @onclick="NavigateToHigherEloTeam" title="Next">
+            <i class="bi bi-caret-right fa-6x"></i>
+        </button>
+    </div>
 
-        <div class="grid-item b3x1" style="background-color: transparent;"> <br /> </div>
+    <!-- Elo History Section -->
+    <div>
+        @if (team != null)
+        {
+            <TeamGraph Team="@team" PrimaryColor="@(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor)" />
+        }
+    </div>
 
-        <!-- Elo History Section -->
-        <div class="grid-item b18x3">
-            <div class="container-fluid overflow-x-auto">
-                <LineChart @ref="lineChart" Width="850" />
-            </div>
-        </div>
-
-        <!-- Player Roster Section -->
-        <!-- Player Roster Section -->
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingRoster">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRoster" aria-expanded="true" aria-controls="collapseRoster" @onclick="LoadRoster">
-                    Player Roster
-                </button>
-            </h2>
-            <div id="collapseRoster" class="accordion-collapse collapse show" aria-labelledby="headingRoster" data-bs-parent="#teamSections">
-                <div class="accordion-body">
-                    @if (Players == null)
-                    {
-                        <p>Loading players...</p>
-                    }
-                    else if (!Players.Any())
-                    {
-                        <p>No players available for this team.</p>
-                    }
-                    else
-                    {
-                        <div class="cards-container">
-                            @foreach (var player in Players)
-                            {
-                                <div class="pack-grid-item">
-                                    <PlayerCard Player="@player" />
-                                </div>
-                            }
-                        </div>
-                    }
+    <!-- Player Roster Section -->
+    <div class="cards-container">
+        @if (Players != null)
+        {
+            @foreach (var player in Players)
+            {
+                <div class="pack-grid-item">
+                    <PlayerCard Player="@player" />
                 </div>
-            </div>
-        </div>
+            }
+        }
+        else
+        {
+            <p>Loading players...</p>
+        }
+    </div>
 
-        <!-- Match History Section -->
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingHistory">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory" aria-expanded="false" aria-controls="collapseHistory" @onclick="LoadMatchHistory">
-                    Match History
-                </button>
-            </h2>
-            <div id="collapseHistory" class="accordion-collapse collapse" aria-labelledby="headingHistory" data-bs-parent="#teamSections">
-                <div class="accordion-body">
-                    @if (Matches == null)
-                    {
-                        <p>Loading match history...</p>
-                    }
-                    else if (!Matches.Any())
-                    {
-                        <p>No match history available for this team.</p>
-                    }
-                    else
-                    {
-                        <table class="table table-hover table-striped table-bordered">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Tournament</th>
-                                    <th scope="col">Team 1</th>
-                                    <th scope="col">Team 2</th>
-                                    <th scope="col">Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var match in Matches)
-                                {
-                                    <tr>
-                                        <td>@match.MatchDate.ToShortDateString()</td>
-                                        <td>@match.Tournament.Name</td>
-                                        <td>@match.Team1?.TeamName</td>
-                                        <td>@match.Team2?.TeamName</td>
-                                        <td>@match.Team1Score - @match.Team2Score</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-                </div>
-            </div>
-        </div>
+    <!-- Elo History Grid -->
+    <div>
+        @if (team != null)
+        {
+            <TeamGrid Team="@team" PrimaryColor="@(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor)" />
+        }
     </div>
 </div>
-<div class="mt-4">
-    <Accordion>
-        <AccordionItem Header="Team Elo History">
-            <Content>
-                <Grid TItem="TeamEloChange"
-                      Class="table table-hover table-bordered table-striped custom-grid"
-                      DataProvider="TeamEloChangesDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      AllowSorting="true"
-                      Responsive="true">
 
-                    <GridColumn TItem="TeamEloChange" HeaderText="ID" PropertyName="TeamEloChangeID" SortString="TeamEloChangeID" SortKeySelector="item => item.TeamEloChangeID" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.TeamEloChangeID
-                    </GridColumn>
-                    <GridColumn TItem="TeamEloChange" HeaderText="Team ID" PropertyName="TeamID" SortString="TeamID" SortKeySelector="item => item.TeamID" FilterTextboxWidth="50">
-                        @context.TeamID
-                    </GridColumn>
-                    
-                    <GridColumn TItem="TeamEloChange" HeaderText="Current Elo" PropertyName="CurrentElo" SortString="CurrentElo" SortKeySelector="item => item.CurrentElo" FilterTextboxWidth="100">
-                        @context.CurrentElo
-                    </GridColumn>
-                    <GridColumn TItem="TeamEloChange" HeaderText="Elo Change" PropertyName="EloChange" SortString="EloChange" SortKeySelector="item => item.EloChange" FilterTextboxWidth="100">
-                        @context.EloChange
-                    </GridColumn>
-                    <GridColumn TItem="TeamEloChange" HeaderText="Date" PropertyName="Date" SortString="Date" SortKeySelector="item => item.Date" FilterTextboxWidth="120">
-                        @context.Date.ToString("yyyy-MM-dd")
-                    </GridColumn>
-                    <GridColumn TItem="TeamEloChange" HeaderText="Note" PropertyName="Note" SortString="Note" SortKeySelector="item => item.Note" FilterTextboxWidth="200">
-                        @context.Note
-                    </GridColumn>
-
-                    <EmptyTemplate>
-                        <div class="text-center text-muted">
-                            No data available to display.
-                        </div>
-                    </EmptyTemplate>
-
-                </Grid>
-            </Content>
-        </AccordionItem>
-    </Accordion>
-</div>
-<div class="mt-4">
-    <h3>Map Win-Rate</h3>
-    <BarChart @ref="MapBarChart" Width="500" Height="300" />
-</div>
 @code {
+
     [Parameter] public string teamName { get; set; } = default!;
     private Team? team;
     private List<TeamEloChange> EloHistory = new();
     private List<Player>? Players = new();
-    private List<Match> Matches = new();
-    private Dictionary<string, (int Wins, int Losses)> mapWinLoss = new();
-
-    private LineChart lineChart = default!;
-    private LineChartOptions lineChartOptions = default!;
-    private ChartData chartData = default!;
-
-    private BarChart MapBarChart = default!;
-    private BarChartOptions MapBarChartOptions = default!;
-    private ChartData MapChartData = default!;
 
     private bool IsRosterLoaded = false;
     private bool IsHistoryLoaded = false;
-
-    private async Task LoadRoster()
-    {
-        var context = await DbFactory.CreateDbContextAsync();
-        if (!IsRosterLoaded & team!=null)
-        {
-            Players = await context.Players
-                .Where(e => e.TeamID == team.TeamID)
-                .Include(p => p.OriginCountry)
-                .ToListAsync();
-            IsRosterLoaded = true;
-        }
-    }
-    private async Task LoadMatchHistory()
-    {
-        var context = await DbFactory.CreateDbContextAsync();
-        if (!IsHistoryLoaded)
-        {
-            Matches = await context.Matches
-                .Where(m => m.Team1ID == team.TeamID || m.Team2ID == team.TeamID)
-                .OrderByDescending(m => m.MatchDate)
-                .ToListAsync();
-            IsHistoryLoaded = true;
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,81 +83,16 @@
         .Include(t => t.Players)
         .FirstOrDefaultAsync(team=>team.TeamName == teamName);
 
+
         if (team != null)
         {
             EloHistory = await context.TeamEloChanges
                 .Where(e => e.TeamID == team.TeamID)
                 .OrderBy(e => e.Date)
-                .ToListAsync();
+                .ToListAsync(); 
 
-            InitializeChartData(EloHistory);  
+            Players = team.Players.ToList();
         }        
-    }
-
-    private void InitializeChartData(List<TeamEloChange> data)
-    {
-        // Prepare chart labels and datasets
-        chartData = new ChartData
-            {
-                Labels = data.Select(e => e.Date.ToShortDateString()).ToList(),
-                Datasets = new List<IChartDataset>
-            {
-                new LineChartDataset
-                {
-                    Label = $"{team?.TeamName} Elo History",
-                    Data = data.Select(e => (double?)e.CurrentElo).ToList(),
-                    //BackgroundColor = var(-bs--black--1),
-                    //BorderColor = ColorUtility.CategoricalTwelveColors[0].ToRgbString(),
-                    PointRadius = new List<double> { 5 },
-                    PointHoverRadius = new List<double> { 8 },
-                }
-            }
-            };
-
-        lineChartOptions = new LineChartOptions
-            {
-                IndexAxis = "x",
-                Interaction = new Interaction { Mode = InteractionMode.Index, Intersect = false },
-                Responsive = true,
-                
-            };
-    }
-    private async Task<GridDataProviderResult<TeamEloChange>> TeamEloChangesDataProvider(GridDataProviderRequest<TeamEloChange> request)
-    {
-        var query = EloHistory.AsQueryable();
-
-        // Apply sorting if present; otherwise, default to sorting by Date descending
-        if (request.Sorting is not null && request.Sorting.Any())
-        {
-            var sort = request.Sorting.First();
-            query = sort.SortDirection == SortDirection.Ascending
-                ? query.OrderBy(sort.SortKeySelector)
-                : query.OrderByDescending(sort.SortKeySelector);
-        }
-        else
-        {
-            query = query.OrderByDescending(item => item.Date); // Default sorting
-        }
-
-        // Apply paging
-        var totalCount = query.Count();
-        var data = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
-
-        return await Task.FromResult(new GridDataProviderResult<TeamEloChange>
-            {
-                Data = data,
-                TotalCount = totalCount
-            });
-    }
-
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await Task.Delay(500); // Delay to ensure scripts are loaded
-            await lineChart.InitializeAsync(chartData, lineChartOptions);
-        }
     }
 
     private async Task NavigateToLowerEloTeam()
@@ -307,7 +103,7 @@
             .OrderByDescending(t => t.CurrentElo)
             .FirstOrDefaultAsync();
 
-        NavManager.NavigateTo($"/teams/{lowerTeam?.TeamName}");
+        NavManager.NavigateTo($"/teams/{lowerTeam?.TeamName}", forceLoad: true);
     }
     private async Task NavigateToHigherEloTeam()
     {
@@ -317,6 +113,34 @@
             .OrderBy(t => t.CurrentElo)
             .FirstOrDefaultAsync();
 
-        NavManager.NavigateTo($"/teams/{higherTeam?.TeamName}");
+        NavManager.NavigateTo($"/teams/{higherTeam?.TeamName}", forceLoad: true);
     }
 }
+
+<style>
+    .custom-btn {
+        background-color: var(--bs-black--1);
+        border: 2px solid var(--bs-gold---1);
+        color: var(--bs-gold---1);
+        padding: 10px 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .custom-btn:hover {
+            background-color: var(--bs-gold---1);
+            color: var(--bs-black--1);
+            border-color: var(--bs-black--1);
+        }
+
+    .custom-arrow {
+        margin: 0 5px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>

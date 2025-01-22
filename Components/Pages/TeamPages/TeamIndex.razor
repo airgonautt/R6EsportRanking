@@ -4,9 +4,10 @@
 @using R6Ranking.Models
 @using R6Ranking.Data
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
-@implements IAsyncDisposable
 @inject NavigationManager NavManager
+@implements IAsyncDisposable
 @rendermode InteractiveServer
+
 
 <PageTitle>Teams</PageTitle>
 
@@ -50,7 +51,7 @@
                     <AuthorizeView Policy="@UserPolicy.VIEW">
                         <Authorized>
                             <CardBody class="text-center" style="padding: 10px;">
-                                <a href="@($"teams/details?teamid={team.TeamID}")"
+                                <a href="@($"teams/details?teamid={team?.TeamID}")"
                                 class="btn btn-sm btn-outline-primary">View Details</a>
                             </CardBody>
                         </Authorized>
@@ -86,7 +87,7 @@
 
     private void NavigateToTeam(string teamName)
     {
-        NavManager.NavigateTo($"/teams/{teamName}", forceLoad: true);
+        NavManager.NavigateTo($"/teams/{teamName}");
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

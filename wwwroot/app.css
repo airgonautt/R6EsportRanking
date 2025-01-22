@@ -204,9 +204,6 @@
     justify-content: center;
 }
 
-
-
-
 /* Variables for consistent styling */
 :root {
     --bs-white--1: #FFFFFF;
@@ -299,6 +296,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+
 }
 .nav-link:focus,
 .nav-link:active {
@@ -306,28 +304,3 @@ body {
     outline: none; 
 }
 
-custom-grid {
-    color: var(--bs-white--1);
-    background-color: var(--bs-green--2);
-}
-
-.custom-grid th {
-    background-color: var(--bs-green--2);
-    color: white;
-}
-.custom-grid td {
-    padding: 10px; 
-}
-
-.custom-grid tr:nth-child(even) {
-    color: var(--bs-white--1);
-    background-color: var(--bs-gray---1);
-}
-.custom-grid tr:nth-child(odd) {
-    color: var(--bs-white--1);
-    background-color: var(--bs-gray---2);
-}
-.custom-grid tr:hover {
-    color: var(--bs-white--1);
-    background-color: var(--bs-green--2);
-}

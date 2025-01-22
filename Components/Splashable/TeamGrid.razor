@@ -1,0 +1,115 @@
+﻿@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+<style>
+    .custom-grid {
+        color: var(--bs-white--1);
+        background-color: var(--primary-color);
+    }
+
+        .custom-grid th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .custom-grid td {
+            padding: 10px;
+        }
+
+        .custom-grid tr:nth-child(even) {
+            color: var(--bs-white--1);
+            background-color: var(--bs-gray---1);
+        }
+
+        .custom-grid tr:nth-child(odd) {
+            color: var(--bs-white--1);
+            background-color: var(--bs-gray---2);
+        }
+
+        .custom-grid tr:hover {
+            color: var(--bs-white--1);
+            background-color: var(--primary-color);
+        }
+</style>
+
+<style>
+    :root {
+        --primary-color: @PrimaryColor;
+    }
+</style>
+
+<Grid TItem="TeamEloChange"
+      Class="table table-hover table-bordered table-striped custom-grid"
+      DataProvider="TeamEloChangesDataProvider"
+      AllowFiltering="true"
+      AllowPaging="true"
+      AllowSorting="true"
+      Responsive="true">
+
+    <GridColumn TItem="TeamEloChange" HeaderText="ID" PropertyName="TeamEloChangeID" SortString="TeamEloChangeID" SortKeySelector="item => item.TeamEloChangeID" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+        @context.TeamEloChangeID
+    </GridColumn>
+    <GridColumn TItem="TeamEloChange" HeaderText="Team ID" PropertyName="TeamID" SortString="TeamID" SortKeySelector="item => item.TeamID" FilterTextboxWidth="50">
+        @context.TeamID
+    </GridColumn>
+    <GridColumn TItem="TeamEloChange" HeaderText="Current Elo" PropertyName="CurrentElo" SortString="CurrentElo" SortKeySelector="item => item.CurrentElo" FilterTextboxWidth="100">
+        @context.CurrentElo
+    </GridColumn>
+    <GridColumn TItem="TeamEloChange" HeaderText="Elo Change" PropertyName="EloChange" SortString="EloChange" SortKeySelector="item => item.EloChange" FilterTextboxWidth="100">
+        @context.EloChange
+    </GridColumn>
+    <GridColumn TItem="TeamEloChange" HeaderText="Date" PropertyName="Date" SortString="Date" SortKeySelector="item => item.Date" FilterTextboxWidth="120">
+        @context.Date.ToString("yyyy-MM-dd")
+    </GridColumn>
+    <GridColumn TItem="TeamEloChange" HeaderText="Note" PropertyName="Note" SortString="Note" SortKeySelector="item => item.Note" FilterTextboxWidth="200">
+        @context.Note
+    </GridColumn>
+
+</Grid>
+
+@code {
+    [Parameter] public Team? Team { get; set; }
+    [Parameter] public string PrimaryColor { get; set; } = "#fbac40"; // Default primary color
+    private List<TeamEloChange> EloHistory = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Team != null)
+        {
+            var context = await DbFactory.CreateDbContextAsync();
+            EloHistory = await context.TeamEloChanges
+                .Where(e => e.TeamID == Team.TeamID)
+                .OrderByDescending(e => e.Date)
+                .ToListAsync();
+        }
+    }
+
+    private async Task<GridDataProviderResult<TeamEloChange>> TeamEloChangesDataProvider(GridDataProviderRequest<TeamEloChange> request)
+    {
+        var query = EloHistory.AsQueryable();
+
+        // Apply sorting
+        if (request.Sorting is not null && request.Sorting.Any())
+        {
+            var sort = request.Sorting.First();
+            query = sort.SortDirection == SortDirection.Ascending
+                ? query.OrderBy(sort.SortKeySelector)
+                : query.OrderByDescending(sort.SortKeySelector);
+        }
+        else
+        {
+            query = query.OrderByDescending(item => item.Date); // Default sorting
+        }
+
+        // Apply paging
+        var totalCount = query.Count();
+        var data = query.Skip((request.PageNumber - 1) * request.PageSize).Take(request.PageSize).ToList();
+
+        return await Task.FromResult(new GridDataProviderResult<TeamEloChange>
+            {
+                Data = data,
+                TotalCount = totalCount
+            });
+    }
+}

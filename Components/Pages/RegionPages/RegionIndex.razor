@@ -82,26 +82,6 @@
                       AllowPaging="true"
                       AllowSorting="true"
                       Responsive="true">
-
-                    <GridColumn TItem="RegionEloChange" HeaderText="ID" PropertyName="RegionEloHistoryID" SortString="RegionEloHistoryID" SortKeySelector="item => item.RegionEloHistoryID" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.RegionEloHistoryID
-                    </GridColumn>
-                    <GridColumn TItem="RegionEloChange" HeaderText="Change Date" PropertyName="ChangeDate" SortString="ChangeDate" SortKeySelector="item => item.ChangeDate" FilterTextboxWidth="120">
-                        @context.ChangeDate.ToString("yyyy-MM-dd")
-                    </GridColumn>
-                    <GridColumn TItem="RegionEloChange" HeaderText="Current Elo" PropertyName="CurrentElo" SortString="CurrentElo" SortKeySelector="item => item.CurrentElo" FilterTextboxWidth="100">
-                        @context.CurrentElo
-                    </GridColumn>
-                    <GridColumn TItem="RegionEloChange" HeaderText="Elo Change" PropertyName="EloChange" SortString="EloChange" SortKeySelector="item => item.EloChange" FilterTextboxWidth="100">
-                        @context.EloChange
-                    </GridColumn>
-                    <GridColumn TItem="RegionEloChange" HeaderText="Note" PropertyName="Note" SortString="Note" SortKeySelector="item => item.Note" FilterTextboxWidth="200">
-                        @context.Note
-                    </GridColumn>
-                    <GridColumn TItem="RegionEloChange" HeaderText="Region ID" PropertyName="RegionID" SortString="RegionID" SortKeySelector="item => item.RegionID" FilterTextboxWidth="100">
-                        @context.RegionID
-                    </GridColumn>
-
                 </Grid>
             </Content>
         </AccordionItem>

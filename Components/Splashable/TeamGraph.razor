@@ -1,0 +1,87 @@
+﻿@using R6Ranking.Models
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Data
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+
+<div class="container-fluid overflow-x-auto">
+    <LineChart @ref="lineChart" Width="900" />
+</div>
+
+@code {
+
+    [Parameter] public Team? Team { get; set; }
+    [Parameter] public string PrimaryColor { get; set; } = "#fbac40"; // gold
+
+    private List<TeamEloChange> EloHistory = new();
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Team != null)
+        {
+            var context = await DbFactory.CreateDbContextAsync();
+            EloHistory = await context.TeamEloChanges
+                .Where(e => e.TeamID == Team.TeamID)
+                .OrderBy(e => e.Date)
+                .ToListAsync();
+
+            InitializeChartData(EloHistory);
+            StateHasChanged();
+        }
+    }
+
+    private void InitializeChartData(List<TeamEloChange> data)
+    {
+        chartData = new ChartData
+            {
+                Labels = data.Select(e => e.Date.ToShortDateString()).ToList(),
+                Datasets = new List<IChartDataset>
+            {
+                new LineChartDataset
+                {
+                    Label = $"{Team?.TeamName} Elo History",
+                    Data = data.Select(e => (double?)e.CurrentElo).ToList(),
+                    BorderColor = PrimaryColor,
+                    BackgroundColor = PrimaryColor,
+                    PointBackgroundColor = new List<string> { PrimaryColor },
+                    PointBorderColor = new List<string> { PrimaryColor},
+                    PointHoverBackgroundColor = new List<string> { PrimaryColor.Replace("rgb", "rgba").Replace(")", ", 0.8)") },
+                    PointHoverBorderColor = new List<string> { PrimaryColor },
+                    PointRadius = new List<double> { 3 },
+                    PointHoverRadius = new List<double> { 8 },
+                    BorderWidth = 2, 
+                }
+            }
+            };
+
+        var options = new LineChartOptions();
+
+        options.Interaction.Mode = InteractionMode.Index;
+        options.Responsive = true;
+
+        options.Plugins.Title!.Text = "RP History";
+        options.Plugins.Title.Display = true;
+        options.Plugins.Title.Font = new ChartFont
+            {
+                Size = 20,
+                Family = "'Kanit', sans-serif",
+                Style = "rgb(255, 255, 255)" 
+            };
+
+        options.Scales.Y.Min = 300;
+
+        lineChartOptions = options;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500); 
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+    }
+}
+
