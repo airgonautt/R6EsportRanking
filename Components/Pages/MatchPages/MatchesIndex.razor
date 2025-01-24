@@ -5,43 +5,42 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Matches</PageTitle>
 
-<h1>Index</h1>
+<div style="padding: 0% 8% 0%; color: var(--bs-white--1)">
+    <h1>Index</h1>
 
-<p>
-    <a href="matches/create" class="btn btn-primary">Create New</a>
-</p>
-
-<table class="table table-bordered table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Match Name</th>
-            <th>Team 1 Score</th>
-            <th>Team 2 Score</th>
-            <th>Match Date</th>
-            <th>Tournament ID</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var match in context.Matches)
-        {
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
             <tr>
-                <td>@match.MatchName</td>
-                <td>@match.Team1Score</td>
-                <td>@match.Team2Score</td>
-                <td>@match.MatchDate.ToShortDateString()</td>
-                <td>@match.TournamentID</td>
-                <td>
-                    <a href="@($"matches/edit?matchid={match.MatchID}")" class="btn btn-link">Edit</a> |
-                    <a href="@($"matches/details?matchid={match.MatchID}")" class="btn btn-link">Details</a> |
-                    <a href="@($"matches/delete?matchid={match.MatchID}")" class="btn btn-link">Delete</a>
-                </td>
+                <th>Match Name</th>
+                <th>Team 1 Score</th>
+                <th>Team 2 Score</th>
+                <th>Match Date</th>
+                <th>Tournament ID</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var match in context.Matches)
+            {
+                <tr>
+                    <td>@match.MatchName</td>
+                    <td>@match.Team1Score</td>
+                    <td>@match.Team2Score</td>
+                    <td>@match.MatchDate.ToShortDateString()</td>
+                    <td>@match.TournamentID</td>
+                    <td>
+                        <a href="@($"matches/edit?matchid={match.MatchID}")" class="btn btn-link">Edit</a> |
+                        <a href="@($"matches/details?matchid={match.MatchID}")" class="btn btn-link">Details</a> |
+                        <a href="@($"matches/delete?matchid={match.MatchID}")" class="btn btn-link">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
 
 @code {
     private R6EsportsDbContext context = default!;

@@ -1,10 +1,10 @@
-﻿@using R6Ranking.Models  
+﻿@using R6Ranking.Models
 
 <div class="card player-card" style="position: relative; width: 218px; height: 350px; cursor: pointer;">
     <!-- Header -->
     <div class="d-flex align-items-center"
-    style="position: absolute; width: 100%; left: 4%; z-index: 4; background-color: transparent;">
-        <img src="@Player.Team?.LogoUrl" alt="F/A" style="width: 30px; padding: 4px;" />
+         style="position: absolute; width: 100%; left: 4%; z-index: 4; background-color: transparent;">
+        <img src="@Player.Team?.LogoUrl" alt="F/A" style="width: 32px; padding: 4px;" />
         <h2 style="margin: 0; padding-top: 1px; font-size: 1.3rem; color: var(--bs-white--2);">@Player.PlayerName</h2>
     </div>
 
@@ -19,11 +19,11 @@
 
     <!-- Portrait Layers -->
     <img src="@Player.CardURL" alt="Card Background"
-    style="position: absolute; top: 4%; left: 5%; width: 90%; height: 90%; z-index: 1;" />
+         style="position: absolute; top: 4%; left: 5%; width: 90%; height: 90%; z-index: 1;" />
     <img src="@Player.PhotoURL" alt="Player Photo"
-    style="position: absolute; top: 20%; width: 95%; height: 80%; z-index: 2; object-fit: cover; padding-left:5px" />
+         style="position: absolute; top: 20%; width: 95%; height: 80%; z-index: 2; object-fit: cover; padding-left:5px" />
     <img src="/images//CardUI/CardFrame_basic.png" alt="Card Frame"
-    style="position: absolute; width: 102%; height: 100%; z-index: 3;" />
+         style="position: absolute; width: 102%; height: 100%; z-index: 3;" />
 
     <!-- Footer -->
     <div style="position: absolute; bottom: 0; right: 0; width: 100%; left: 3%; padding: 10px; z-index: 4; background-color: transparent;">
@@ -33,7 +33,9 @@
                 if (i <= Player.SkillRating)
                 {
                     <i class="bi bi-star-fill" style="color: var(--bs-cream--1); font-size: 20px;"></i>
-                }else{
+                }
+                else
+                {
                     <i class="bi bi-star" style="color: var(--bs-cream--1); font-size: 20px;"> </i>
                 }
             }
@@ -60,4 +62,3 @@
     [Parameter]
     public Player Player { get; set; } = new Player();
 }
-

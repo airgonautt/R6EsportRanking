@@ -10,150 +10,151 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Create</PageTitle>
+<div style="padding: 0% 8% 0%; color: var(--bs-white--1)"> 
+    <h1>Create</h1>
 
-<h1>Create</h1>
+    <h2>Match</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
 
-<h2>Match</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm method="post" Model="Match" OnValidSubmit="AddMatch" FormName="create" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert" />
+                <div class="mb-3">
+                    <label>Team 1:</label>
+                    <InputSelect @bind-Value="Match.Team1ID" class="form-control">
+                        <option value="">Select Team 1</option>
+                        @foreach (var team in Teams)
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label>Team 1:</label>
-                <InputSelect @bind-Value="Match.Team1ID" class="form-control">
-                    <option value="">Select Team 1</option>
-                    @foreach (var team in Teams)
-                    {
-                        <option value="@team.TeamID">@team.TeamName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label>Team 2:</label>
+                    <InputSelect @bind-Value="Match.Team2ID" class="form-control">
+                        <option value="">Select Team 2</option>
+                        @foreach (var team in Teams)
+                        {
+                            <option value="@team.TeamID">@team.TeamName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label>Team 2:</label>
-                <InputSelect @bind-Value="Match.Team2ID" class="form-control">
-                    <option value="">Select Team 2</option>
-                    @foreach (var team in Teams)
-                    {
-                        <option value="@team.TeamID">@team.TeamName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label for="team1score" class="form-label">Team1Score:</label>
+                    <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
+                    <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
+                </div>
 
-            <div class="mb-3">
-                <label for="team1score" class="form-label">Team1Score:</label>
-                <InputNumber id="team1score" @bind-Value="Match.Team1Score" class="form-control" />
-                <ValidationMessage For="() => Match.Team1Score" class="text-danger" />
-            </div>
+                <div class="mb-3">
+                    <label for="team2score" class="form-label">Team2Score:</label>
+                    <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
+                    <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
+                </div>
 
-            <div class="mb-3">
-                <label for="team2score" class="form-label">Team2Score:</label>
-                <InputNumber id="team2score" @bind-Value="Match.Team2Score" class="form-control" />
-                <ValidationMessage For="() => Match.Team2Score" class="text-danger" />
-            </div>
+                <div class="mb-3">
+                    <label for="matchdate" class="form-label">MatchDate:</label>
+                    <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
+                    <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
+                </div>
 
-            <div class="mb-3">
-                <label for="matchdate" class="form-label">MatchDate:</label>
-                <InputDate id="matchdate" @bind-Value="Match.MatchDate" class="form-control" />
-                <ValidationMessage For="() => Match.MatchDate" class="text-danger" />
-            </div>
+                <div class="mb-3">
+                    <label for="matchURL" class="form-label">MatchURL:</label>
+                    <InputText id="matchURL" @bind-Value="Match.VODURL" class="form-control" />
+                    <ValidationMessage For="() => Match.VODURL" class="text-danger" />
+                </div>
 
-            <div class="mb-3">
-                <label for="matchURL" class="form-label">MatchURL:</label>
-                <InputText id="matchURL" @bind-Value="Match.VODURL" class="form-control" />
-                <ValidationMessage For="() => Match.VODURL" class="text-danger" />
-            </div>
+                <div class="mb-3">
+                    <label>Map:</label>
+                    <InputSelect @bind-Value="Match.MapID" class="form-control">
+                        <option value="">Select Map</option>
+                        @foreach (var map in Maps)
+                        {
+                            <option value="@map.MapID">@map.MapName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label>Map:</label>
-                <InputSelect @bind-Value="Match.MapID" class="form-control">
-                    <option value="">Select Map</option>
-                    @foreach (var map in Maps)
-                    {
-                        <option value="@map.MapID">@map.MapName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label>Tournament:</label>
+                    <InputSelect @bind-Value="Match.TournamentID" class="form-control">
+                        <option value="">Select Tournament</option>
+                        @foreach (var tournament in Tournaments)
+                        {
+                            <option value="@tournament.TournamentID">@tournament.TournamentName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label>Tournament:</label>
-                <InputSelect @bind-Value="Match.TournamentID" class="form-control">
-                    <option value="">Select Tournament</option>
-                    @foreach (var tournament in Tournaments)
-                    {
-                        <option value="@tournament.TournamentID">@tournament.TournamentName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label for="team1operatorban1">Team 1 Operator Ban 1:</label>
+                    <InputSelect @bind-Value="Match.Team1Ban1" class="form-control">
+                        <option value="">Select Operator Ban</option>
+                        @foreach (var ban in OperatorBans)
+                        {
+                            <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label for="team1operatorban1">Team 1 Operator Ban 1:</label>
-                <InputSelect @bind-Value="Match.Team1Ban1" class="form-control">
-                    <option value="">Select Operator Ban</option>
-                    @foreach (var ban in OperatorBans)
-                    {
-                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label for="team2operatorban1">Team 2 Operator Ban 1:</label>
+                    <InputSelect @bind-Value="Match.Team2Ban1" class="form-control">
+                        <option value="">Select Operator Ban</option>
+                        @foreach (var ban in OperatorBans)
+                        {
+                            <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label for="team2operatorban1">Team 2 Operator Ban 1:</label>
-                <InputSelect @bind-Value="Match.Team2Ban1" class="form-control">
-                    <option value="">Select Operator Ban</option>
-                    @foreach (var ban in OperatorBans)
-                    {
-                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label for="team1operatorban2">Team 1 Operator Ban 2:</label>
+                    <InputSelect @bind-Value="Match.Team1Ban2" class="form-control">
+                        <option value="">Select Operator Ban</option>
+                        @foreach (var ban in OperatorBans)
+                        {
+                            <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label for="team1operatorban2">Team 1 Operator Ban 2:</label>
-                <InputSelect @bind-Value="Match.Team1Ban2" class="form-control">
-                    <option value="">Select Operator Ban</option>
-                    @foreach (var ban in OperatorBans)
-                    {
-                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label for="team2operatorban2">Team 2 Operator Ban 2:</label>
+                    <InputSelect @bind-Value="Match.Team2Ban2" class="form-control">
+                        <option value="">Select Operator Ban</option>
+                        @foreach (var ban in OperatorBans)
+                        {
+                            <option value="@ban.OperatorBanID">@ban.OperatorName</option>
+                        }
+                    </InputSelect>
+                </div>
 
-            <div class="mb-3">
-                <label for="team2operatorban2">Team 2 Operator Ban 2:</label>
-                <InputSelect @bind-Value="Match.Team2Ban2" class="form-control">
-                    <option value="">Select Operator Ban</option>
-                    @foreach (var ban in OperatorBans)
-                    {
-                        <option value="@ban.OperatorBanID">@ban.OperatorName</option>
-                    }
-                </InputSelect>
-            </div>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox unchecked @bind-value="Match.isBo3" />
+                        is BO3?
+                    </label>
+                </div>
 
-            <div class="mb-3">
-                <label>
-                    <InputCheckbox unchecked @bind-value="Match.isBo3" />
-                    is BO3?
-                </label>
-            </div>
+                <div class="mb-3">
+                    <label>
+                        <InputCheckbox unchecked @bind-value="Match.isInternational" />
+                        is Interantional Match?
+                    </label>
+                </div>
 
-            <div class="mb-3">
-                <label>
-                    <InputCheckbox unchecked @bind-value="Match.isInternational" />
-                    is Interantional Match?
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Create</button>
-        </EditForm>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </EditForm>
+        </div>
     </div>
-</div>
 
-<div>
-    <a href="/matches">Back to List</a>
+    <div>
+        <a href="/matches">Back to List</a>
+    </div>
 </div>
 
 @code {

@@ -10,7 +10,7 @@
 @code {
 
     [Parameter] public Team? Team { get; set; }
-    [Parameter] public string PrimaryColor { get; set; } = "#fbac40"; // gold
+    [Parameter] public string PrimaryColor { get; set; } = "#fbac40"; // gold default
 
     private List<TeamEloChange> EloHistory = new();
     private LineChart lineChart = default!;
@@ -41,7 +41,6 @@
             {
                 new LineChartDataset
                 {
-                    Label = $"{Team?.TeamName} Elo History",
                     Data = data.Select(e => (double?)e.CurrentElo).ToList(),
                     BorderColor = PrimaryColor,
                     BackgroundColor = PrimaryColor,
@@ -51,7 +50,7 @@
                     PointHoverBorderColor = new List<string> { PrimaryColor },
                     PointRadius = new List<double> { 3 },
                     PointHoverRadius = new List<double> { 8 },
-                    BorderWidth = 2, 
+                    BorderWidth = 2,
                 }
             }
             };
@@ -67,7 +66,7 @@
             {
                 Size = 20,
                 Family = "'Kanit', sans-serif",
-                Style = "rgb(255, 255, 255)" 
+                Style = "rgb(255, 255, 255)"
             };
 
         options.Scales.Y.Min = 300;
@@ -84,4 +83,3 @@
         }
     }
 }
-

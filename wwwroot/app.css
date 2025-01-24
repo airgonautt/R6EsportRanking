@@ -157,7 +157,7 @@
 
 .pack-grid-item {
     display: flex;
-    flex-direction: column; /* Ensures consistent alignment for both packs and cards */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
@@ -192,6 +192,38 @@
         transform: translateY(-3px) scale(1.05) rotateX(15deg);
     }
 
+@media (max-width: 1024px) {
+    .cards-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+}
+@media (max-width: 992px) {
+    .custom-grid th, .custom-grid td {
+        font-size: 14px;
+        padding: 8px;
+    }
+}
+@media (max-width: 768px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    .custom-grid th, .custom-grid td {
+        font-size: 12px;
+        padding: 6px;
+        white-space: normal; 
+    }
+
+    .custom-grid {
+        font-size: 12px;
+    }
+}
+@media (max-width: 480px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+    
+}
 
 .team-card:hover {
     transform: scale(1.02);
@@ -204,7 +236,7 @@
     justify-content: center;
 }
 
-/* Variables for consistent styling */
+/* Color Variables */
 :root {
     --bs-white--1: #FFFFFF;
     --bs-white--2: #dedbd5;

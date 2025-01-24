@@ -8,26 +8,24 @@
 @implements IAsyncDisposable
 
 <PageTitle>Players</PageTitle>
+<div style="padding: 0% 8% 0%; color: var(--bs-white--1)">
 
-<h1>Players</h1>
+    <h1>Players</h1>
 
-<p>
-    <a href="players/create">Create New</a>
-</p>
-
-<!-- Flex container for players -->
-<div class="cards-container">
-    @if (players != null) {
-        @foreach (var player in players) {
-            <div class="pack-grid-item">
-                <PlayerCard Player="@player" />
-            </div>
+    <!-- Flex container for players -->
+    <div class="cards-container">
+        @if (players != null) {
+            @foreach (var player in players) {
+                <div class="pack-grid-item">
+                    <PlayerCard Player="@player" />
+                </div>
+            }
         }
-    }
 
-    else {
-        <p>Loading players...</p>
-    }
+        else {
+            <p>Loading players...</p>
+        }
+    </div>
 </div>
 
 @code {
@@ -39,7 +37,6 @@
     protected override async Task OnInitializedAsync() {
 
         context = DbFactory.CreateDbContext();
-
         players = await context.Players
             .Include(p => p.OriginCountry)
             .Include(p => p.Team)
@@ -52,7 +49,6 @@
     public async ValueTask DisposeAsync() {
 
         if (context != null) {
-
             await context.DisposeAsync();
 
         }

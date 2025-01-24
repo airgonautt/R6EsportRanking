@@ -8,25 +8,30 @@
 @inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
 @inject NavigationManager NavManager
 
-<div class="main-layout container" style="background-color: #343A40; border:8px solid; border-radius:5px; border-color: @(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor);">
+<div class="main-layout container" style="background-color: rgba(64, 71, 79, 0.98);
+    border: 8px solid; border-radius: 5px; 
+    border-color: @(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor);">
+    
     <!-- Header and Navigation -->
-    <div class="d-flex justify-content-between align-items-center mb-4" style="background-color:@(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor);
-            border-bottom-left-radius:15px; border-bottom-right-radius:15px;">
-
-        <!-- Back Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 fixed-header"
+         style="background-color:@(string.IsNullOrWhiteSpace(team?.PrimaryColor) ? "#fbac40" : team.PrimaryColor); 
+         border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
         <button class="custom-btn" @onclick="NavigateToLowerEloTeam" title="Back">
             <i class="bi bi-caret-left fa-6x"></i>
         </button>
 
-        <div class="d-flex align-items-center">
-            <img src="@team?.LogoUrl" alt="Team Logo" class="img-fluid me-3 team-logo" style="filter: drop-shadow(3px 3px 2px var(--bs-black--3))">
-            <div>
-                <h2 class="fw-bold text-white mb-1" style="filter: drop-shadow(3px 3px 1px var(--bs-black--3))">@team?.TeamName</h2>
-                <h4 class="text-warning mb-0" style="filter: drop-shadow(3px 3px 1px var(--bs-black--3))">@team?.CurrentElo RP</h4>
+        <div class="team-name-container">
+            <div class="team-logo-name">
+                <img src="@team?.LogoUrl" alt="Team Logo" class="img-fluid me-3 team-logo" 
+                     style="filter: drop-shadow(3px 3px 5px var(--bs-black--3))">
+                <h2 class="team-name fw-bold text-white mb-1" 
+                    style="filter: drop-shadow(3px 3px 2px var(--bs-black--3));">@team?.TeamName</h2>
             </div>
+            <h4 class="text-warning mb-0" style="filter: drop-shadow(3px 3px 4px var(--bs-black--3))">
+                @team?.CurrentElo RP
+            </h4>
         </div>
 
-        <!-- Next Button -->
         <button class="custom-btn" @onclick="NavigateToHigherEloTeam" title="Next">
             <i class="bi bi-caret-right fa-6x"></i>
         </button>
@@ -81,6 +86,7 @@
         var context = await DbFactory.CreateDbContextAsync();
         team = await context.Teams
         .Include(t => t.Players)
+        .ThenInclude(p => p.OriginCountry)
         .FirstOrDefaultAsync(team=>team.TeamName == teamName);
 
 
@@ -118,29 +124,31 @@
 }
 
 <style>
-    .custom-btn {
-        background-color: var(--bs-black--1);
-        border: 2px solid var(--bs-gold---1);
-        color: var(--bs-gold---1);
-        padding: 10px 15px;
-        font-size: 16px;
-        font-weight: bold;
-        border-radius: 5px;
-        display: inline-flex;
+    .team-name-container {
+        display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease-in-out;
+        width: 550px;
     }
 
-        .custom-btn:hover {
-            background-color: var(--bs-gold---1);
-            color: var(--bs-black--1);
-            border-color: var(--bs-black--1);
-        }
-
-    .custom-arrow {
-        margin: 0 5px;
-        font-size: 18px;
-        font-weight: bold;
+    .team-logo-name {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
+    .team-logo{
+        max-height: 120px;
+        width: auto;
+    }
+
+    .team-name {
+        font-size: calc(18px + 1vw); 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 350px; 
+    }
+
 </style>

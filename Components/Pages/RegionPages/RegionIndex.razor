@@ -8,93 +8,91 @@
 @implements IAsyncDisposable
 @rendermode InteractiveServer
 
-<PageTitle>Regions</PageTitle>
+<div style="padding: 0% 8% 1%;">
+    
+    <div class="container-fluid" style="background-color:rgba(29, 30, 33, 0.84);">
+        <h1 style="color: var(--bs-white--1)">Regions</h1>
 
-<h1>Regions</h1>
+        <div class="row h-28">
+            <!-- Map  -->
+            <div class="col-6 d-flex align-items-center justify-content-center">
+                <div class="map-container border rounded p-3 w-100 h-100">
+                    @foreach (var region in Regions)
+                    {
+                        <img src="/Images/Region/@region.RegionMap"
+                             alt="@region.RegionName Map"
+                             class="region-map"
+                             style="filter: @((HoveredRegionID == region.RegionID)
+                                     ? $"brightness(1.2) drop-shadow(1px 1px 2px {region.SocialUrl})"
+                                     : "brightness(0)");"
+                             data-region="@region.RegionID" />
+                    }
+                    <img src="/Images/Region/map.png"
+                         alt="World Map"
+                         class="region-map"
+                         style="filter: brightness(0);" />
+                </div>
+            </div>
 
-<div class="container-fluid d-flex">
-    <div class="row">
-        <!-- Map Section -->
-        <div class="col-md-4">
-            <div class="map-container">
-                @foreach (var region in Regions)
-                {
-                    <img src="/Images/Region/@region.RegionMap"
-                    alt="@region.RegionName Map"
-                    class="region-map"
-                    style="filter: @((HoveredRegionID == region.RegionID)
-                                ? $"brightness(1) drop-shadow(1px 1px 2px {region.SocialUrl})"
-                                : "brightness(0)");"
-                    data-region="@region.RegionID" />
-                }
-                <img src="/Images/Region/map.png"
-                alt="World Map"
-                class="region-map"
-                style="filter: brightness(0);" />
+            <!-- Regions List -->
+            <div class="col-3 d-flex align-items-center justify-content-center">
+                <table class="table table-hover w-70">
+                    <tbody style="padding: 0; margin-0;">
+                        @foreach (var region in Regions)
+                        {
+                            <tr @onmouseover="@(() => HoverRegion(region.RegionID))"
+                                @onmouseout="@ClearHoverRegion"
+                                style="background-color: @region.SocialUrl;">
+                                <td style="color: var(--bs-white--1); padding: 0; margin-0; font-size: 1rem; filter: drop-shadow(1px 1px 1px var(--bs-black--3));">
+                                    <img src="/Images/Logos/region.png" alt="@region.RegionName Logo"
+                                         class="region-logo me-2" />
+                                    @region.RegionName
+                                    @region.RegionalElo
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Right: Regions List -->
-        <div class="col-md-4">
-            <table class="table table-hover">
-                <tbody>
-                    @foreach (var region in Regions)
-                    {
-                        <tr @onmouseover="@(() => HoverRegion(region.RegionID))"
-                        @onmouseout="@ClearHoverRegion"
-                        style="background-color: @region.SocialUrl;">
-                            <td>
-                                <img src="/Images/Logos/region.png" alt="@region.RegionName Logo"
-                                class="region-logo me-3" />
-                                @region.RegionName
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+        <h1 style="color: var(--bs-white--1)">Region Metrics</h1>
 
-        <div class="col-md-4">
-            <DoughnutChart @ref="doughnutChart" Width="300" />
+        <div class="row h-72">
+            <!-- Doughnut Chart -->
+            <div class="col-6 d-flex align-items-center justify-content-center">
+                <div class="chart-container">
+                    <DoughnutChart @ref="doughnutChart" Width="300" />
+                </div>
+            </div>
+
+            <!-- Line Chart -->
+            <div class="col-6 d-flex flex-column align-items-center justify-content-center">
+                <LineChart @ref="lineChart" Width="500" Height="350" />
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container-fluid d-flex">
-    <!-- Bottom Section: Graph and Chart -->
-    <div class="row mt-5">
-        <!-- Line Graph -->
-        <div class="col-md-6">
-            <h3>Elo Changes Over Time</h3>
-            <LineChart @ref="lineChart" Width="500" Height="300" />
-        </div>
+    <!-- Region RP History -->
+    <div class="mt-4">
+        <Content>
+            <Grid TItem="RegionEloChange"
+                Class="table table-hover table-bordered table-striped custom-grid"
+                DataProvider="RegionEloChangesDataProvider"
+                AllowFiltering="true"
+                AllowPaging="true"
+                AllowSorting="true"
+                Responsive="true">
+            </Grid>
+        </Content>
     </div>
 </div>
-<!-- Region RP History -->
-<div class="mt-4">
-    <Accordion>
-        <AccordionItem Header="Regional RP History">
-            <Content>
-                <Grid TItem="RegionEloChange"
-                      Class="table table-hover table-bordered table-striped custom-grid"
-                      DataProvider="RegionEloChangesDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      AllowSorting="true"
-                      Responsive="true">
-                </Grid>
-            </Content>
-        </AccordionItem>
-    </Accordion>
-</div>
-
-
 
 @code {
     private List<Region> Regions = new();
     R6EsportsDbContext context = default!;
     private string? HoveredRegionID;
-    private List<RegionEloChange> eloHistory = new(); 
+    private List<RegionEloChange> eloHistory = new();
     private DoughnutChart doughnutChart = default!;
     private ChartData chartData = new();
 
@@ -105,8 +103,9 @@
     {
         context = DbFactory.CreateDbContext();
         Regions = await context.Regions
-            .OrderByDescending(r => r.RegionalElo)    
+            .OrderByDescending(r => r.RegionalElo)
             .ToListAsync();
+
         if (Regions.Any())
         {
             InitializeDoughnutChart();
@@ -114,14 +113,30 @@
         }
     }
 
-
     private void HoverRegion(string regionId)
     {
         HoveredRegionID = regionId;
     }
+
     private void ClearHoverRegion()
     {
         HoveredRegionID = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Small delay to ensure rendering is complete
+            await Task.Delay(500);
+
+            // Initialize the charts if the regions have been loaded
+            if (Regions.Any())
+            {
+                await doughnutChart.InitializeAsync(chartData, new DoughnutChartOptions { Responsive = true });
+                await lineChart.InitializeAsync(lineChartData, new LineChartOptions { Responsive = true });
+            }
+        }
     }
 
     private void InitializeDoughnutChart()
@@ -139,41 +154,17 @@
             }
             };
     }
-    private void UpdateDoughnutChart(string regionId)
-    {
-        var selectedRegion = Regions.FirstOrDefault(r => r.RegionID == regionId);
-        if (selectedRegion is not null)
-        {
-            chartData = new ChartData
-                {
-                    Labels = new List<string> { "Elo" },
-                    Datasets = new List<IChartDataset>
-                {
-                    new DoughnutChartDataset
-                    {
-                        Data = new List<double?> { selectedRegion.RegionalElo },
-                        BackgroundColor = new List<string> { selectedRegion.SocialUrl }
-                    }
-                }
-                };
-
-            doughnutChart?.UpdateAsync(chartData, new DoughnutChartOptions { Responsive = true });
-        }
-    }
 
     private async Task InitializeLineChartAsync()
     {
-        
-        // Fetching Elo change data from database
         eloHistory = await context.RegionEloChanges
             .Include(h => h.Region)
             .OrderBy(h => h.ChangeDate)
             .ToListAsync();
 
-        // Grouping by RegionID for dataset creation
         var groupedData = eloHistory.GroupBy(h => h.RegionID);
-
         var datasets = new List<IChartDataset>();
+
         foreach (var group in groupedData)
         {
             var region = Regions.FirstOrDefault(r => r.RegionID == group.Key);
@@ -200,29 +191,6 @@
             };
     }
 
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (Regions.Any())
-            {
-                await doughnutChart.InitializeAsync(chartData, new DoughnutChartOptions
-                    {
-                        Responsive = true
-                    });
-
-                await lineChart.InitializeAsync(lineChartData, new LineChartOptions
-                    {
-                        Responsive = true
-
-                    });
-            }
-            
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
     private async Task<GridDataProviderResult<RegionEloChange>> RegionEloChangesDataProvider(GridDataProviderRequest<RegionEloChange> request)
     {
         var query = eloHistory.AsQueryable();
@@ -236,7 +204,7 @@
         }
         else
         {
-            query = query.OrderByDescending(item => item.ChangeDate); // Default render on load
+            query = query.OrderByDescending(item => item.ChangeDate);
         }
 
         var totalCount = query.Count();
@@ -249,8 +217,12 @@
             });
     }
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        await context.DisposeAsync();
+    }
 }
+
 
 <style>
     .map-container {
@@ -270,7 +242,7 @@
     }
 
     .regions-list {
-        width: 40%; 
+        width: 40%;
         display: flex;
         flex-direction: column;
         gap: 1rem;
@@ -281,11 +253,13 @@
         font-weight: bold;
         cursor: pointer;
         transition: color 0.2s ease;
+        margin: 0;
+        padding: 0;
     }
 
-    .region-item:hover {
-        color: var(--bs-gold---1);
-    }
+        .region-item:hover {
+            color: var(--bs-gold---1);
+        }
 
     .region-logo {
         width: 40px;
@@ -295,5 +269,8 @@
 
     .chart-container {
         text-align: center;
+    }
+    .table{
+        --bs-table-hover-bg: rrgba(13, 13, 12, 0.06);
     }
 </style>
