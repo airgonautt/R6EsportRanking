@@ -1,0 +1,54 @@
+﻿@page "/upcomingmatches/details"
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>UpcomingMatch</h2>
+    <hr />
+    @if (upcomingmatch is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">MatchName</dt>
+            <dd class="col-sm-10">@upcomingmatch.MatchName</dd>
+            <dt class="col-sm-2">VODURL</dt>
+            <dd class="col-sm-10">@upcomingmatch.VODURL</dd>
+            <dt class="col-sm-2">Team1ID</dt>
+            <dd class="col-sm-10">@upcomingmatch.Team1ID</dd>
+            <dt class="col-sm-2">Team2ID</dt>
+            <dd class="col-sm-10">@upcomingmatch.Team2ID</dd>
+            <dt class="col-sm-2">MatchDate</dt>
+            <dd class="col-sm-10">@upcomingmatch.MatchDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/upcomingmatches/edit?futurematchid={upcomingmatch.FutureMatchID}")">Edit</a> |
+            <a href="@($"/upcomingmatches")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private UpcomingMatch? upcomingmatch;
+
+    [SupplyParameterFromQuery]
+    private int FutureMatchID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        upcomingmatch = await context.UpcomingMatches.FirstOrDefaultAsync(m => m.FutureMatchID == FutureMatchID);
+
+        if (upcomingmatch is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

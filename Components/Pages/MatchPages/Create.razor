@@ -186,19 +186,16 @@
         using var context = DbFactory.CreateDbContext();
         using var transaction = await context.Database.BeginTransactionAsync();
 
-        // Fetch teams
         var team1 = await context.Teams.FindAsync(Match.Team1ID);
         var team2 = await context.Teams.FindAsync(Match.Team2ID);
-
         Match.MatchName = $"{team1.TeamName} vs {team2.TeamName}";
 
-        //initialized
+        //upload to db
         context.Matches.Add(Match);
         await context.SaveChangesAsync();
 
         //elo logic+history
         await UpdateEloAndSaveHistoryAsync(context, team1, team2, Match);
-
         //ban history
          await SaveOperatorBansAsync(context, Match.MatchID);
 

@@ -1,0 +1,109 @@
+﻿@page "/upcomingmatches/edit"
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>UpcomingMatch</h2>
+<hr />
+@if (UpcomingMatch is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="UpcomingMatch" OnValidSubmit="UpdateUpcomingMatch" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="UpcomingMatch.FutureMatchID" value="@UpcomingMatch.FutureMatchID" />
+                <div class="mb-3">
+                    <label for="matchname" class="form-label">MatchName:</label>
+                    <InputText id="matchname" @bind-Value="UpcomingMatch.MatchName" class="form-control" />
+                    <ValidationMessage For="() => UpcomingMatch.MatchName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="vodurl" class="form-label">VODURL:</label>
+                    <InputText id="vodurl" @bind-Value="UpcomingMatch.VODURL" class="form-control" />
+                    <ValidationMessage For="() => UpcomingMatch.VODURL" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="team1id" class="form-label">Team1ID:</label>
+                    <InputNumber id="team1id" @bind-Value="UpcomingMatch.Team1ID" class="form-control" />
+                    <ValidationMessage For="() => UpcomingMatch.Team1ID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="team2id" class="form-label">Team2ID:</label>
+                    <InputNumber id="team2id" @bind-Value="UpcomingMatch.Team2ID" class="form-control" />
+                    <ValidationMessage For="() => UpcomingMatch.Team2ID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="matchdate" class="form-label">MatchDate:</label>
+                    <InputDate id="matchdate" @bind-Value="UpcomingMatch.MatchDate" class="form-control" />
+                    <ValidationMessage For="() => UpcomingMatch.MatchDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/upcomingmatches">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int FutureMatchID { get; set; }
+
+    [SupplyParameterFromForm]
+    private UpcomingMatch? UpcomingMatch { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        UpcomingMatch ??= await context.UpcomingMatches.FirstOrDefaultAsync(m => m.FutureMatchID == FutureMatchID);
+
+        if (UpcomingMatch is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateUpcomingMatch()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(UpcomingMatch!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UpcomingMatchExists(UpcomingMatch!.FutureMatchID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/upcomingmatches");
+    }
+
+    private bool UpcomingMatchExists(int futurematchid)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.UpcomingMatches.Any(e => e.FutureMatchID == futurematchid);
+    }
+}

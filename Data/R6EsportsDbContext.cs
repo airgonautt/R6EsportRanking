@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using R6Ranking.Components.Splashable;
 using R6Ranking.Migrations;
 using R6Ranking.Models;
 
@@ -20,6 +21,8 @@ public class R6EsportsDbContext : DbContext {
     public DbSet<Trophy> Trophies { get; set; }
     public DbSet<OriginCountry> Countries { get; set; }
     public DbSet<MapStat> MapStats { get; set; }
+    public DbSet<TeamRivalry> TeamRivalries { get; set; }
+    public DbSet<UpcomingMatch> UpcomingMatches { get; set; }
 
     public DbSet<UserAccount> UserAccounts { get; set; }
     public DbSet<UserAccountPolicy> UserAccountsPolicies { get; set; }
@@ -34,6 +37,21 @@ public class R6EsportsDbContext : DbContext {
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
+
+        //UPCOMING MATCHES
+        modelBuilder.Entity<UpcomingMatch>(entity => {
+            entity.HasKey(m => m.FutureMatchID);
+
+            entity.HasOne(m => m.Team1)
+                .WithMany()
+                .HasForeignKey(m => m.Team1ID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(m => m.Team2)
+                .WithMany()
+                .HasForeignKey(m => m.Team2ID)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
 
         //MATCH RELATIONSHIPS
         modelBuilder.Entity<Match>(entity => {

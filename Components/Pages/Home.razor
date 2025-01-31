@@ -21,14 +21,14 @@
                 </CardHeader>
                 <CardBody class="text-center" style="padding: 5px;">
                     <img src="Images/Teams/teamGraphs2023.png"
-                         alt="Team Metrics Graph"
-                         class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
+                    alt="Team Metrics Graph"
+                    class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
                 </CardBody>
                 <CardFooter style="padding: 5px 10px;">
                     <p style="color: var(--bs-white--1); font-size: 0.9rem; margin-bottom: 5px;">Study and compare team statistics.</p>
                     <a class="btn btn-outline-secondary btn-sm"
-                       style="color: var(--bs-white--1); font-size: 0.85rem;"
-                       href="/teams/compare">Learn More</a>
+                    style="color: var(--bs-white--1); font-size: 0.85rem;"
+                    href="/teams/compare">Learn More</a>
                 </CardFooter>
             </Card>
         </div>
@@ -41,14 +41,14 @@
                 </CardHeader>
                 <CardBody class="text-center" style="padding: 5px;">
                     <img src="Images/Players/players.png"
-                         alt="Player Draft Image"
-                         class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
+                    alt="Player Draft Image"
+                    class="img-fluid rounded mb-2" style="object-fit: contain; max-height: 250px;" />
                 </CardBody>
                 <CardFooter style="padding: 5px 10px;">
                     <p style="color: var(--bs-white--1); font-size: 0.9rem; margin-bottom: 5px;">Collect, track, and upgrade player cards.</p>
                     <a class="btn btn-outline-secondary btn-sm"
-                       style="color: var(--bs-white--1); font-size: 0.85rem;"
-                       href="/players/draft">Try it now</a>
+                    style="color: var(--bs-white--1); font-size: 0.85rem;"
+                    href="/players/draft">Try it now</a>
                 </CardFooter>
             </Card>
         </div>
@@ -71,7 +71,7 @@
                                             <span class="me-3" style="font-size: 1.2rem; font-weight: bold;">@(@Teams.IndexOf(team) + 1)</span>
                                             <!-- Team Logo -->
                                             <img src="@team.LogoUrl" alt="@team.TeamName Logo"
-                                                 class="team-logo me-3 rounded" style="height: 40px; width: 40px;" />
+                                            class="team-logo me-3 rounded" style="height: 40px; width: 40px;" />
                                             <!-- Team Name -->
                                             <span class="me-auto" style="font-size: 1.2rem; font-weight: 500;">@team.TeamName</span>
                                             <!-- Current Elo -->
@@ -89,21 +89,61 @@
             </Card>
         </div>
 
-        <!-- Recent Matches -->
-        <div class="grid-item b6x4">
-            <h2>Recent Matches</h2>
-            <table class="table table-hover custom-leaderboard-table">
-                <tbody>
-                    @foreach (var match in Matches)
-                    {
-                        <tr @onclick="() => NavigateToMatch(match)">
-                            <td>
-                                
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <!-- Future Matches -->
+        <div class="grid-item b6x6" style="text-align: center; padding: 5px;">
+        <Card style="padding: 5px;">
+            <CardHeader style="padding: 5px 10px;">
+                <h4 class="mb-1" style="color: var(--bs-white--1); font-size: 1.5rem;">Upcoming Matches</h4>
+            </CardHeader>
+            <CardBody class="text-center" style="padding: 5px;">
+                <table class="table table-hover custom-leaderboard-table" style="margin-bottom: 5px; width: 100%;">
+                    <tbody>
+                        @foreach (var match in FutureMatches)
+                        {
+
+
+                            <tr style="cursor: pointer;">
+                                <td style="padding: 10px;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <!-- Date & Time -->
+                                        <div class="d-flex flex-column align-items-center">
+                                            <span style="font-size: 0.8rem; color: var(--bs-white--2);">
+                                                @match.MatchDate.ToString("MMM d, yyyy")
+                                            </span>
+                                            <span class="fw-bold fst-italic" style="font-size: 1.2rem; color: var(--bs-white--1);">
+                                                @match.MatchDate.ToString("HH:mm")
+                                            </span>
+                                        </div>
+
+                                        <!-- Team 1 -->
+                                            <div class="d-flex flex-column align-items-center" @onclick="() => NavigateToTeam(match.Team1)">
+                                            <span style="font-size: 0.9rem; color: var(--bs-white--1);">
+                                                @(match.Team1?.TeamName ?? "Unknown")
+                                            </span>
+                                            <img src="@(match.Team1?.LogoUrl ?? "default-logo.png")" alt="Team 1 Logo"
+                                                 class="rounded" style="height: 40px; width: 40px; object-fit: contain;" />
+                                        </div>
+
+                                        <!-- VS -->
+                                        <span class="fw-bold" style="font-size: 1.5rem; color: var(--bs-white--1);">VS</span>
+
+                                        <!-- Team 2 -->
+                                            <div class="d-flex flex-column align-items-center" @onclick="() => NavigateToTeam(match.Team2)">
+                                            <span style="font-size: 0.9rem; color: var(--bs-white--1);">
+                                                @(match.Team2?.TeamName ?? "Unknown")
+                                            </span>
+                                            <img src="@(match.Team2?.LogoUrl ?? "default-logo.png")" alt="Team 2 Logo"
+                                                 class="rounded" style="height: 40px; width: 40px; object-fit: contain;" />
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </CardBody>
+        </Card>
         </div>
 
         <!-- Ubisoft Newsletter -->
@@ -134,6 +174,7 @@
     private List<Team> Teams = new List<Team>();
     private List<Match> Matches = new List<Match>();
     private Dictionary<int, string> TeamLogoCache = new();
+    private List<UpcomingMatch> FutureMatches = new List<UpcomingMatch>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,6 +190,14 @@
             .OrderByDescending(m => m.MatchDate)
             .Take(8)
             .ToListAsync();
+
+        FutureMatches = await context.UpcomingMatches
+            .OrderBy(m => m.MatchDate)
+            .Include(t => t.Team1)
+            .Include(t => t.Team2)
+            .Take(8)
+            .ToListAsync();
+
     }
 
     private void NavigateToTeam(Team team)

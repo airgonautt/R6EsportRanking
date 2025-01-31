@@ -19,10 +19,10 @@ builder.Services.AddBlazorBootstrap();
 
 /* DATABASE */
 builder.Services.AddDbContext<R6EsportsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")));
 
 builder.Services.AddDbContextFactory<R6EsportsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING")),
     ServiceLifetime.Transient);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -36,10 +36,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/access-denied";
     });
 
-builder.Services.AddAuthorization(config =>{
+builder.Services.AddAuthorization(config => {
     foreach (var userPolicy in UserPolicy.GetPolicies())
-        config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true")); 
-    });
+        config.AddPolicy(userPolicy, cfg => cfg.RequireClaim(userPolicy, "true"));
+});
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => {

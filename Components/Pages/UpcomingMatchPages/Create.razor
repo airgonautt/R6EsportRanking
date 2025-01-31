@@ -1,0 +1,86 @@
+﻿@page "/upcomingmatches/create"
+@using Microsoft.EntityFrameworkCore
+@using R6Ranking.Models
+@inject IDbContextFactory<R6Ranking.Data.R6EsportsDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>UpcomingMatch</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="UpcomingMatch" OnValidSubmit="AddUpcomingMatch" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+     
+            <div class="mb-3">
+                <label for="vodurl" class="form-label">VODURL:</label> 
+                <InputText id="vodurl" @bind-Value="UpcomingMatch.VODURL" class="form-control" /> 
+                <ValidationMessage For="() => UpcomingMatch.VODURL" class="text-danger" /> 
+            </div>         
+            
+            <div class="mb-3">
+                <label>Team 1:</label>
+                <InputSelect @bind-Value="UpcomingMatch.Team1ID" class="form-control">
+                    <option value="">Select Team 1</option>
+                    @foreach (var team in Teams)
+                    {
+                        <option value="@team.TeamID">@team.TeamName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label>Team 2:</label>
+                <InputSelect @bind-Value="UpcomingMatch.Team2ID" class="form-control">
+                    <option value="">Select Team 2</option>
+                    @foreach (var team in Teams)
+                    {
+                        <option value="@team.TeamID">@team.TeamName</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="mb-3">
+                <label for="matchdate" class="form-label">MatchDate:</label> 
+                <InputDate id="matchdate" @bind-Value="UpcomingMatch.MatchDate" class="form-control" /> 
+                <ValidationMessage For="() => UpcomingMatch.MatchDate" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/upcomingmatches">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private UpcomingMatch UpcomingMatch { get; set; } = new();
+    private List<Team> Teams { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Teams = await context.Teams.ToListAsync();
+    }
+
+    private async Task AddUpcomingMatch()
+    {
+        using var context = DbFactory.CreateDbContext();
+
+        var team1 = await context.Teams.FindAsync(UpcomingMatch.Team1ID);
+        var team2 = await context.Teams.FindAsync(UpcomingMatch.Team2ID);
+        UpcomingMatch.MatchName = $"{team1.TeamName} vs {team2.TeamName}";
+
+        context.UpcomingMatches.Add(UpcomingMatch);
+        await context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/upcomingmatches");
+    }
+}
